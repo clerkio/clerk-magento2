@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Clerk_Clerk::css/powerstep.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Clerk\Clerk\Block\Powerstep" name="clerk.cart.added" template="Clerk_Clerk::added.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

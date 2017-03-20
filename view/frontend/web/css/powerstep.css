@@ -1,0 +1,15 @@
+.powerstep-success {
+    overflow: hidden;
+}
+
+.powerstep-product {
+    float: left;
+}
+
+.powerstep-product img {
+    vertical-align: top;
+}
+
+.powerstep-actions {
+    float: right;
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <!-- Remove default results -->
+            <referenceBlock name="search.result" remove="true"/>
+            <!-- Insert Clerk results -->
+            <block class="Clerk\Clerk\Block\Result" name="clerk.search.result" template="Clerk_Clerk::result.phtml" cacheable="false" ifconfig="clerk/search/enabled"/>
+        </referenceContainer>
+    </body>
+</page>

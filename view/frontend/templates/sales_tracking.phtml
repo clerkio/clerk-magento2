@@ -1,0 +1,11 @@
+<?php
+/** @var \Clerk\Clerk\Block\SalesTracking $block */
+?>
+<span
+    class="clerk"
+    data-api="log/sale"
+
+    data-sale="<?php echo $block->getIncrementId(); ?>"
+    data-email="<?php echo $block->getCustomerEmail(); ?>"
+    data-products='<?php echo $block->escapeJsQuote($block->getProducts()); ?>'>
+</span>

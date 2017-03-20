@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <clerk>
+            <general>
+                <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+            </general>
+            <product_synchronization>
+                <use_realtime_updates>1</use_realtime_updates>
+                <fields>name,description,price,list_price,image,url,categories,brand,sku,age,on_sale</fields>
+                <saleable_only>1</saleable_only>
+                <visibility>4</visibility>
+            </product_synchronization>
+            <search>
+                <enabled>0</enabled>
+            </search>
+            <live_search>
+                <enabled>0</enabled>
+            </live_search>
+            <search>
+                <enabled>0</enabled>
+            </search>
+            <powerstep>
+                <enabled>0</enabled>
+                <type>1</type>
+            </powerstep>
+        </clerk>
+    </default>
+</config>

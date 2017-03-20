@@ -1,0 +1,31 @@
+<?php
+/** @var \Clerk\Clerk\Block\Powerstep $block */
+?>
+<div class="powerstep-success">
+    <div class="powerstep-product">
+        <img src="<?php echo $block->getImageUrl(); ?>">
+            <?php echo __('You added %1 to your shopping cart.', $block->escapeHtml($block->getProduct()->getName())); ?>
+    </div>
+    <div class="powerstep-actions">
+        <button class="action"
+                data-mage-init='{"redirectUrl":{"url":"<?php echo $block->getCartUrl(); ?>"}}'
+                type="button" title="<?php echo __('Cart') ?>">
+            <span><?php echo __('Cart') ?></span>
+        </button>
+        <button class="action primary"
+                data-mage-init='{"redirectUrl":{"url":"<?php echo $block->getCheckoutUrl(); ?>"}}'
+                type="button" title="<?php echo __('Proceed to Checkout'); ?>">
+            <span><?php echo __('Proceed to Checkout'); ?></span>
+        </button>
+    </div>
+
+    <div class="powerstep-teampltes">
+        <?php foreach ($block->getTemplates() as $template) : ?>
+            <span class="clerk"
+                  data-template="@<?php echo $template; ?>"
+                  data-product="<?php echo $block->getProduct()->getId(); ?>"
+                  data-category="<?php echo $block->getProduct()->getCategoryId(); ?>"
+            ></span>
+        <?php endforeach; ?>
+    </div>
+</div>

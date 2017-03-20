@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="standard">
+        <route id="clerk" frontName="clerk">
+            <module name="Clerk_Clerk"/>
+        </route>
+        <route id="checkout">
+            <module name="Clerk_Clerk" after="Magento_Checkout"/>
+        </route>
+    </router>
+</config>
