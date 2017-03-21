@@ -19,7 +19,7 @@
     "magento/module-customer": "100.1.*",
     "magento/module-catalog": "101.0.*",
     "magento/module-quote": "100.1.*",
-    "magento/module-theme": "100.1.*",
+    "magento/module-theme": "100.1.*"
   },
   "type": "magento2-module",
   "version": "0.9.0",
