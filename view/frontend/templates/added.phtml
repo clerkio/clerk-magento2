@@ -18,14 +18,13 @@
             <span><?php echo __('Proceed to Checkout'); ?></span>
         </button>
     </div>
-
-    <div class="powerstep-teampltes">
-        <?php foreach ($block->getTemplates() as $template) : ?>
-            <span class="clerk"
-                  data-template="@<?php echo $template; ?>"
-                  data-product="<?php echo $block->getProduct()->getId(); ?>"
-                  data-category="<?php echo $block->getProduct()->getCategoryId(); ?>"
-            ></span>
-        <?php endforeach; ?>
-    </div>
+</div>
+<div class="powerstep-templates">
+    <?php foreach ($block->getTemplates() as $template) : ?>
+        <span class="clerk"
+              data-template="@<?php echo $template; ?>"
+              data-product="<?php echo $block->getProduct()->getId(); ?>"
+              data-category="<?php echo $block->getProduct()->getCategoryId(); ?>"
+        ></span>
+    <?php endforeach; ?>
 </div>

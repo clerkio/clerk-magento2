@@ -27,7 +27,7 @@
                 </field>
                 <field id="fields" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Fields</label>
-                    <comment>A comma separated list fields to include in real-time updates</comment>
+                    <comment>A comma separated list fields to sync to Clerk.io</comment>
                 </field>
                 <field id="saleable_only" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Only synchronize saleable products</label>

@@ -34,5 +34,6 @@ class Config
      * Powerstep configuration
      */
     const XML_PATH_POWERSTEP_ENABLED = 'clerk/powerstep/enabled';
+    const XML_PATH_POWERSTEP_TYPE = 'clerk/powerstep/type';
     const XML_PATH_POWERSTEP_TEMPLATES = 'clerk/powerstep/templates';
 }
