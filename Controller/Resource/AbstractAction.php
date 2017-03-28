@@ -225,7 +225,7 @@ abstract class AbstractAction extends Action
                         'code'        => 500,
                         'message'     => 'An exception occured',
                         'description' => $e->getMessage(),
-                        'how_to_fix'  => 'Please report this error to xxx@clerk.io',
+                        'how_to_fix'  => 'Please report this error to the clerk support team',
                     ])
                 );
         }

@@ -37,12 +37,23 @@ class Product extends AbstractAction
     {
         //Add price fieldhandler
         $this->addFieldHandler('price', function($item) {
-            return $item->getFinalPrice();
+            try {
+                $price = $item->getFinalPrice();
+                return $price;
+            } catch(\Exception $e) {
+                return 0;
+            }
+//            return $item->getFinalPrice();
         });
 
         //Add list_price fieldhandler
         $this->addFieldHandler('list_price', function($item) {
-           return $item->getPrice();
+            try {
+                $price = $item->getPrice();
+                return $price;
+            } catch(\Exception $e) {
+                return 0;
+            }
         });
 
         //Add image fieldhandler
@@ -73,7 +84,14 @@ class Product extends AbstractAction
 
         //Add on_sale fieldhandler
         $this->addFieldHandler('on_sale', function($item) {
-            return $item->getFinalPrice() < $item->getPrice();
+            try {
+                $finalPrice = $item->getFinalPrice();
+                $price = $item->getPrice();
+
+                return $finalPrice < $price;
+            } catch (\Exception $e) {
+                return false;
+            }
         });
     }
 

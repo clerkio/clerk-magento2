@@ -22,7 +22,7 @@
     "magento/module-theme": "100.1.*"
   },
   "type": "magento2-module",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "license": [
     "OSL-3.0",
     "AFL-3.0"
