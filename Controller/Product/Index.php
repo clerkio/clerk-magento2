@@ -1,7 +1,8 @@
 <?php
 
-namespace Clerk\Clerk\Controller\Resource;
+namespace Clerk\Clerk\Controller\Product;
 
+use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\App\Action\Context;
@@ -9,7 +10,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Psr\Log\LoggerInterface;
 
-class Product extends AbstractAction
+class Index extends AbstractAction
 {
     protected $fieldMap = [
         'entity_id' => 'id',

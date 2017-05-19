@@ -10,6 +10,7 @@
   "require": {
     "php": "~5.6.5|7.0.2|7.0.4|~7.0.6",
     "magento/framework": "100.1.*",
+    "magento/magento-composer-installer": "*",
     "magento/module-config": "100.1.*",
     "magento/module-directory": "100.1.*",
     "magento/module-checkout": "100.1.*",
@@ -21,9 +22,10 @@
     "magento/module-theme": "100.1.*"
   },
   "type": "magento2-module",
-  "version": "0.9.2",
+  "version": "1.0.0",
   "license": [
-    "MIT"
+    "OSL-3.0",
+    "AFL-3.0"
   ],
   "autoload": {
     "files": [

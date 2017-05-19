@@ -5,7 +5,8 @@
 <script type="text/javascript">
     window.clerkAsyncInit = function() {
         Clerk.config({
-            key: '<?php echo $block->escapeJsQuote($block->getPublicKey()); ?>'
+            key: '<?php echo $block->escapeJsQuote($block->getPublicKey()); ?>',
+            collect_email: <?php echo $block->getCollectionEmails(); ?>
         });
     };
 

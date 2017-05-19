@@ -1,13 +1,14 @@
 <?php
 
-namespace Clerk\Clerk\Controller\Resource;
+namespace Clerk\Clerk\Controller\Customer;
 
+use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
 use Psr\Log\LoggerInterface;
 
-class Customer extends AbstractAction
+class Index extends AbstractAction
 {
     protected $fieldMap = [
         'entity_id' => 'id',

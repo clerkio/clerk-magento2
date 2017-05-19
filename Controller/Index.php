@@ -1,6 +1,6 @@
 <?php
 
-namespace Clerk\Clerk\Controller\Resource;
+namespace Clerk\Clerk\Controller;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\ResponseInterface;

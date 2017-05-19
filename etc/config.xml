@@ -14,6 +14,7 @@
             </general>
             <product_synchronization>
                 <use_realtime_updates>1</use_realtime_updates>
+                <collect_emails>1</collect_emails>
                 <fields>name,description,price,list_price,image,url,categories,brand,sku,age,on_sale</fields>
                 <saleable_only>1</saleable_only>
                 <visibility>4</visibility>
