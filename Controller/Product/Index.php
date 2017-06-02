@@ -51,7 +51,7 @@ class Index extends AbstractAction
         $this->addFieldHandler('list_price', function($item) {
             try {
                 $price = $item->getPrice();
-                return $price;
+                return (float) $price;
             } catch(\Exception $e) {
                 return 0;
             }
