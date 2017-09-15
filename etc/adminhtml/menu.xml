@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Clerk_Clerk::report_clerkroot" title="Clerk" translate="title" module="Clerk_Clerk" sortOrder="90" parent="Magento_Reports::report" resource="Clerk_Clerk::clerkroot"/>
+        <add id="Clerk_Clerk::report_clerkroot_dashboard" title="Dashboard" translate="title" module="Clerk_Clerk" sortOrder="10" parent="Clerk_Clerk::report_clerkroot" action="clerk/dashboard/index" resource="Clerk_Clerk::dashboard"/>
+        <add id="Clerk_Clerk::report_clerkroot_search_insights" title="Search Insights" translate="title" module="Clerk_Clerk" sortOrder="20" parent="Clerk_Clerk::report_clerkroot" action="clerk/dashboard/search" resource="Clerk_Clerk::dashboard"/>
+        <add id="Clerk_Clerk::report_clerkroot_recommendations_insights" title="Recommendations Insights" translate="title" module="Clerk_Clerk" sortOrder="30" parent="Clerk_Clerk::report_clerkroot" action="clerk/dashboard/recommendations" resource="Clerk_Clerk::dashboard"/>
+        <add id="Clerk_Clerk::report_clerkroot_email_insights" title="Email Insights" translate="title" module="Clerk_Clerk" sortOrder="40" parent="Clerk_Clerk::report_clerkroot" action="clerk/dashboard/email" resource="Clerk_Clerk::dashboard"/>
+        <add id="Clerk_Clerk::report_clerkroot_audience_insights" title="Audience Insights" translate="title" module="Clerk_Clerk" sortOrder="50" parent="Clerk_Clerk::report_clerkroot" action="clerk/dashboard/audience" resource="Clerk_Clerk::dashboard"/>
+    </menu>
+</config>

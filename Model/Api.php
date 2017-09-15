@@ -59,12 +59,12 @@ class Api
      *
      * @param $productIds
      */
-    public function removeProduct($productIds)
+    public function removeProduct($productId)
     {
         $params = [
             'key'          => $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
             'private_key'  => $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
-            'products'     => $productIds,
+            'products'     => $productId,
         ];
 
         $this->get('remove', $params);
