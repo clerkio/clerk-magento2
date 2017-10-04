@@ -84,7 +84,7 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
 
                 foreach ($fields as $field) {
                     if (! isset($productItem[$field])) {
-                        $productItem[$field] = $product->getData[$field];
+                        $productItem[$field] = $product->getData($field);
                     }
                 }
 
