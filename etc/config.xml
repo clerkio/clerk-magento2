@@ -14,23 +14,23 @@
             </general>
             <product_synchronization>
                 <use_realtime_updates>1</use_realtime_updates>
-                <collect_emails>1</collect_emails>
+                <collect_emails>0</collect_emails>
                 <fields>name,description,price,list_price,image,url,categories,brand,sku,age,on_sale</fields>
                 <saleable_only>1</saleable_only>
                 <visibility>4</visibility>
             </product_synchronization>
             <search>
                 <enabled>0</enabled>
+                <template>search-page</template>
             </search>
             <live_search>
                 <enabled>0</enabled>
+                <template>live-search</template>
             </live_search>
-            <search>
-                <enabled>0</enabled>
-            </search>
             <powerstep>
                 <enabled>0</enabled>
                 <type>1</type>
+                <template>power-step-others-also-bought</template>
             </powerstep>
         </clerk>
     </default>

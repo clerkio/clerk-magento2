@@ -49,7 +49,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="template" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Template</label>
+                    <label>Content</label>
                     <depends>
                         <field id="*/*/enabled">1</field>
                     </depends>
@@ -62,7 +62,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="template" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Template</label>
+                    <label>Content</label>
                     <depends>
                         <field id="*/*/enabled">1</field>
                     </depends>
@@ -82,8 +82,8 @@
                     </depends>
                 </field>
                 <field id="templates" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Templates</label>
-                    <comment>A comma separated list of clerk templates to render</comment>
+                    <label>Content</label>
+                    <comment>A comma separated list of clerk content to render</comment>
                     <depends>
                         <field id="*/*/enabled">1</field>
                     </depends>
