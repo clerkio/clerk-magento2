@@ -6,6 +6,7 @@ use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\ObjectManagerInterface;
@@ -20,17 +21,28 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
     /**
      * @var ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
+
+    /**
+     * @var ManagerInterface
+     */
+    protected $eventManager;
 
     /**
      * @var Api
      */
     protected $api;
 
-    public function __construct(ObjectManagerInterface $objectManager, ScopeConfigInterface $scopeConfig, Api $api)
+    public function __construct(
+        ObjectManagerInterface $objectManager,
+        ScopeConfigInterface $scopeConfig,
+        ManagerInterface $eventManager,
+        Api $api
+    )
     {
         $this->objectManager = $objectManager;
-        $this->_scopeConfig = $scopeConfig;
+        $this->scopeConfig = $scopeConfig;
+        $this->eventManager = $eventManager;
         $this->api = $api;
     }
 
@@ -42,19 +54,19 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        if ($this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED)) {
+        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED)) {
             /** @var Product $product */
             $product = $observer->getProduct();
 
             if ($product && $product->getId()) {
 
                 //Cancel if product visibility is not as defined
-                if ($product->getVisibility() != $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY)) {
+                if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY)) {
                     return;
                 }
 
                 //Cancel if product is not saleable
-                if ($this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
                     if (!$product->isSalable()) {
                         return;
                     }
@@ -79,7 +91,7 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
                 /**
                  * @todo Refactor to use fieldhandlers or similar
                  */
-                $configFields = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_FIELDS);
+                $configFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_FIELDS);
                 $fields = explode(',', $configFields);
 
                 foreach ($fields as $field) {
@@ -88,7 +100,12 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
                     }
                 }
 
-                $this->api->addProduct($productItem);
+                $productObject = new \Magento\Framework\DataObject();
+                $productObject->setData($productItem);
+
+                $this->eventManager->dispatch('clerk_product_sync_before', ['product' => $productObject]);
+
+                $this->api->addProduct($productObject->toArray());
             }
         }
     }

@@ -16,7 +16,7 @@ class Api
     /**
      * @var ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
 
     /**
      * @var \Magento\Framework\HTTP\ZendClientFactory
@@ -33,10 +33,14 @@ class Api
      *
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(LoggerInterface $logger, ScopeConfigInterface $scopeConfig, ZendClientFactory $httpClientFactory)
+    public function __construct(
+        LoggerInterface $logger,
+        ScopeConfigInterface $scopeConfig,
+        ZendClientFactory $httpClientFactory
+    )
     {
         $this->logger = $logger;
-        $this->_scopeConfig = $scopeConfig;
+        $this->scopeConfig = $scopeConfig;
         $this->httpClientFactory = $httpClientFactory;
     }
 
@@ -46,8 +50,8 @@ class Api
     public function addProduct($params)
     {
         $params = [
-            'key'          => $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
-            'private_key'  => $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
+            'key'          => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
+            'private_key'  => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
             'products'     => [$params],
         ];
 
@@ -62,8 +66,8 @@ class Api
     public function removeProduct($productId)
     {
         $params = [
-            'key'          => $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
-            'private_key'  => $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
+            'key'          => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
+            'private_key'  => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
             'products'     => $productId,
         ];
 

@@ -13,7 +13,7 @@ class LayoutLoadBeforeObserver implements ObserverInterface
     /**
      * @var ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
 
     /**
      * LayoutGenerateBlocksAfterObserver constructor.
@@ -22,7 +22,7 @@ class LayoutLoadBeforeObserver implements ObserverInterface
      */
     public function __construct(ScopeConfigInterface $scopeConfig)
     {
-        $this->_scopeConfig = $scopeConfig;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -48,6 +48,6 @@ class LayoutLoadBeforeObserver implements ObserverInterface
      */
     private function isClerkSearchEnabled()
     {
-        return $this->_scopeConfig->isSetFlag(Config::XML_PATH_SEARCH_ENABLED);
+        return $this->scopeConfig->isSetFlag(Config::XML_PATH_SEARCH_ENABLED);
     }
 }

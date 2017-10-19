@@ -14,7 +14,10 @@ class Tracking extends Template
      */
     public function getPublicKey()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->_scopeConfig->getValue(
+            Config::XML_PATH_PUBLIC_KEY,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**
@@ -24,6 +27,9 @@ class Tracking extends Template
      */
     public function getCollectionEmails()
     {
-        return ($this->_scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE) ? 'true' : 'false');
+        return ($this->_scopeConfig->isSetFlag(
+            Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ) ? 'true' : 'false');
     }
 }

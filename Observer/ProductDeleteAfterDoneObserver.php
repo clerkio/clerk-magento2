@@ -13,7 +13,7 @@ class ProductDeleteAfterDoneObserver implements ObserverInterface
     /**
      * @var ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
 
     /**
      * @var Api
@@ -22,7 +22,7 @@ class ProductDeleteAfterDoneObserver implements ObserverInterface
 
     public function __construct(ScopeConfigInterface $scopeConfig, Api $api)
     {
-        $this->_scopeConfig = $scopeConfig;
+        $this->scopeConfig = $scopeConfig;
         $this->api = $api;
     }
 
@@ -34,7 +34,7 @@ class ProductDeleteAfterDoneObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        if ($this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED)) {
+        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED)) {
             $product = $observer->getProduct();
 
             if ($product && $product->getId()) {

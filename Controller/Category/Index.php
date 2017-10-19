@@ -22,7 +22,12 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $categoryCollectionFactory
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, CollectionFactory $categoryCollectionFactory, LoggerInterface $logger)
+    public function __construct(
+        Context $context,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $categoryCollectionFactory,
+        LoggerInterface $logger
+    )
     {
         $this->collectionFactory = $categoryCollectionFactory;
 
@@ -52,5 +57,25 @@ class Index extends AbstractAction
             //Remove own ID from subcategories array
             return array_values(array_diff($children, [$item->getId()]));
         });
+    }
+
+    /**
+     * Prepare collection
+     *
+     * @return mixed
+     */
+    protected function prepareCollection()
+    {
+        $collection = $this->collectionFactory->create();
+
+        $collection->addFieldToSelect('*');
+        $collection->addAttributeToFilter('level', ['gteq' => 2]);
+        $collection->addAttributeToFilter('name', ['neq' => null]);
+
+        $collection->setPageSize($this->limit)
+                   ->setCurPage($this->page)
+                   ->addOrder($this->orderBy, $this->order);
+
+        return $collection;
     }
 }

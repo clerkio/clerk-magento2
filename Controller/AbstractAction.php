@@ -14,7 +14,7 @@ abstract class AbstractAction extends Action
     /**
      * @var ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
 
     /**
      * @var bool
@@ -74,7 +74,7 @@ abstract class AbstractAction extends Action
      */
     public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger)
     {
-        $this->_scopeConfig = $scopeConfig;
+        $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
 
         parent::__construct($context);
@@ -139,7 +139,10 @@ abstract class AbstractAction extends Action
      */
     private function getPrivateKey()
     {
-        return $this->_scopeConfig->getValue(\Clerk\Clerk\Model\Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE);
+        return $this->scopeConfig->getValue(
+            \Clerk\Clerk\Model\Config::XML_PATH_PRIVATE_KEY,
+            ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**
@@ -149,7 +152,10 @@ abstract class AbstractAction extends Action
      */
     private function getPublicKey()
     {
-        return $this->_scopeConfig->getValue(\Clerk\Clerk\Model\Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE);
+        return $this->scopeConfig->getValue(
+            \Clerk\Clerk\Model\Config::XML_PATH_PUBLIC_KEY,
+            ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**

@@ -22,10 +22,14 @@ class Index extends AbstractAction
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, CollectionFactory $productCollectionFactory, LoggerInterface $logger)
+    public function __construct(
+        Context $context,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $productCollectionFactory,
+        LoggerInterface $logger
+    )
     {
         $this->collectionFactory = $productCollectionFactory;
-
         $this->addFieldHandlers();
 
         parent::__construct($context, $scopeConfig, $logger);
@@ -103,7 +107,7 @@ class Index extends AbstractAction
      */
     protected function getDefaultFields()
     {
-        $configFields = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_FIELDS);
+        $configFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_FIELDS);
         $fields = [];
 
         if ($configFields) {
@@ -125,11 +129,11 @@ class Index extends AbstractAction
         $collection->addFieldToSelect('*');
 
         //Filter on is_saleable if defined
-        if ($this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
             $collection->addFieldToFilter('is_saleable', true);
         }
 
-        $visibility = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
+        $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
 
         switch ($visibility) {
             case Visibility::VISIBILITY_IN_CATALOG:
