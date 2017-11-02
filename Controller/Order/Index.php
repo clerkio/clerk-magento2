@@ -14,6 +14,8 @@ class Index extends AbstractAction
         'entity_id' => 'id',
     ];
 
+    protected $clerkEventPrefix = 'clerk_order';
+
     /**
      * Order controller constructor.
      *
