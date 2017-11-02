@@ -67,6 +67,16 @@ abstract class AbstractAction extends Action
     protected $logger;
 
     /**
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    protected $eventManager;
+
+    /**
+     * @var string
+     */
+    protected $clerkEventPrefix = '';
+
+    /**
      * Constructor
      *
      * @param Context $context
@@ -76,6 +86,7 @@ abstract class AbstractAction extends Action
     {
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
+        $this->eventManager = $this->getEventManager();
 
         parent::__construct($context);
     }
@@ -193,6 +204,11 @@ abstract class AbstractAction extends Action
     {
         try {
             $collection = $this->prepareCollection();
+            
+            $this->eventManager->dispatch($this->clerkEventPrefix .'_before_response_build', [
+                'controller' => $this,
+                'collection' => $collection
+            ]);
 
             $response = [];
 
@@ -276,7 +292,7 @@ abstract class AbstractAction extends Action
      * @param $field
      * @param callable $handler
      */
-    protected function addFieldHandler($field, callable $handler)
+    public function addFieldHandler($field, callable $handler)
     {
         $this->fieldHandlers[$field] = $handler;
     }

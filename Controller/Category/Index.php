@@ -15,6 +15,8 @@ class Index extends AbstractAction
         'parent_id' => 'parent',
     ];
 
+    protected $clerkEventPrefix = 'clerk_category';
+
     /**
      * Category controller constructor.
      *
