@@ -12,9 +12,17 @@ use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var array
+     */
     protected $fieldMap = [
         'entity_id' => 'id',
     ];
+
+    /**
+     * @var string
+     */
+    protected $eventPrefix = 'clerk_product';
 
     /**
      * Product controller constructor.
@@ -153,5 +161,23 @@ class Index extends AbstractAction
             ->addOrder($this->orderBy, $this->order);
 
         return $collection;
+    }
+
+    /**
+     * Get attribute value for product
+     * 
+     * @param $resourceItem
+     * @param $field
+     * @return mixed
+     */
+    protected function getAttributeValue($resourceItem, $field)
+    {
+        $attribute = $resourceItem->getResource()->getAttribute($field);
+
+        if ($attribute->usesSource()) {
+            return $attribute->getSource()->getOptionText($resourceItem[$field]);
+        }
+
+        return parent::getAttributeValue($resourceItem, $field);
     }
 }

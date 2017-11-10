@@ -10,10 +10,18 @@ use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var array
+     */
     protected $fieldMap = [
         'entity_id' => 'id',
         'parent_id' => 'parent',
     ];
+
+    /**
+     * @var string
+     */
+    protected $eventPrefix = 'clerk_category';
 
     /**
      * Category controller constructor.

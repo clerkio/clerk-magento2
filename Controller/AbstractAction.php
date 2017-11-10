@@ -67,6 +67,11 @@ abstract class AbstractAction extends Action
     protected $logger;
 
     /**
+     * @var string
+     */
+    protected $eventPrefix = '';
+
+    /**
      * Constructor
      *
      * @param Context $context
@@ -194,6 +199,11 @@ abstract class AbstractAction extends Action
         try {
             $collection = $this->prepareCollection();
 
+            $this->_eventManager->dispatch($this->eventPrefix . '_get_collection_after', [
+                'controller' => $this,
+                'collection' => $collection
+            ]);
+
             $response = [];
 
             //Build response
@@ -202,7 +212,7 @@ abstract class AbstractAction extends Action
 
                 foreach ($this->fields as $field) {
                     if (isset($resourceItem[$field])) {
-                        $item[$this->getFieldName($field)] = $resourceItem[$field];
+                        $item[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
                     }
 
                     if (isset($this->fieldHandlers[$field])) {
@@ -276,7 +286,7 @@ abstract class AbstractAction extends Action
      * @param $field
      * @param callable $handler
      */
-    protected function addFieldHandler($field, callable $handler)
+    public function addFieldHandler($field, callable $handler)
     {
         $this->fieldHandlers[$field] = $handler;
     }
@@ -289,5 +299,16 @@ abstract class AbstractAction extends Action
     protected function getDefaultFields()
     {
         return [];
+    }
+
+    /**
+     * Get attribute value
+     *
+     * @param $resourceItem
+     * @param $field
+     */
+    protected function getAttributeValue($resourceItem, $field)
+    {
+        return $resourceItem[$field];
     }
 }

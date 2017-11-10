@@ -10,9 +10,17 @@ use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var array
+     */
     protected $fieldMap = [
         'entity_id' => 'id',
     ];
+
+    /**
+     * @var string
+     */
+    protected $eventPrefix = 'clerk_order';
 
     /**
      * Order controller constructor.
