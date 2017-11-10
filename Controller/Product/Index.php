@@ -165,7 +165,7 @@ class Index extends AbstractAction
 
     /**
      * Get attribute value for product
-     * 
+     *
      * @param $resourceItem
      * @param $field
      * @return mixed
