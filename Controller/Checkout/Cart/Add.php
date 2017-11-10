@@ -32,12 +32,12 @@ class Add extends BaseAdd
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
 
+        $productId = (int)$this->getRequest()->getParam('product');
+
         /**
          * Check if we should redirect to powerstep
          */
         if ($shouldRedirectPowerstep && $powerstepType == Config\Source\PowerstepType::TYPE_PAGE) {
-            $productId = (int)$this->getRequest()->getParam('product');
-
             return $this->_url->getUrl('checkout/cart/added/id/' . $productId);
         }
 
@@ -50,7 +50,8 @@ class Add extends BaseAdd
             if ($this->getRequest()->getActionName() == 'add' && !$this->getRequest()->getParam('in_cart')) {
                 $this->_checkoutSession->setContinueShoppingUrl($this->_redirect->getRefererUrl());
             }
-            return $this->_url->getUrl('checkout/cart/added/id/12');
+            
+            return $this->_url->getUrl('checkout/cart/added/id/' . $productId);
         }
 
         return $defaultUrl;
