@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Controller\Order;
 use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Psr\Log\LoggerInterface;
 
@@ -14,7 +15,7 @@ class Index extends AbstractAction
      * @var array
      */
     protected $fieldMap = [
-        'entity_id' => 'id',
+        'increment_id' => 'id',
     ];
 
     /**
@@ -29,7 +30,12 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $orderCollectionFactory
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, CollectionFactory $orderCollectionFactory, LoggerInterface $logger)
+    public function __construct(
+        Context $context,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $orderCollectionFactory,
+        LoggerInterface $logger
+    )
     {
         $this->collectionFactory = $orderCollectionFactory;
 
@@ -71,5 +77,16 @@ class Index extends AbstractAction
 
             return $products;
         });
+    }
+
+    /**
+     * Parse request arguments
+     */
+    protected function getArguments(RequestInterface $request)
+    {
+        parent::getArguments($request);
+
+        //Use increment id instead of entity_id
+        $this->fields = str_replace('entity_id', 'increment_id', $this->fields);
     }
 }

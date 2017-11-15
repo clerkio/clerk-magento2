@@ -166,7 +166,7 @@ abstract class AbstractAction extends Action
     /**
      * Parse request arguments
      */
-    private function getArguments(RequestInterface $request)
+    protected function getArguments(RequestInterface $request)
     {
         $this->debug = (bool) $request->getParam('debug', false);
         $this->limit = (int) $request->getParam('limit', 0);
