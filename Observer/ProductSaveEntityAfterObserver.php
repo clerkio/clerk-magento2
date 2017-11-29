@@ -91,7 +91,10 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
                 /**
                  * @todo Refactor to use fieldhandlers or similar
                  */
-                $configFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_FIELDS);
+                $configFields = $this->scopeConfig->getValue(
+                    Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS
+                );
+
                 $fields = explode(',', $configFields);
 
                 foreach ($fields as $field) {

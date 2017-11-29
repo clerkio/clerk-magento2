@@ -115,11 +115,24 @@ class Index extends AbstractAction
      */
     protected function getDefaultFields()
     {
-        $configFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_FIELDS);
-        $fields = [];
+        $fields = [
+            'name',
+            'description',
+            'price',
+            'list_price',
+            'image',
+            'url',
+            'categories',
+            'brand',
+            'sku',
+            'age',
+            'on_sale'
+        ];
 
-        if ($configFields) {
-            $fields = explode(',', $configFields);
+        $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS);
+
+        if ($additionalFields) {
+            $fields = array_merge($fields, explode(',', $additionalFields));
         }
 
         return $fields;

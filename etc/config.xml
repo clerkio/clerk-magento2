@@ -15,7 +15,7 @@
             <product_synchronization>
                 <use_realtime_updates>1</use_realtime_updates>
                 <collect_emails>0</collect_emails>
-                <fields>name,description,price,list_price,image,url,categories,brand,sku,age,on_sale</fields>
+                <additional_fields></additional_fields>
                 <saleable_only>1</saleable_only>
                 <visibility>4</visibility>
             </product_synchronization>
