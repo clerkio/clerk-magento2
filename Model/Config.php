@@ -37,4 +37,11 @@ class Config
     const XML_PATH_POWERSTEP_ENABLED = 'clerk/powerstep/enabled';
     const XML_PATH_POWERSTEP_TYPE = 'clerk/powerstep/type';
     const XML_PATH_POWERSTEP_TEMPLATES = 'clerk/powerstep/templates';
+
+    /**
+     * Exit intent configuration
+     */
+    const XML_PATH_EXIT_INTENT_ENABLED = 'clerk/exit_intent/enabled';
+    const XML_PATH_EXIT_INTENT_TEMPLATE = 'clerk/exit_intent/template';
+
 }

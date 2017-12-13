@@ -52,7 +52,7 @@ class Index extends AbstractAction
         $this->addFieldHandler('price', function($item) {
             try {
                 $price = $item->getFinalPrice();
-                return $price;
+                return (float) $price;
             } catch(\Exception $e) {
                 return 0;
             }

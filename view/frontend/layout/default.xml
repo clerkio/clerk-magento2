@@ -7,6 +7,7 @@
         <referenceBlock name="before.body.end">
             <block class="Clerk\Clerk\Block\Tracking" name="clerk.tracking.js" template="Clerk_Clerk::tracking.phtml"/>
             <block class="Clerk\Clerk\Block\LiveSearch" name="clerk.livesearch" template="Clerk_Clerk::livesearch.phtml" ifconfig="clerk/livesearch/enabled"/>
+            <block class="Clerk\Clerk\Block\ExitIntent" name="clerk.exit_intent" template="Clerk_Clerk::exit_intent.phtml" ifconfig="clerk/exit_intent/enabled"/>
         </referenceBlock>
     </body>
 </page>
