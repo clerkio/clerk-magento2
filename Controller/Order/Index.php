@@ -7,6 +7,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
@@ -42,6 +43,27 @@ class Index extends AbstractAction
         $this->addFieldHandlers();
 
         parent::__construct($context, $scopeConfig, $logger);
+    }
+
+    /**
+     * Execute request
+     */
+    public function execute()
+    {
+        $disabled = $this->scopeConfig->isSetFlag(
+            \Clerk\Clerk\Model\Config::XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION,
+            ScopeInterface::SCOPE_STORE
+        );
+
+        if ($disabled) {
+            $this->getResponse()
+                 ->setHttpResponseCode(200)
+                 ->setHeader('Content-Type', 'application/json', true)
+                 ->setBody(json_encode([]));
+            return;
+        }
+
+        parent::execute();
     }
 
     /**

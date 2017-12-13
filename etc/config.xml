@@ -18,6 +18,7 @@
                 <additional_fields></additional_fields>
                 <saleable_only>1</saleable_only>
                 <visibility>4</visibility>
+                <disable_order_synchronization>0</disable_order_synchronization>
             </product_synchronization>
             <search>
                 <enabled>0</enabled>
@@ -32,6 +33,10 @@
                 <type>1</type>
                 <template>power-step-others-also-bought</template>
             </powerstep>
+            <exit_intent>
+                <enabled>0</enabled>
+                <template>exit-intent-visitor-recommendations</template>
+            </exit_intent>
         </clerk>
     </default>
 </config>

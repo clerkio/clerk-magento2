@@ -20,7 +20,7 @@
                 </field>
             </group>
             <group id="product_synchronization" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Product Synchronization</label>
+                <label>Synchronization</label>
                 <field id="use_realtime_updates" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use Real-time Updates</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -40,6 +40,10 @@
                 <field id="visibility" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Only synchronize product with visibility</label>
                     <source_model>Clerk\Clerk\Model\Config\Source\Visibility</source_model>
+                </field>
+                <field id="disable_order_synchronization" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable order synchronization</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
             <group id="search" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
