@@ -1,0 +1,42 @@
+<?php
+/** @var \Clerk\Clerk\Block\PowerstepPopup $block */
+$categoryIds = $block->getProduct()->getCategoryIds();
+?>
+<?php if ($block->shouldShow()) : ?>
+<div id="clerk_powerstep" style="display: none;">
+    <div class="clerk_powerstep_header">
+        <h2><?php echo $block->getHeaderText(); ?></h2>
+    </div>
+    <div class="clerk_powerstep_image">
+        <img src="<?php echo $block->getImageUrl(); ?>" alt="<?php echo $block->getHeaderText(); ?>">
+    </div>
+    <div class="clerk_powerstep_clear actions">
+        <button class="action primary clerk_powerstep_button clerk_powerstep_continue" onClick="location.href='<?php echo $block->getCartUrl(); ?>';">Gå til indkøbskurven</button>
+        <button class="action clerk_powerstep_button clerk_powerstep_close">Shop videre</button>
+    </div>
+    <div class="clerk_powerstep_templates">
+    <?php foreach ($block->getTemplates() as $template) : ?>
+        <span class="clerk"
+              data-template="@<?php echo $block->escapeHtmlAttr($template); ?>"
+              data-products="[<?php echo $block->escapeHtmlAttr($block->getProduct()->getId()); ?>]"
+              data-category="<?php echo $block->escapeHtmlAttr(reset($categoryIds)); ?>"
+        ></span>
+    <?php endforeach; ?>
+    </div>
+</div>
+<script>
+require(['jquery', 'clerk'], function($, Clerk) {
+    var popup = Clerk.ui.popup("#clerk_powerstep");
+
+    $(".clerk_powerstep_close").on("click", function() {
+        popup.close();
+    });
+
+    popup.show();
+
+    <?php if ($block->isAjax()) : ?>
+    Clerk.renderBlocks(".clerk_powerstep_templates .clerk");
+    <?php endif; ?>
+});
+</script>
+<?php endif; ?>

@@ -1,0 +1,33 @@
+<?php
+/** @var \Clerk\Clerk\Block\PowerstepScripts $block */
+if ($block->shouldShow()) :
+?>
+<script>
+require(['jquery'], function($) {
+    function getPowerstepPopup(isAjax)
+    {
+        $("#clerk_powerstep").remove();
+        $("#clerk_powerstep .clerk-slider").remove();
+        var data = isAjax ? { isAjax: true } : {};
+        $.ajax({
+            url: '/clerk/powerstep/popup',
+            data: data,
+            type: 'get',
+            success: function(res) {
+                if (res.length > 0) {
+                    $('body').append(res);
+                }
+            }
+        });
+    }
+
+    $(document).on('ajax:addToCart', function(e) {
+        getPowerstepPopup(true);
+    });
+
+    $(document).ready(function() {
+        getPowerstepPopup();
+    })
+});
+</script>
+<?php endif; ?>

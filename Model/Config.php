@@ -11,7 +11,7 @@ class Config
     const XML_PATH_PUBLIC_KEY = 'clerk/general/public_key';
 
     /**
-     * Product Synchronization configuration
+     * Popup Synchronization configuration
      */
     const XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED = 'clerk/product_synchronization/use_realtime_updates';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS = 'clerk/product_synchronization/collect_emails';

@@ -9,19 +9,6 @@ use Magento\Catalog\Model\Product;
 
 class Powerstep extends AbstractProduct
 {
-//    /**
-//     * Powerstep constructor.
-//     *
-//     * @param Context $context
-//     * @param array $data
-//     */
-//    public function __construct(Context $context, CartHelper $cartHelper, array $data = [])
-//    {
-//        $this->cartHelper = $cartHelper;
-//
-//        parent::__construct($context, $data);
-//    }
-
     /**
      * Get Cart URL
      *

@@ -25,7 +25,7 @@ class Index extends AbstractAction
     protected $eventPrefix = 'clerk_product';
 
     /**
-     * Product controller constructor.
+     * Popup controller constructor.
      *
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig

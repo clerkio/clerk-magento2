@@ -3,4 +3,7 @@
     <event name="layout_load_before">
         <observer name="clerk_layout_load_before" instance="Clerk\Clerk\Observer\LayoutLoadBeforeObserver"/>
     </event>
+    <event name="checkout_cart_add_product_complete">
+        <observer name="clerk_checkout_cart_add_product_complete" instance="Clerk\Clerk\Observer\CheckoutCartAddProductCompleteObserver"/>
+    </event>
 </config>

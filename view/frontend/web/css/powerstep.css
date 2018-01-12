@@ -13,3 +13,27 @@
 .powerstep-actions {
     float: right;
 }
+
+.clerk_powerstep_header,
+.clerk_powerstep_image {
+    text-align: center;
+}
+
+.clerk_powerstep_header h2:before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAq1BMVEUAAAApsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsikpsinO2zpuAAAAOHRSTlMAAQIEBQsMDQ4QERITFhceHytBQ0lKS0xNTk9QUVJUVVZXWF5pb3N/g5WotMXHyMrMztzm6Ovx8+xBc0UAAAESSURBVFjD7dPJVgIxEIXhio3zDM7zBKKCM/Z9/ydzwTkKsdK5qXIHd9nJ9686IvPN6sL6ksu3a2CwYvc3AIDRms/bC9eAq/DrbYUrwFWY9sBoscxfIt6j0wMLBf4CvsC55p+cvl6l/Znqt/7T7/T67ZDyp3l/BwDDltl3xx/f1MIJ7YHXls9rheMiD7xEhaNCHxcI34mPnycKh8T/84l0gfGVcmVYjc8OCC9SJwv7lJdb7dqgor3Ig17YY70EtfCh+k31regF3tOFpCcLDZ4qNHqikPHZQtZnCl9531igfEOB9MkC7ROFAq8WirxSKPR/CsU+Khj8VMHkJwpG/1Mwe5FwD+B9w+xFZHl3O3j8fDO2bzO4/xLnWGFuAAAAAElFTkSuQmCC);
+    background-size: 28px;
+    vertical-align: top;
+    margin-right: 5px;
+}
+
+.clerk_powerstep_clear {
+    overflow: hidden;
+}
+
+.clerk_powerstep_continue {
+    float: right;
+}
