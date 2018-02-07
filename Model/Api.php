@@ -26,7 +26,7 @@ class Api
     /**
      * @var string
      */
-    protected $baseurl = 'http://api.clerk.io/v2/product/';
+    protected $baseurl = 'http://api.clerk.io/v2/';
 
     /**
      * Api constructor
@@ -50,12 +50,10 @@ class Api
     public function addProduct($params)
     {
         $params = [
-            'key'          => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
-            'private_key'  => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
-            'products'     => [$params],
+            'products' => [$params],
         ];
 
-        $this->post('add', $params);
+        $this->post('product/add', $params);
     }
 
     /**
@@ -66,12 +64,32 @@ class Api
     public function removeProduct($productId)
     {
         $params = [
-            'key'          => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
-            'private_key'  => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
             'products'     => $productId,
         ];
 
-        $this->get('remove', $params);
+        $this->get('product/remove', $params);
+    }
+
+    /**
+     * Validate public & private key
+     *
+     * @param $publicKey
+     * @param $privateKey
+     * @return string
+     */
+    public function keysValid($publicKey, $privateKey)
+    {
+        $params = [
+            'key' => $publicKey,
+            'private_key' => $privateKey,
+        ];
+
+        return $this->get('client/account/info', $params)->getBody();
+    }
+
+    public function getFacetAttributes()
+    {
+        return $this->get('product/facets');
     }
 
     /**
@@ -82,11 +100,15 @@ class Api
      */
     private function get($endpoint, $params = [])
     {
+        $params = array_merge($this->getDefaultParams(), $params);
+
         /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
         $httpClient = $this->httpClientFactory->create();
         $httpClient->setUri($this->baseurl . $endpoint);
         $httpClient->setParameterGet($params);
-        $httpClient->request('GET');
+        $response = $httpClient->request('GET');
+
+        return $response;
     }
 
     /**
@@ -97,11 +119,21 @@ class Api
      */
     private function post($endpoint, $params = [])
     {
+        $params = array_merge($this->getDefaultParams(), $params);
+
         /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
         $httpClient = $this->httpClientFactory->create();
         $httpClient->setUri($this->baseurl . $endpoint);
         $httpClient->setRawData(json_encode($params), 'application/json');
 
         $result = $httpClient->request('POST');
+    }
+
+    private function getDefaultParams()
+    {
+        return [
+            'key'         => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
+            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
+        ];
     }
 }

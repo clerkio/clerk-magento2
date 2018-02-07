@@ -59,6 +59,38 @@
                     </depends>
                 </field>
             </group>
+            <group id="faceted_search" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Faceted Search Settings</label>
+                <frontend_model>Clerk\Clerk\Block\Adminhtml\System\Config\Fieldset\FacetedSearch</frontend_model>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="attributes" translate="label" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attributes</label>
+                    <source_model>Clerk\Clerk\Model\Config\Source\FacetAttributes</source_model>
+                    <depends>
+                        <field id="*/*/enabled">1</field>
+                    </depends>
+                </field>
+                <field id="multiselect_attributes" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Multiselect Attributes</label>
+                    <frontend_model>Clerk\Clerk\Block\Adminhtml\System\Config\Field\MultiselectFacetAttributes</frontend_model>
+                    <source_model>Clerk\Clerk\Model\Config\Source\MultiselectFacetAttributes</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <depends>
+                        <field id="*/*/enabled">1</field>
+                    </depends>
+                </field>
+                <field id="titles" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Titles</label>
+                    <frontend_model>Clerk\Clerk\Block\Adminhtml\System\Config\Field\FacetTitles</frontend_model>
+                    <backend_model>Clerk\Clerk\Model\Config\Backend\FacetTitles</backend_model>
+                    <depends>
+                        <field id="*/*/enabled">1</field>
+                    </depends>
+                </field>
+            </group>
             <group id="livesearch" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Live Search Settings</label>
                 <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">

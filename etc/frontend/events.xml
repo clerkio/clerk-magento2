@@ -6,4 +6,7 @@
     <event name="checkout_cart_add_product_complete">
         <observer name="clerk_checkout_cart_add_product_complete" instance="Clerk\Clerk\Observer\CheckoutCartAddProductCompleteObserver"/>
     </event>
+    <event name="controller_action_layout_render_before_catalogsearch_result_index">
+        <observer name="clerk_controller_action_layout_render_before" instance="Clerk\Clerk\Observer\ControllerActionLayoutRenderBeforeObserver"/>
+    </event>
 </config>

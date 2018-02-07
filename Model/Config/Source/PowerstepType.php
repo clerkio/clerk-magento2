@@ -2,7 +2,9 @@
 
 namespace Clerk\Clerk\Model\Config\Source;
 
-class PowerstepType implements \Magento\Framework\Option\ArrayInterface
+use Magento\Framework\Option\ArrayInterface;
+
+class PowerstepType implements ArrayInterface
 {
     const TYPE_PAGE = 1;
     const TYPE_POPUP = 2;

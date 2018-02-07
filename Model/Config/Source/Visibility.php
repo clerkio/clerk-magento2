@@ -3,8 +3,9 @@
 namespace Clerk\Clerk\Model\Config\Source;
 
 use Magento\Catalog\Model\Product\Visibility as BaseVisibility;
+use Magento\Framework\Option\ArrayInterface;
 
-class Visibility implements \Magento\Framework\Option\ArrayInterface
+class Visibility implements ArrayInterface
 {
     /**
      * Options getter

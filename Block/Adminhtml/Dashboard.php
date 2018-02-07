@@ -53,6 +53,16 @@ class Dashboard extends Template
     }
 
     /**
+     * Get url for clerk system configuration
+     *
+     * @return string
+     */
+    public function getConfigureUrl()
+    {
+        return $this->getUrl('adminhtml/system_config/edit/section/clerk');
+    }
+
+    /**
      * Get first 8 characters of public key
      *
      * @param $publicKey

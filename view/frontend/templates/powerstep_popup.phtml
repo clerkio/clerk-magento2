@@ -12,7 +12,7 @@ $categoryIds = $block->getProduct()->getCategoryIds();
     </div>
     <div class="clerk_powerstep_clear actions">
         <button class="action primary clerk_powerstep_button clerk_powerstep_continue" onClick="location.href='<?php echo $block->getCartUrl(); ?>';">Gå til indkøbskurven</button>
-        <button class="action clerk_powerstep_button clerk_powerstep_close">Shop videre</button>
+        <button class="action clerk_powerstep_button clerk_powerstep_close"><?php echo __('Continue Shopping'); ?></button>
     </div>
     <div class="clerk_powerstep_templates">
     <?php foreach ($block->getTemplates() as $template) : ?>

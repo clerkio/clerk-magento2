@@ -6,7 +6,7 @@ if ($block->getStoreId()) :
     <?php if ($block->getEmbedUrl()) : ?>
     <iframe id="clerk-embed" src="<?php echo $this->getEmbedUrl(); ?>" frameborder="0" width="100%" height="2400"></iframe>
     <?php else : ?>
-        <?php echo __('Clerk is not configured for this store. <a href="%s">Click here to configure</a>', 'heste'); ?>
+        <?php echo __('Clerk is not configured for this store. <a href="%1">Click here to configure</a>', $block->getConfigureUrl()); ?>
     <?php endif; ?>
 <?php else: ?>
     <?php echo __('Select a store to view dashboard'); ?>
