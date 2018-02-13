@@ -58,7 +58,7 @@ class FacetTitles extends Field
 
     /**
      * Get store id
-     * 
+     *
      * @return mixed
      */
     public function getStoreId()

@@ -32,7 +32,10 @@ class FacetAttributes implements ArrayInterface
         $res = [];
 
         foreach (self::toArray() as $index => $value) {
-            $res[] = ['value' => $value, 'label' => $value];
+            $res[] = [
+                'value' => $value,
+                'label' => $value
+            ];
         }
 
         return $res;
@@ -67,7 +70,9 @@ class FacetAttributes implements ArrayInterface
         if ($attributesResponse) {
             $attributes = json_decode($attributesResponse->getBody());
 
-            return $attributes->facets;
+            if (isset($attributes->facets)) {
+                return $attributes->facets;
+            }
         }
 
         return [];
