@@ -26,6 +26,7 @@
             </search>
             <live_search>
                 <enabled>0</enabled>
+                <include_categories>1</include_categories>
                 <template>live-search</template>
             </live_search>
             <powerstep>

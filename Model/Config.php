@@ -38,6 +38,7 @@ class Config
      * Live search configuration
      */
     const XML_PATH_LIVESEARCH_ENABLED = 'clerk/livesearch/enabled';
+    const XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES = 'clerk/livesearch/include_categories';
     const XML_PATH_LIVESEARCH_TEMPLATE = 'clerk/livesearch/template';
 
     /**

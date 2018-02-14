@@ -4,6 +4,7 @@
 <span
     class="clerk"
     data-template="@<?php echo $block->getLiveSearchTemplate(); ?>"
+    data-live-search-categories="<?php echo $block->shouldIncludeCategories(); ?>"
     data-live-search-categories-title="<?php echo __('Categories'); ?>"
     data-live-search-products-title="<?php echo __('Products'); ?>"
     data-bind-live-search="#search">
