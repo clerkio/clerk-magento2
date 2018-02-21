@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Controller\Product;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Catalog\Model\Product\Visibility;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -56,18 +57,24 @@ class Index extends AbstractAction
             } catch(\Exception $e) {
                 return 0;
             }
-//            return $item->getFinalPrice();
         });
 
         //Add list_price fieldhandler
         $this->addFieldHandler('list_price', function($item) {
             try {
                 $price = $item->getPrice();
+
+                //Fix for configurable products
+                if ($item->getTypeId() === Configurable::TYPE_CODE) {
+                    $price = $item->getPriceInfo()->getPrice('regular_price')->getValue();//->getPrice('regular_price');
+                }
+
                 return (float) $price;
             } catch(\Exception $e) {
                 return 0;
             }
         });
+
 
         //Add image fieldhandler
         $this->addFieldHandler('image', function($item) {
