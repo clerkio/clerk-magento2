@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
+    <indexer id="clerk_products" view_id="clerk_products" class="Clerk\Clerk\Model\Indexer\Product">
+        <title translate="true">Clerk Products</title>
+        <description translate="true">Clerk Products reindex when real time synchronization is enabled</description>
+    </indexer>
+</config>
