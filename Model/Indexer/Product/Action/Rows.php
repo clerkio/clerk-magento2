@@ -95,7 +95,7 @@ class Rows
     protected function reindexRow($productId)
     {
         try {
-            $product = $this->productRepository->get($productId);
+            $product = $this->productRepository->getById($productId);
         } catch (NoSuchEntityException $e) {
             $this->api->removeProduct($productId);
             return;
