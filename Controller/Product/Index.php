@@ -6,6 +6,7 @@ use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -26,6 +27,11 @@ class Index extends AbstractAction
     protected $eventPrefix = 'clerk_product';
 
     /**
+     * @var StatusFactory
+     */
+    protected $stockStatusFactory;
+
+    /**
      * Popup controller constructor.
      *
      * @param Context $context
@@ -35,10 +41,12 @@ class Index extends AbstractAction
         Context $context,
         ScopeConfigInterface $scopeConfig,
         CollectionFactory $productCollectionFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        StatusFactory $stockStatusFactory
     )
     {
         $this->collectionFactory = $productCollectionFactory;
+        $this->stockStatusFactory = $stockStatusFactory;
         $this->addFieldHandlers();
 
         parent::__construct($context, $scopeConfig, $logger);
@@ -158,7 +166,10 @@ class Index extends AbstractAction
 
         //Filter on is_saleable if defined
         if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-            $collection->addFieldToFilter('is_saleable', true);
+            $collection->getSelect()->where(
+                'stock_status_index.stock_status = ?',
+                \Magento\CatalogInventory\Model\Stock\Status::STATUS_IN_STOCK
+            );
         }
 
         $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);

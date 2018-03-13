@@ -64,10 +64,15 @@ class Api
     public function removeProduct($productId)
     {
         $params = [
-            'products'     => $productId,
+            'products'     => [$productId],
         ];
 
-        $this->get('product/remove', $params);
+        // work around a problem that API fails with query like ?products[0]=123&products[1]=456
+        // make it like this: ?products[]=123&products[]=456
+        $query = http_build_query($params);
+        $query = preg_replace('/%5B[0-9]+%5D/simU', '%5B%5D', $query);
+
+        $this->get('product/remove?' . $query);
     }
 
     /**
