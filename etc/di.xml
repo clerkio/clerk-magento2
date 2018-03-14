@@ -7,4 +7,7 @@
     <type name="Magento\Catalog\Model\Product\Action">
         <plugin name="clerkProductsMassAction" type="Clerk\Clerk\Plugin\Catalog\Product\Action"/>
     </type>
+    <type name="Magento\CatalogInventory\Model\ResourceModel\Stock\Item">
+        <plugin name="clerkProducts" type="Clerk\Clerk\Plugin\CatalogInventory\Stock\Item"/>
+    </type>
 </config>
