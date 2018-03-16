@@ -79,7 +79,8 @@ class Index extends AbstractAction
         //Add image fieldhandler
         $this->addFieldHandler('image', function($item) {
             $store = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore();
-            $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $item->getImage();
+            $itemImage = $item->getImage() ?? $item->getSmallImage() ?? $item->getThumbnail();
+            $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
 
            return $imageUrl;
         });
