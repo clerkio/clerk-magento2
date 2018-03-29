@@ -52,7 +52,6 @@ class Image
         // get image thumbnail from settings
         $imageType = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_IMAGE_TYPE);
         if ($imageType) {
-            // FIXME: correct theme when in admin observer
             /** @var \Magento\Catalog\Helper\Image $helper */
             $helper = $this->helperFactory->create()
                 ->init($item, $imageType);
