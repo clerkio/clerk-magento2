@@ -4,12 +4,15 @@ namespace Clerk\Clerk\Observer;
 
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
+use Clerk\Clerk\Model\Handler\Image;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Store\Model\App\Emulation;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ProductSaveEntityAfterObserver implements ObserverInterface
 {
@@ -33,17 +36,38 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
      */
     protected $api;
 
+    /**
+     * @var Emulation
+     */
+    protected $emulation;
+
+    /**
+     * @var Image
+     */
+    protected $imageHandler;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
     public function __construct(
         ObjectManagerInterface $objectManager,
         ScopeConfigInterface $scopeConfig,
         ManagerInterface $eventManager,
-        Api $api
+        Api $api,
+        Emulation $emulation,
+        Image $imageHandler,
+        StoreManagerInterface $storeManager
     )
     {
         $this->objectManager = $objectManager;
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
         $this->api = $api;
+        $this->emulation = $emulation;
+        $this->imageHandler = $imageHandler;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -72,8 +96,10 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
                     }
                 }
 
-                $store = $this->objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore();
-                $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+                $store = $this->storeManager->getDefaultStoreView();
+                $this->emulation->startEnvironmentEmulation($store->getId());
+
+                $imageUrl = $this->imageHandler->handle($product);
 
                 $productItem = [
                     'id' => $product->getId(),
@@ -109,6 +135,8 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
                 $this->eventManager->dispatch('clerk_product_sync_before', ['product' => $productObject]);
 
                 $this->api->addProduct($productObject->toArray());
+
+                $this->emulation->stopEnvironmentEmulation();
             }
         }
     }
