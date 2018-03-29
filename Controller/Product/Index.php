@@ -4,6 +4,7 @@ namespace Clerk\Clerk\Controller\Product;
 
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
+use Clerk\Clerk\Model\Handler\Image;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -25,6 +26,11 @@ class Index extends AbstractAction
     protected $eventPrefix = 'clerk_product';
 
     /**
+     * @var Image
+     */
+    protected $imageHandler;
+
+    /**
      * Popup controller constructor.
      *
      * @param Context $context
@@ -34,10 +40,12 @@ class Index extends AbstractAction
         Context $context,
         ScopeConfigInterface $scopeConfig,
         CollectionFactory $productCollectionFactory,
+        Image $imageHandler,
         LoggerInterface $logger
     )
     {
         $this->collectionFactory = $productCollectionFactory;
+        $this->imageHandler = $imageHandler;
         $this->addFieldHandlers();
 
         parent::__construct($context, $scopeConfig, $logger);
@@ -77,10 +85,7 @@ class Index extends AbstractAction
 
         //Add image fieldhandler
         $this->addFieldHandler('image', function($item) {
-            $store = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore();
-            $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $item->getImage();
-
-           return $imageUrl;
+            return $this->imageHandler->handle($item);
         });
 
         //Add url fieldhandler

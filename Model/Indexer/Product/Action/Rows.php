@@ -4,6 +4,7 @@ namespace Clerk\Clerk\Model\Indexer\Product\Action;
 
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
+use Clerk\Clerk\Model\Handler\Image;
 use Magento\Catalog\Model\Product;
 use Magento\CatalogInventory\Helper\Stock;
 use Magento\CatalogInventory\Model\StockRegistryStorage;
@@ -12,6 +13,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Store\Model\App\Emulation;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Rows
 {
@@ -51,6 +54,21 @@ class Rows
     protected $api;
 
     /**
+     * @var Emulation
+     */
+    protected $emulation;
+
+    /**
+     * @var Image
+     */
+    protected $imageHandler;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * @param ObjectManagerInterface $objectManager
      * @param ScopeConfigInterface $scopeConfig
      * @param ManagerInterface $eventManager
@@ -64,7 +82,10 @@ class Rows
         StockRegistryStorage $stockRegistryStorage,
         ManagerInterface $eventManager,
         ProductRepository $productRepository,
-        Api $api
+        Api $api,
+        Emulation $emulation,
+        Image $imageHandler,
+        StoreManagerInterface $storeManager
     ) {
         $this->objectManager = $objectManager;
         $this->scopeConfig = $scopeConfig;
@@ -73,6 +94,9 @@ class Rows
         $this->eventManager = $eventManager;
         $this->productRepository = $productRepository;
         $this->api = $api;
+        $this->emulation = $emulation;
+        $this->imageHandler = $imageHandler;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -132,8 +156,10 @@ class Rows
             }
         }
 
-        $store = $this->objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore();
-        $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+        $store = $this->storeManager->getDefaultStoreView();
+        $this->emulation->startEnvironmentEmulation($store->getId());
+
+        $imageUrl = $this->imageHandler->handle($product);
 
         $productItem = [
             'id' => $product->getId(),
@@ -169,6 +195,8 @@ class Rows
         $this->eventManager->dispatch('clerk_product_sync_before', ['product' => $productObject]);
 
         $this->api->addProduct($productObject->toArray());
+
+        $this->emulation->stopEnvironmentEmulation();
     }
 
     /**
