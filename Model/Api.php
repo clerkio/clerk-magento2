@@ -59,7 +59,8 @@ class Api
     /**
      * Remove product
      *
-     * @param $productIds
+     * @param $productId
+     * @throws \Zend_Http_Client_Exception
      */
     public function removeProduct($productId)
     {
@@ -76,6 +77,7 @@ class Api
      * @param $publicKey
      * @param $privateKey
      * @return string
+     * @throws \Zend_Http_Client_Exception
      */
     public function keysValid($publicKey, $privateKey)
     {
@@ -87,9 +89,134 @@ class Api
         return $this->get('client/account/info', $params)->getBody();
     }
 
+    /**
+     * Get available facet attributes
+     *
+     * @return \Zend_Http_Response
+     * @throws \Zend_Http_Client_Exception
+     */
     public function getFacetAttributes()
     {
         return $this->get('product/facets');
+    }
+
+    /**
+     * Get Clerk Content
+     *
+     * @param null $storeId
+     * @return string
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function getContent($storeId = null)
+    {
+        $params = [
+            'key'         => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
+            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
+        ];
+
+        return $this->get('client/account/content/list', $params)->getBody();
+    }
+
+    public function getEndpointForContent($contentId)
+    {
+        $contentResult = json_decode($this->getContent());
+
+        if ($contentResult) {
+            foreach ($contentResult->contents as $content) {
+                if ($content->type !== 'html') {
+                    continue;
+                }
+
+                if ($content->id === $contentId) {
+                    return $content->api;
+                }
+            }
+        }
+    }
+
+    public function getParametersForEndpoint($endpoint)
+    {
+        $endpointMap = [
+            'search/search' => [
+                'query',
+                'limit'
+            ],
+            'search/predictive' => [
+                'query',
+                'limit'
+            ],
+            'search/categories' => [
+                'query',
+                'limit'
+            ],
+            'search/suggestions' => [
+                'query',
+                'limit'
+            ],
+            'search/popular' => [
+                'query',
+                'limit'
+            ],
+            'recommendations/popular' => [
+                'limit'
+            ],
+            'recommendations/trending' => [
+                'limit'
+            ],
+            'recommendations/currently_watched' => [
+                'limit'
+            ],
+            'recommendations/popular' => [
+                'limit'
+            ],
+            'recommendations/keywords' => [
+                'limit',
+                'keywords'
+            ],
+            'recommendations/complementary' => [
+                'limit',
+                'products'
+            ],
+            'recommendations/substituting' => [
+                'limit',
+                'products'
+            ],
+            'recommendations/category/popular' => [
+                'limit',
+                'category'
+            ],
+            'recommendations/category/trending' => [
+                'limit',
+                'category'
+            ],
+            'recommendations/visitor/history' => [
+                'limit',
+            ],
+            'recommendations/visitor/complementary' => [
+                'limit',
+            ],
+            'recommendations/visitor/substituting' => [
+                'limit',
+            ],
+            'recommendations/customer/history' => [
+                'limit',
+                'email'
+            ],
+            'recommendations/customer/complementary' => [
+                'limit',
+                'email'
+            ],
+            'recommendations/customer/substituting' => [
+                'limit',
+                'email'
+            ],
+        ];
+
+        if (array_key_exists($endpoint, $endpointMap)) {
+            return $endpointMap[$endpoint];
+        }
+
+        return false;
     }
 
     /**
@@ -97,6 +224,8 @@ class Api
      *
      * @param string $endpoint
      * @param array $params
+     * @return \Zend_Http_Response
+     * @throws \Zend_Http_Client_Exception
      */
     private function get($endpoint, $params = [])
     {
@@ -116,6 +245,7 @@ class Api
      *
      * @param string $endpoint
      * @param array $params
+     * @throws \Zend_Http_Client_Exception
      */
     private function post($endpoint, $params = [])
     {

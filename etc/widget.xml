@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget id="clerk_widget_content" class="Clerk\Clerk\Block\Widget\Content" ttl="86400">
+        <label translate="true">Clerk Content</label>
+        <description translate="true">Insert Clerk Content</description>
+        <parameters>
+            <parameter name="store" xsi:type="block" visible="true">
+                <label translate="true">Store</label>
+                <block class="Clerk\Clerk\Block\Adminhtml\Widget\Store"/>
+            </parameter>
+        </parameters>
+        <containers>
+            <container name="sidebar.main">
+                <template name="default" value="list_default" />
+                <template name="names_only" value="list_names" />
+                <template name="images_only" value="list_images" />
+            </container>
+            <container name="content">
+                <template name="grid" value="default" />
+                <template name="list" value="list" />
+            </container>
+            <container name="sidebar.additional">
+                <template name="default" value="list_default" />
+                <template name="names_only" value="list_names" />
+                <template name="images_only" value="list_images" />
+            </container>
+        </containers>
+    </widget>
+</widgets>
+

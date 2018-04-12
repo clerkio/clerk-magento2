@@ -1,0 +1,42 @@
+<script type="text/javascript">
+    require([
+        "jquery"
+    ], function($) {
+        $("#<?php echo $block->getSelectId(); ?>").on("change", function() {
+            getContentForStore($(this).val());
+        });
+
+        $(document).on('change', 'select#clerk_widget_content', function() {
+            getParametersForContent($(this).val());
+        });
+
+        function getContentForStore(storeId) {
+            $.ajax({
+                url: "<?php echo $block->getAjaxUrl(); ?>",
+                data: { type: 'content', store_id : storeId },
+                dataType: 'json',
+                showLoader: true,
+                success: function(response) {
+                    $('.field-clerk_widget_content').remove();
+                    var form = $("#<?php echo $block->getSelectId(); ?>").parents('.fieldset-widget-options');
+                    form.append(response.content);
+                }
+            });
+        }
+
+        function getParametersForContent(content) {
+            $.ajax({
+                url: "<?php echo $block->getAjaxUrl(); ?>",
+                data: { type: 'parameters', content : content },
+                dataType: 'json',
+                showLoader: true,
+                success: function(response) {
+                    $('.clerk_widget_parameters').remove();
+                    var form = $("#widget_options").find('.form-inline');
+                    console.log(form);
+                    form.append(response.content);
+                }
+            });
+        }
+    });
+</script>

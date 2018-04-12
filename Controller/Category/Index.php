@@ -71,6 +71,7 @@ class Index extends AbstractAction
      * Prepare collection
      *
      * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function prepareCollection()
     {
