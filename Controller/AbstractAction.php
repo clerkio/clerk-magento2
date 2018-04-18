@@ -253,7 +253,7 @@ abstract class AbstractAction extends Action
      * @param $field
      * @return mixed
      */
-    private function getFieldName($field)
+    protected function getFieldName($field)
     {
         if (isset($this->fieldMap[$field])) {
             return $this->fieldMap[$field];

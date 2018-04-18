@@ -45,6 +45,11 @@
                     <label>Disable order synchronization</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="include_cms_pages" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include CMS Pages</label>
+                    <comment>Synchronize CMS pages as dummy categories, makes it possible to include CMS pages in live search results</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <group id="search" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Search Settings</label>

@@ -11,7 +11,7 @@ class Config
     const XML_PATH_PUBLIC_KEY = 'clerk/general/public_key';
 
     /**
-     * Popup Synchronization configuration
+     * Product Synchronization configuration
      */
     const XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED = 'clerk/product_synchronization/use_realtime_updates';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS = 'clerk/product_synchronization/collect_emails';
@@ -19,6 +19,7 @@ class Config
     const XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY = 'clerk/product_synchronization/saleable_only';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY = 'clerk/product_synchronization/visibility';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION = 'clerk/product_synchronization/disable_order_synchronization';
+    const XML_PATH_PRODUCT_SYNCHRONIZATION_INCLUDE_CMS_PAGES = 'clerk/product_synchronization/include_cms_pages';
 
     /**
      * Search configuration
