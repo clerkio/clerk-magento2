@@ -4,6 +4,8 @@ namespace Clerk\Clerk\Model\Indexer\Product\Action;
 
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
+use Magento\Catalog\Model\Product\Type;
+use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
@@ -33,9 +35,19 @@ class Rows
     protected $productRepository;
 
     /**
+     * @var Type
+     */
+    protected $productType;
+
+    /**
      * @var Api
      */
     protected $api;
+
+    /**
+     * @var AbstractType[]
+     */
+    protected $compositeTypes;
 
     /**
      * @param ObjectManagerInterface $objectManager
@@ -49,12 +61,14 @@ class Rows
         ScopeConfigInterface $scopeConfig,
         ManagerInterface $eventManager,
         ProductRepository $productRepository,
+        Type $productType,
         Api $api
     ) {
         $this->objectManager = $objectManager;
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
         $this->productRepository = $productRepository;
+        $this->productType = $productType;
         $this->api = $api;
     }
 
@@ -83,6 +97,7 @@ class Rows
 
         foreach ($ids as $id) {
             $this->reindexRow($id);
+            $this->updateParentProducts($id);
         }
     }
 
@@ -150,5 +165,42 @@ class Rows
         $this->eventManager->dispatch('clerk_product_sync_before', ['product' => $productObject]);
 
         $this->api->addProduct($productObject->toArray());
+    }
+
+    /**
+     * Reindex parent configurable/bundle/grouped products
+     *
+     * @param int $productId
+     * @return void
+     * @see \Magento\Catalog\Model\Indexer\Product\Flat\AbstractAction::_getProductTypeInstances
+     */
+    public function updateParentProducts($productId)
+    {
+        $parentIds = [];
+
+        foreach ($this->getCompositeTypes() as $typeInstance) {
+            $parentIds = array_merge($parentIds, $typeInstance->getParentIdsByChild($productId));
+        }
+
+        foreach ($parentIds as $parentId) {
+            $this->reindexRow($parentId);
+        }
+    }
+
+    /**
+     * @return AbstractType[]
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function getCompositeTypes()
+    {
+        if (null === $this->compositeTypes) {
+            $productEmulator = new \Magento\Framework\DataObject();
+            foreach ($this->productType->getCompositeTypes() as $typeId) {
+                $productEmulator->setTypeId($typeId);
+                $this->compositeTypes[$typeId] = $this->productType->factory($productEmulator);
+            }
+        }
+
+        return $this->compositeTypes;
     }
 }
