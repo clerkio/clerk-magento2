@@ -38,6 +38,18 @@
                 <enabled>0</enabled>
                 <template>exit-intent-visitor-recommendations</template>
             </exit_intent>
+            <category>
+                <enabled>0</enabled>
+                <content>category-page-popular</content>
+            </category>
+            <product>
+                <enabled>0</enabled>
+                <content>product-page-alternatives</content>
+            </product>
+            <cart>
+                <enabled>0</enabled>
+                <content>cart-others-also-bought</content>
+            </cart>
         </clerk>
     </default>
 </config>

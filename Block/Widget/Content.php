@@ -2,15 +2,39 @@
 
 namespace Clerk\Clerk\Block\Widget;
 
+use Clerk\Clerk\Model\Config;
+use Magento\Checkout\Model\Cart;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Element\Template;
 use Magento\Widget\Block\BlockInterface;
 
 class Content extends \Magento\Framework\View\Element\Template implements \Magento\Widget\Block\BlockInterface
 {
-    protected function _construct()
+    /**
+     * @var Registry
+     */
+    protected $registry;
+
+    /**
+     * @var Cart
+     */
+    protected $cart;
+
+    /**
+     * Content constructor.
+     * @param Template\Context $context
+     * @param Registry $registry
+     * @param array $data
+     */
+    public function __construct(Template\Context $context, Registry $registry, Cart $cart, array $data = [])
     {
-        parent::_construct();
+        parent::__construct($context, $data);
+
+        $this->registry = $registry;
+        $this->cart = $cart;
         $this->setTemplate('Clerk_Clerk::widget.phtml');
     }
+
 
     /**
      * Get attributes for Clerk span
@@ -52,10 +76,93 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             }
         }
 
+        if ($this->getType() === 'cart') {
+            $spanAttributes['data-products'] = json_encode($this->getCartProducts());
+            $spanAttributes['data-template'] = '@' . $this->getCartContent();
+        }
+
+        if ($this->getType() === 'category') {
+            $spanAttributes['data-category'] = $this->getCurrentCategory();
+            $spanAttributes['data-template'] = '@' . $this->getCategoryContent();
+        }
+
+        if ($this->getType() === 'product') {
+            $spanAttributes['data-products'] = json_encode([$this->getCurrentProduct()]);
+            $spanAttributes['data-template'] = '@' . $this->getProductContent();
+        }
+
         foreach ($spanAttributes as $attribute => $value) {
             $output .= ' ' . $attribute . '=\'' . $value . '\'';
         }
 
         return trim($output);
+    }
+
+    /**
+     * Get current category id
+     *
+     * @return mixed
+     */
+    protected function getCurrentCategory()
+    {
+        $category = $this->registry->registry('current_category');
+
+        if ($category) {
+            return $category->getId();
+        }
+    }
+
+    /**
+     * Get content for category page slider
+     *
+     * @return mixed
+     */
+    protected function getCategoryContent()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_CONTENT);
+    }
+
+    /**
+     * Get current product id
+     *
+     * @return mixed
+     */
+    protected function getCurrentProduct()
+    {
+        $product = $this->registry->registry('current_product');
+
+        if ($product) {
+            return $product->getId();
+        }
+    }
+
+    /**
+     * Get content for product page slider
+     *
+     * @return mixed
+     */
+    protected function getProductContent()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_CONTENT);
+    }
+
+    /**
+     * Get product ids from cart
+     *
+     * @return int[]
+     */
+    protected function getCartProducts()
+    {
+        return $this->cart->getProductIds();
+    }
+
+    /**
+     * Get product ids from cart
+     *
+     * @return mixed
+     */
+    protected function getCartContent()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_CART_CONTENT);
     }
 }

@@ -55,4 +55,21 @@ class Config
     const XML_PATH_EXIT_INTENT_ENABLED = 'clerk/exit_intent/enabled';
     const XML_PATH_EXIT_INTENT_TEMPLATE = 'clerk/exit_intent/template';
 
+    /**
+     * Category configuration
+     */
+    const XML_PATH_CATEGORY_ENABLED = 'clerk/category/enabled';
+    const XML_PATH_CATEGORY_CONTENT = 'clerk/category/content';
+
+    /**
+     * Product configuration
+     */
+    const XML_PATH_PRODUCT_ENABLED = 'clerk/product/enabled';
+    const XML_PATH_PRODUCT_CONTENT = 'clerk/product/content';
+
+    /**
+     * Cart configuration
+     */
+    const XML_PATH_CART_ENABLED = 'clerk/cart/enabled';
+    const XML_PATH_CART_CONTENT = 'clerk/cart/content';
 }
