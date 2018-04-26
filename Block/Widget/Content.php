@@ -35,6 +35,34 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
         $this->setTemplate('Clerk_Clerk::widget.phtml');
     }
 
+    /**
+     * Determine if we should show any output
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function _toHtml()
+    {
+        if ($this->getType() === 'cart') {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CART_ENABLED)) {
+                return;
+            }
+        }
+
+        if ($this->getType() === 'category') {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CATEGORY_ENABLED)) {
+                return;
+            }
+        }
+
+        if ($this->getType() === 'product') {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_ENABLED)) {
+                return;
+            }
+        }
+
+        return parent::_toHtml();
+    }
 
     /**
      * Get attributes for Clerk span
