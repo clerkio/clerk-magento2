@@ -170,20 +170,7 @@ class Index extends AbstractAction
         }
 
         $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
-
-        switch ($visibility) {
-            case Visibility::VISIBILITY_IN_CATALOG:
-                $collection->setVisibility(Visibility::VISIBILITY_IN_CATALOG);
-                break;
-            case Visibility::VISIBILITY_IN_SEARCH:
-                $collection->setVisibility(Visibility::VISIBILITY_IN_SEARCH);
-                break;
-            case Visibility::VISIBILITY_BOTH:
-                $collection->setVisibility(Visibility::VISIBILITY_BOTH);
-                break;
-        }
-
-//
+        $collection->addFieldToFilter('visibility', $visibility);
         $collection->setPageSize($this->limit)
             ->setCurPage($this->page)
             ->addOrder($this->orderBy, $this->order);
