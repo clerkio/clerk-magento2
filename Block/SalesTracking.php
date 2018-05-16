@@ -59,8 +59,8 @@ class SalesTracking extends Template
         foreach ($order->getAllVisibleItems() as $item) {
             $product = [
                 'id'       => $item->getProductId(),
-                'quantity' => $item->getQtyOrdered(),
-                'price'    => $item->getBasePrice(),
+                'quantity' => (int) $item->getQtyOrdered(),
+                'price'    => (float) $item->getBasePrice(),
             ];
 
             $products[] = $product;

@@ -66,7 +66,7 @@ class Index extends AbstractAction
 
                 //Fix for configurable products
                 if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                    $price = $item->getPriceInfo()->getPrice('regular_price')->getValue();//->getPrice('regular_price');
+                    $price = $item->getPriceInfo()->getPrice('regular_price')->getValue();
                 }
 
                 return (float) $price;

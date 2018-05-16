@@ -216,7 +216,7 @@ abstract class AbstractAction extends Action
                     }
 
                     if (isset($this->fieldHandlers[$field])) {
-                        $item[$field] = $this->fieldHandlers[$field]($resourceItem);
+                        $item[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
                     }
                 }
 
@@ -306,6 +306,7 @@ abstract class AbstractAction extends Action
      *
      * @param $resourceItem
      * @param $field
+     * @return mixed
      */
     protected function getAttributeValue($resourceItem, $field)
     {
