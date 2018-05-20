@@ -1,4 +1,13 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\Checkout\Controller\Cart\Add" type="Clerk\Clerk\Controller\Checkout\Cart\Add"/>
+    <type name="Magento\Catalog\Model\ResourceModel\Product">
+        <plugin name="clerkProducts" type="Clerk\Clerk\Plugin\Catalog\Product"/>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Action">
+        <plugin name="clerkProductsMassAction" type="Clerk\Clerk\Plugin\Catalog\Product\Action"/>
+    </type>
+    <type name="Magento\CatalogInventory\Model\ResourceModel\Stock\Item">
+        <plugin name="clerkProducts" type="Clerk\Clerk\Plugin\CatalogInventory\Stock\Item"/>
+    </type>
 </config>
