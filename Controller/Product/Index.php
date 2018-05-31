@@ -159,7 +159,10 @@ class Index extends AbstractAction
 
         //Filter on is_saleable if defined
         if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-            $collection->addFieldToFilter('is_saleable', true);
+            $collection->getSelect()->where(
+                'stock_status_index.stock_status = ?',
+                \Magento\CatalogInventory\Model\Stock\Status::STATUS_IN_STOCK
+            );
         }
 
         $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);

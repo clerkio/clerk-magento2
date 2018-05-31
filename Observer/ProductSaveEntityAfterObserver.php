@@ -5,6 +5,8 @@ namespace Clerk\Clerk\Observer;
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
 use Magento\Catalog\Model\Product;
+use Magento\CatalogInventory\Helper\Stock;
+use Magento\CatalogInventory\Model\StockRegistryStorage;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Event\Observer;
@@ -24,6 +26,16 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
     protected $scopeConfig;
 
     /**
+     * @var Stock
+     */
+    protected $stockHelper;
+
+    /**
+     * @var StockRegistryStorage
+     */
+    protected $stockRegistryStorage;
+
+    /**
      * @var ManagerInterface
      */
     protected $eventManager;
@@ -36,12 +48,16 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
     public function __construct(
         ObjectManagerInterface $objectManager,
         ScopeConfigInterface $scopeConfig,
+        Stock $stockHelper,
+        StockRegistryStorage $stockRegistryStorage,
         ManagerInterface $eventManager,
         Api $api
     )
     {
         $this->objectManager = $objectManager;
         $this->scopeConfig = $scopeConfig;
+        $this->stockHelper = $stockHelper;
+        $this->stockRegistryStorage = $stockRegistryStorage;
         $this->eventManager = $eventManager;
         $this->api = $api;
     }
@@ -62,12 +78,14 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
 
                 //Cancel if product visibility is not as defined
                 if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY)) {
+                    $this->api->removeProduct($product->getId());
                     return;
                 }
 
                 //Cancel if product is not saleable
                 if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-                    if (!$product->isSalable()) {
+                    if (!$this->isSalable($product)) {
+                        $this->api->removeProduct($product->getId());
                         return;
                     }
                 }
@@ -111,5 +129,25 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
                 $this->api->addProduct($productObject->toArray());
             }
         }
+    }
+
+    /**
+     * Checks if product is salable
+     *
+     * Works around problems with cached
+     *
+     * @param Product $product
+     * @return bool
+     */
+    public function isSalable(Product $product)
+    {
+        $productId = $product->getId();
+
+        // isSalable relies on status that is assigned after initial product load
+        // stock registry holds cached old stock status, invalidate to force reload
+        $this->stockRegistryStorage->removeStockStatus($productId);
+        $this->stockHelper->assignStatusToProduct($product);
+
+        return $product->isSalable();
     }
 }
