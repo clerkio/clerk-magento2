@@ -98,8 +98,8 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
                 $fields = explode(',', $configFields);
 
                 foreach ($fields as $field) {
-                    if (! isset($productItem[$field])) {
-                        $productItem[$field] = $product->getData($field);
+                    if (!isset($productItem[$field]) && isset($product[$field])) {
+                        $productItem[$field] = $this->getAttributeValue($product, $field);
                     }
                 }
 
@@ -110,6 +110,24 @@ class ProductSaveEntityAfterObserver implements ObserverInterface
 
                 $this->api->addProduct($productObject->toArray());
             }
+        }
+    }
+
+    /**
+     * Get attribute value for product
+     *
+     * @param Product $product
+     * @param string $field
+     * @return string
+     * @see \Magento\Catalog\Block\Product\View\Attributes::getAdditionalData
+     */
+    protected function getAttributeValue(Product $product, $field)
+    {
+        $attribute = $product->getResource()->getAttribute($field);
+        if ($attribute && $attribute->usesSource()) {
+            return $attribute->getSource()->getOptionText($product[$field]);
+        } else {
+            return $product->getData($field);
         }
     }
 }
