@@ -91,7 +91,7 @@ class Index extends AbstractAction
             $products = [];
             foreach ($item->getAllVisibleItems() as $productItem) {
                 $products[] = [
-                    'id'       => $productItem->getId(),
+                    'id'       => $productItem->getProductId(),
                     'quantity' => (int) $productItem->getQtyOrdered(),
                     'price'    => (float) $productItem->getPrice(),
                 ];
