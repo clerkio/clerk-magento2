@@ -104,9 +104,9 @@ abstract class AbstractAction extends Action
                 ->representJson(
                     json_encode([
                         'code'        => 403,
-                        'message'     => 'Invalid keys supplied',
-                        'description' => 'The supplied public or private key is invalid',
-                        'how_to_fix'  => 'Ensure that the proper keys are set up in the configuration',
+                        'message'     => __('Invalid keys supplied'),
+                        'description' => __('The supplied public or private key is invalid'),
+                        'how_to_fix'  => __('Ensure that the proper keys are set up in the configuration'),
                     ])
                 );
 
