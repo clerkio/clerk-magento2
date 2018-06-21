@@ -109,7 +109,7 @@ abstract class AbstractAdapter
 
     /**
      * Add field to get
-     * 
+     *
      * @param $field
      */
     public function addField($field)
