@@ -30,6 +30,7 @@ class Index extends AbstractAction
      * @var PageCollectionFactory
      */
     protected $pageCollectionFactory;
+
     /**
      * @var Page
      */

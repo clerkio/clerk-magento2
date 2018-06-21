@@ -135,7 +135,6 @@ class ProductSaveAfterObserver implements ObserverInterface
                 }
 
                 $productInfo = $this->productAdapter->getInfoForItem($product);
-//                die(var_dump($productInfo));
 
                 $this->api->addProduct($productInfo);
             }

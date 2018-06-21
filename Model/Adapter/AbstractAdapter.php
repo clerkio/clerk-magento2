@@ -49,7 +49,7 @@ abstract class AbstractAdapter
      * @param ScopeConfigInterface $scopeConfig
      * @param ManagerInterface $eventManager
      * @param StoreManagerInterface $storeManager
-     * @param $collectionFactory
+     * @param mixed $collectionFactory
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,

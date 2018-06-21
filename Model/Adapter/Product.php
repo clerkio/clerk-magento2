@@ -3,7 +3,6 @@
 namespace Clerk\Clerk\Model\Adapter;
 
 use Clerk\Clerk\Model\Config;
-use Magento\Catalog\Model\Product as BaseProduct;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;

@@ -90,6 +90,7 @@ abstract class AbstractAction extends Action
      *
      * @param RequestInterface $request
      * @return \Magento\Framework\App\ResponseInterface
+     * @throws \Magento\Framework\Exception\NotFoundException
      */
     public function dispatch(RequestInterface $request)
     {
