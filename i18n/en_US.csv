@@ -1,0 +1,70 @@
+"Public and private key must be set in order to enable faceted search","Public and private key must be set in order to enable faceted search"
+"Public or private key invalid","Public or private key invalid"
+"You added %1 to your shopping cart.","You added %1 to your shopping cart."
+"Invalid keys supplied","Invalid keys supplied"
+"The supplied public or private key is invalid","The supplied public or private key is invalid"
+"Ensure that the proper keys are set up in the configuration","Ensure that the proper keys are set up in the configuration"
+"Clerk.io - Audience Insights","Clerk.io - Audience Insights"
+"Clerk.io - Email Insights","Clerk.io - Email Insights"
+"Clerk.io Dashboard","Clerk.io Dashboard"
+"Clerk.io - Recommendations Insights","Clerk.io - Recommendations Insights"
+"Clerk.io - Search Insights","Clerk.io - Search Insights"
+Content,Content
+"Clerk Content Options","Clerk Content Options"
+Product,Product
+"Select Product...","Select Product..."
+Category,Category
+"Select Category...","Select Category..."
+Page,Page
+Popup,Popup
+Catalog,Catalog
+Search,Search
+"Catalog, Search","Catalog, Search"
+"Clerk is not configured for this store. <a href=""%1"">Click here to configure</a>","Clerk is not configured for this store. <a href=""%1"">Click here to configure</a>"
+"Select a store to view dashboard","Select a store to view dashboard"
+Default,Default
+Cart,Cart
+"Proceed to Checkout","Proceed to Checkout"
+Filters,Filters
+Categories,Categories
+Products,Products
+"Continue to Checkout","Continue to Checkout"
+"Continue Shopping","Continue Shopping"
+Clerk,Clerk
+Dashboard,Dashboard
+"Search Insights","Search Insights"
+"Recommendations Insights","Recommendations Insights"
+"Email Insights","Email Insights"
+"Audience Insights","Audience Insights"
+Configuration,Configuration
+General,General
+Version,Version
+"Public Key","Public Key"
+"Private Key","Private Key"
+Synchronization,Synchronization
+"Use Real-time Updates","Use Real-time Updates"
+"Collect Emails","Collect Emails"
+"Additional Fields","Additional Fields"
+"A comma separated list of additional fields to sync to Clerk.io","A comma separated list of additional fields to sync to Clerk.io"
+"Only synchronize saleable products","Only synchronize saleable products"
+"Only synchronize product with visibility","Only synchronize product with visibility"
+"Disable order synchronization","Disable order synchronization"
+"Include CMS Pages","Include CMS Pages"
+"Search Settings","Search Settings"
+Enabled,Enabled
+"Faceted Search Settings","Faceted Search Settings"
+Attributes,Attributes
+"Multiselect Attributes","Multiselect Attributes"
+Titles,Titles
+"Live Search Settings","Live Search Settings"
+"Include Categories","Include Categories"
+Powerstep,Powerstep
+Type,Type
+"A comma separated list of clerk content to render","A comma separated list of clerk content to render"
+"Exit Intent","Exit Intent"
+"Category Settings","Category Settings"
+"Product Settings","Product Settings"
+"Cart Settings","Cart Settings"
+"Clerk Content","Clerk Content"
+"Insert Clerk Content","Insert Clerk Content"
+Store,Store

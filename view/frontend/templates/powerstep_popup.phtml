@@ -11,7 +11,7 @@ $categoryIds = $block->getProduct()->getCategoryIds();
         <img src="<?php echo $block->getImageUrl(); ?>" alt="<?php echo $block->getHeaderText(); ?>">
     </div>
     <div class="clerk_powerstep_clear actions">
-        <button class="action primary clerk_powerstep_button clerk_powerstep_continue" onClick="location.href='<?php echo $block->getCartUrl(); ?>';">Gå til indkøbskurven</button>
+        <button class="action primary clerk_powerstep_button clerk_powerstep_continue" onClick="location.href='<?php echo $block->getCartUrl(); ?>';"><?php echo __('Continue to Checkout'); ?></button>
         <button class="action clerk_powerstep_button clerk_powerstep_close"><?php echo __('Continue Shopping'); ?></button>
     </div>
     <div class="clerk_powerstep_templates">

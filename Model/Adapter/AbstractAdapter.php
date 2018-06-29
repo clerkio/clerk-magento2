@@ -104,7 +104,7 @@ abstract class AbstractAdapter
      */
     public function setFields($fields)
     {
-        $this->fields = array_merge(['entity_id'], (array)$fields);
+        $this->fields = array_merge(['entity_id'], $this->getDefaultFields(), (array)$fields);
     }
 
     /**
@@ -124,10 +124,6 @@ abstract class AbstractAdapter
      */
     public function getFields()
     {
-        if (empty($this->fields)) {
-            return $this->getDefaultFields();
-        }
-
         return $this->fields;
     }
 
