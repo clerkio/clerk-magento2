@@ -3,6 +3,7 @@
 namespace Clerk\Clerk\Model\Adapter;
 
 use Clerk\Clerk\Model\Config;
+use Clerk\Clerk\Helper\Image;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
@@ -16,6 +17,11 @@ class Product extends AbstractAdapter
      * @var CollectionFactory
      */
     protected $collectionFactory;
+
+    /**
+     * @var Image
+     */
+    protected $imageHelper;
 
     /**
      * @var string
@@ -41,9 +47,11 @@ class Product extends AbstractAdapter
         ScopeConfigInterface $scopeConfig,
         ManagerInterface $eventManager,
         CollectionFactory $collectionFactory,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        Image $imageHelper
     )
     {
+        $this->imageHelper = $imageHelper;
         parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory);
     }
 
@@ -140,9 +148,7 @@ class Product extends AbstractAdapter
 
         //Add image fieldhandler
         $this->addFieldHandler('image', function($item) {
-            $store = $this->storeManager->getStore();
-            $itemImage = $item->getImage() ?? $item->getSmallImage() ?? $item->getThumbnail();
-            $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
+            $imageUrl = $this->imageHelper->getUrl($item);
 
             return $imageUrl;
         });
