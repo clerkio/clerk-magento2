@@ -10,6 +10,7 @@ use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Bundle\Model\Product\Type as Bundle;
 
 class Product extends AbstractAdapter
 {
@@ -123,7 +124,17 @@ class Product extends AbstractAdapter
         //Add price fieldhandler
         $this->addFieldHandler('price', function($item) {
             try {
-                $price = $item->getFinalPrice();
+                if ($item->getTypeId() === Bundle::TYPE_CODE) {
+                    //Get minimum price for bundle products
+                    $price = $item
+                        ->getPriceInfo()
+                        ->getPrice('final_price')
+                        ->getMinimalPrice()
+                        ->getValue();
+                } else {
+                    $price = $item->getFinalPrice();
+                }
+
                 return (float) $price;
             } catch(\Exception $e) {
                 return 0;
@@ -138,6 +149,14 @@ class Product extends AbstractAdapter
                 //Fix for configurable products
                 if ($item->getTypeId() === Configurable::TYPE_CODE) {
                     $price = $item->getPriceInfo()->getPrice('regular_price')->getValue();
+                }
+
+                if ($item->getTypeId() === Bundle::TYPE_CODE) {
+                    $price = $item
+                        ->getPriceInfo()
+                        ->getPrice('regular_price')
+                        ->getMinimalPrice()
+                        ->getValue();
                 }
 
                 return (float) $price;
