@@ -137,21 +137,6 @@ class Index extends AbstractAction
                 $response[] = $item;
             }
 
-            //Append CMS pages as dummy categories
-            if ($this->scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_INCLUDE_CMS_PAGES)) {
-                $pageCollection = $this->pageCollectionFactory->create();
-                $pageCollection->addFieldToSelect('*');
-                $pageCollection->addFieldToFilter('is_active', \Magento\Cms\Model\Page::STATUS_ENABLED);
-
-                foreach ($pageCollection as $pageItem) {
-                    $response[] = [
-                        'id' => $pageItem->getId() + 10000, //Add 10000 to avoid category ID collisions
-                        'name' => $pageItem->getTitle(),
-                        'url' => $this->pageHelper->getPageUrl($pageItem->getId()),
-                    ];
-                }
-            }
-
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
