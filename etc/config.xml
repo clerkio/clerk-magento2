@@ -17,6 +17,8 @@
             <search>
                 <enabled>0</enabled>
                 <template>search-page</template>
+                <load_more_text>Load More Results</load_more_text>
+                <no_results_text>No products found</no_results_text>
             </search>
             <live_search>
                 <enabled>0</enabled>

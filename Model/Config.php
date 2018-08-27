@@ -26,6 +26,8 @@ class Config
      */
     const XML_PATH_SEARCH_ENABLED = 'clerk/search/enabled';
     const XML_PATH_SEARCH_TEMPLATE = 'clerk/search/template';
+    const XML_PATH_SEARCH_NO_RESULTS_TEXT = 'clerk/search/no_results_text';
+    const XML_PATH_SEARCH_LOAD_MORE_TEXT = 'clerk/search/load_more_text';
 
     /**
      * Faceted Search configuration

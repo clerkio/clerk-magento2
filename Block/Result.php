@@ -43,7 +43,9 @@ class Result extends BaseResult
             'class' => 'clerk',
             'data-template' => '@' . $this->getSearchTemplate(),
             'data-query' => $this->getSearchQuery(),
-            'data-target' => '#' . $this->getTargetId()
+            'data-target' => '#' . $this->getTargetId(),
+            'data-offset' => 0,
+            'data-after-render' => '_clerk_after_load_event',
         ];
 
         if ($this->_scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED)) {
@@ -77,5 +79,25 @@ class Result extends BaseResult
     public function getTargetId()
     {
         return self::TARGET_ID;
+    }
+
+    /**
+     * Get no results text
+     *
+     * @return mixed
+     */
+    public function getNoResultsText()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_NO_RESULTS_TEXT);
+    }
+
+    /**
+     * Get load more text
+     *
+     * @return mixed
+     */
+    public function getLoadMoreText()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_LOAD_MORE_TEXT);
     }
 }

@@ -2,4 +2,55 @@
 /** @var \Clerk\Clerk\Block\Result $block */
 ?>
 <span <?php echo $block->getSpanAttributes(); ?>></span>
-<div id="<?php echo $block->getTargetId(); ?>"></div>
+
+<div class="products wrapper grid products-grid">
+    <div id="<?php echo $block->getTargetId(); ?>" style="overflow: hidden;"></div>
+</div>
+
+<div id="clerk-search-no-results" style="display: none;">
+    <p class="note-msg"><?php echo $block->getNoResultsText(); ?></p>
+</div>
+
+<div id="clerk-search-load-more-button" style="text-align:center; display: none;">
+    <button class="action primary"><?php echo $block->getLoadMoreText(); ?></button>
+</div>
+
+<script type="text/javascript">
+require(['jquery'], function($) {
+    var total_loaded = 0;
+
+    window._clerk_after_load_event = function(data) {
+        total_loaded += data.response.result.length;
+
+        // If limit is undefined set limit to result length
+        var e = $('#clerk-search');
+
+        console.log(e);
+
+        if (typeof e.data('limit') === "undefined"){
+            e.data('limit', data.response.result.length)
+        }
+
+        // Setup eventhandler for loadmore button
+        $('#clerk-search-load-more-button').on('click', function() {
+            e.data('offset', e.data('offset') + e.data('limit'));
+            Clerk.renderBlocks('#clerk-search');
+            $('#clerk-search-load-more-button').off();
+        });
+
+        // If total is 0, show no results
+        if (total_loaded == 0) {
+            $('#clerk-search-no-results').show();
+        } else {
+            $('#clerk-search-no-results').hide();
+        }
+
+        // Show LoadMore button if totalloadses is not eq to hits
+        if (total_loaded == data.response.hits) {
+            $('#clerk-search-load-more-button').hide();
+        } else{
+            $('#clerk-search-load-more-button').show();
+        }
+    }
+});
+</script>

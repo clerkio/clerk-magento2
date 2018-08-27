@@ -67,6 +67,18 @@
                         <field id="*/*/enabled">1</field>
                     </depends>
                 </field>
+                <field id="load_more_text" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Load more button text</label>
+                    <depends>
+                        <field id="*/*/enabled">1</field>
+                    </depends>
+                </field>
+                <field id="no_results_text" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>No results text</label>
+                    <depends>
+                        <field id="*/*/enabled">1</field>
+                    </depends>
+                </field>
             </group>
             <group id="faceted_search" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Faceted Search Settings</label>
