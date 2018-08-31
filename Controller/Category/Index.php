@@ -120,21 +120,23 @@ class Index extends AbstractAction
 
             $response = [];
 
-            //Build response
-            foreach ($collection as $resourceItem) {
-                $item = [];
+            if ($this->page <= $collection->getLastPageNumber()) {
+                //Build response
+                foreach ($collection as $resourceItem) {
+                    $item = [];
 
-                foreach ($this->fields as $field) {
-                    if (isset($resourceItem[$field])) {
-                        $item[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
+                    foreach ($this->fields as $field) {
+                        if (isset($resourceItem[$field])) {
+                            $item[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
+                        }
+
+                        if (isset($this->fieldHandlers[$field])) {
+                            $item[$field] = $this->fieldHandlers[$field]($resourceItem);
+                        }
                     }
 
-                    if (isset($this->fieldHandlers[$field])) {
-                        $item[$field] = $this->fieldHandlers[$field]($resourceItem);
-                    }
+                    $response[] = $item;
                 }
-
-                $response[] = $item;
             }
 
             $this->getResponse()

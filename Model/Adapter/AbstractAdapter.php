@@ -87,11 +87,13 @@ abstract class AbstractAdapter
 
         $response = [];
 
-        //Build response
-        foreach ($collection as $resourceItem) {
-            $item = $this->getInfoForItem($resourceItem);
+        if ($page <= $collection->getLastPageNumber()) {
+            //Build response
+            foreach ($collection as $resourceItem) {
+                $item = $this->getInfoForItem($resourceItem);
 
-            $response[] = $item;
+                $response[] = $item;
+            }
         }
 
         return $response;
