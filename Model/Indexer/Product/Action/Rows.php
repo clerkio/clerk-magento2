@@ -6,8 +6,6 @@ use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
 use Clerk\Clerk\Model\Handler\Image;
 use Magento\Catalog\Model\Product;
-use Magento\CatalogInventory\Helper\Stock;
-use Magento\CatalogInventory\Model\StockRegistryStorage;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\Catalog\Model\ProductRepository;
@@ -29,16 +27,6 @@ class Rows
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
-
-    /**
-     * @var Stock
-     */
-    protected $stockHelper;
-
-    /**
-     * @var StockRegistryStorage
-     */
-    protected $stockRegistryStorage;
 
     /**
      * @var ManagerInterface
@@ -81,29 +69,41 @@ class Rows
     protected $compositeTypes;
 
     /**
+     * @var \Clerk\Clerk\Helper\Product
+     */
+    protected $helper;
+
+    /**
+     * @var array
+     */
+    protected $fieldHandlers = [];
+
+    /**
      * @param ObjectManagerInterface $objectManager
      * @param ScopeConfigInterface $scopeConfig
      * @param ManagerInterface $eventManager
      * @param ProductRepository $productRepository
      * @param Api $api
+     * @param Emulation $emulation
+     * @param Image $imageHandler
+     * @param StoreManagerInterface $storeManager
+     * @param Type $productType
+     * @param \Clerk\Clerk\Helper\Product $helper
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
         ScopeConfigInterface $scopeConfig,
-        Stock $stockHelper,
-        StockRegistryStorage $stockRegistryStorage,
         ManagerInterface $eventManager,
         ProductRepository $productRepository,
         Api $api,
         Emulation $emulation,
         Image $imageHandler,
         StoreManagerInterface $storeManager,
-        Type $productType
+        Type $productType,
+        \Clerk\Clerk\Helper\Product $helper
     ) {
         $this->objectManager = $objectManager;
         $this->scopeConfig = $scopeConfig;
-        $this->stockHelper = $stockHelper;
-        $this->stockRegistryStorage = $stockRegistryStorage;
         $this->eventManager = $eventManager;
         $this->productRepository = $productRepository;
         $this->productType = $productType;
@@ -111,6 +111,7 @@ class Rows
         $this->emulation = $emulation;
         $this->imageHandler = $imageHandler;
         $this->storeManager = $storeManager;
+        $this->helper = $helper;
     }
 
     /**
@@ -165,7 +166,7 @@ class Rows
 
         //Cancel if product is not saleable
         if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-            if (!$this->isSalable($product)) {
+            if (!$this->helper->isSalable($product)) {
                 $this->api->removeProduct($product->getId());
                 return;
             }
@@ -198,9 +199,18 @@ class Rows
 
         $fields = explode(',', $configFields);
 
+        $this->eventManager->dispatch('clerk_product_get_fields_before', [
+            'subject' => $this,
+            'collection' => $fields
+        ]);
+
         foreach ($fields as $field) {
             if (!isset($productItem[$field]) && isset($product[$field])) {
                 $productItem[$field] = $this->getAttributeValue($product, $field);
+            }
+
+            if (isset($this->fieldHandlers[$field])) {
+                $item[$field] = $this->fieldHandlers[$field]($product);
             }
         }
 
@@ -212,26 +222,6 @@ class Rows
         $this->api->addProduct($productObject->toArray());
 
         $this->emulation->stopEnvironmentEmulation();
-    }
-
-    /**
-     * Checks if product is salable
-     *
-     * Works around problems with cached
-     *
-     * @param Product $product
-     * @return bool
-     */
-    public function isSalable(Product $product)
-    {
-        $productId = $product->getId();
-
-        // isSalable relies on status that is assigned after initial product load
-        // stock registry holds cached old stock status, invalidate to force reload
-        $this->stockRegistryStorage->removeStockStatus($productId);
-        $this->stockHelper->assignStatusToProduct($product);
-
-        return $product->isSalable();
     }
 
     /**
@@ -287,5 +277,16 @@ class Rows
         }
 
         return $this->compositeTypes;
+    }
+
+    /**
+     * @param string $field
+     * @param callable $handler
+     * @return $this
+     */
+    public function addFieldHandler($field, callable $handler)
+    {
+        $this->fieldHandlers[$field] = $handler;
+        return $this;
     }
 }
