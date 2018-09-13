@@ -210,7 +210,7 @@ class Rows
             }
 
             if (isset($this->fieldHandlers[$field])) {
-                $item[$field] = $this->fieldHandlers[$field]($product);
+                $productItem[$field] = $this->fieldHandlers[$field]($product);
             }
         }
 
