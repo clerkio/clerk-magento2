@@ -154,10 +154,11 @@ class Index extends AbstractAction
                 ->setHeader('Content-Type', 'application/json', true)
                 ->representJson(
                     json_encode([
-                        'code'        => 500,
-                        'message'     => 'An exception occured',
-                        'description' => $e->getMessage(),
-                        'how_to_fix'  => 'Please report this error to the clerk support team',
+                        'error' => [
+                            'code'        => 500,
+                            'message'     => 'An exception occured',
+                            'description' => $e->getMessage(),
+                        ]
                     ])
                 );
         }

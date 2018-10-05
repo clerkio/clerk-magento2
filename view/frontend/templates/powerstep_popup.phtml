@@ -1,6 +1,6 @@
 <?php
 /** @var \Clerk\Clerk\Block\PowerstepPopup $block */
-$categoryIds = $block->getProduct()->getCategoryIds();
+$categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [];
 ?>
 <?php if ($block->shouldShow()) : ?>
 <div id="clerk_powerstep" style="display: none;">

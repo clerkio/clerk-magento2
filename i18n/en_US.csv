@@ -15,6 +15,7 @@ Product,Product
 "Select Product...","Select Product..."
 Category,Category
 "Select Category...","Select Category..."
+"Original image (full size)","Original image (full size)"
 Page,Page
 Popup,Popup
 Catalog,Catalog
@@ -49,9 +50,12 @@ Synchronization,Synchronization
 "Only synchronize saleable products","Only synchronize saleable products"
 "Only synchronize product with visibility","Only synchronize product with visibility"
 "Disable order synchronization","Disable order synchronization"
-"Include CMS Pages","Include CMS Pages"
+"Image type","Image type"
+"Select image type to send to Clerk","Select image type to send to Clerk"
 "Search Settings","Search Settings"
 Enabled,Enabled
+"Load more button text","Load more button text"
+"No results text","No results text"
 "Faceted Search Settings","Faceted Search Settings"
 Attributes,Attributes
 "Multiselect Attributes","Multiselect Attributes"

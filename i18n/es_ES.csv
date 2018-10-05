@@ -1,0 +1,72 @@
+"Public and private key must be set in order to enable faceted searchsearch","La claves pública y privada deben configurarse para permitir la búsqueda con facetas"
+Public or private key invalid,Clave pública o privada es inválida
+You added %1 to your shopping cart.,Agrego %1 a su canasta de compras
+Invalid keys supplied,Claves suministradas son inválidas
+The supplied public or private key is invalid,La clave pública o privada suministrada no es válida
+Ensure that the proper keys are set up in the configuration,Asegúrese de que las claves adecuadas estén configuradas en la configuración
+Clerk.io - Audience Insights,Clerk.io - Información sobre el Público
+Clerk.io - Email Insights,Clerk.io - Información sobre Correo Electronicos
+Clerk.io Dashboard,Clerk.io - Panel de herramientas
+Clerk.io - Recommendations Insights,Clerk.io - Información sobre Recomendaciones
+Clerk.io - Search Insights,Clerk.io - Información sobre Busqueda / Estadísticas de búsqueda
+Content,Contenido
+Clerk Content Options,Opciones de contenido de clerk
+Product,Producto
+Select Product...,Seleccione (un) producto
+Category,Categoría
+Select Category...,Seleccione una categoría
+Original image (full size),Imagen original (tamaño entero) / (estándar size)
+Page,Página
+Popup,Ventana emergente
+Catalog,Catálogo
+Search,Búsqueda / buscar
+Clerk is not configured for this store. <a href=""%1"">Click here to configure</a>,"Clerk no está configurado para esta tienda <a href=""%1"">Haga clic aquí para configurar</a>"
+Select a store to view dashboard,Seleccione una tienda para ver el panel de herramientas
+Default,Estándar
+Cart,Canasta
+Proceed to Checkout,Proceder a la caja de pago
+Filters,Filtros
+Categories,Categorías
+Products,Productos
+Continue to Checkout,Continuar a la caja de pago
+Continue Shopping,Sguir comprando
+Dashboard,Panel de herramientas
+Search Insights,Información sobre búsquedas / Estadísticas de búsqueda
+Recommendations Insights,Información sobre recomendaciones
+Email Insights,Información sobre correos electronicos
+Audience Insights,Información sobre el público
+Configuration,Configuración
+General,General
+Version,Versión
+Public Key,Clave pública
+Private Key,Clave privada
+Synchronization,Sincronización
+Use Real-time Updates,Use actualizciones en tiempo real
+Collect Emails,
+Additional Fields,Espacios adicionales
+A comma separated list of additional fields to sync to Clerk.io,Una lista separada por comas de espacios adicionales para sincronizar con Clerk.io
+Only synchronize saleable products,Solo sincronice productos vendibles
+Only synchronize product with visibility,Solo sincronice productos con visibilidad
+Disable order synchronization,Desactivar la sincornización de pedidios
+Image type,Tipo de imagen
+Select image type to send to Clerk,Seleccione el tipo de imagen para enviar a Clerk
+Search Settings,Configuración de búsqueda
+Enabled,Activado
+Load more button text,Cargar mas texto de botón
+No results text,Sin texto de resultado
+Faceted Search Settings,Configuración de búsqueda facetada
+Attributes,Atributos
+Multiselect Attributes,Atributos de multiselect
+Titles,Títulos
+Live Search Settings,Configuración de búsqueda en vivo
+Include Categories,Incluir categorías
+Powerstep,Powerstep
+Type,Tipo
+A comma separated list of clerk content to render,Una lista separada por comas del contenido de Clerk para rendir
+Exit Intent,Salir de Intent
+Category Settings,Configuración de categorías
+Product Settings,Configuranción de los producto
+Cart Settings,Configuracion de la carretilla / canasta de compra
+Clerk Content,Contenido de Clerk
+Insert Clerk Content,Insertar contenido de Clerk
+Store,Tienda

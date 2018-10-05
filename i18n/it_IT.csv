@@ -1,0 +1,74 @@
+Public and private key must be set in order to enable faceted searchsearch,La public key e la private key devono essere impostate per poter attivare la ricerca con filtri
+Public or private key invalid,La Public o la Private key non e' valida
+You added %1 to your shopping cart.,Hai aggiunto %1 al tuo carrello.
+Invalid keys supplied,La key fornita non e' valida
+The supplied public or private key is invalid,La public o la private key fornita non e' valida
+Ensure that the proper keys are set up in the configuration,Assicurati che le public e private key siano correttamente impostate nella configurazione
+Clerk.io - Audience Insights,Clerk.io - Analisi dell'Audience
+Clerk.io - Email Insights,Clerk.io - Analisi delle Email
+Clerk.io Dashboard,Clerk.io - Pannello di Controllo
+Clerk.io - Recommendations Insights,Clerk.io - Analisi delle Raccomandazioni
+Clerk.io - Search Insights,Clerk.io - Analisi delle Ricerche
+Content,Contenuto
+Clerk Content Options,Opzioni del Contenuto di Clerk
+Product,Prodotto
+Select Product...,Seleziona un prodotto...
+Category,Categoria
+Select Category...,Seleziona una Categoria...
+Original image (full size),Immagine originale (a piena risoluzione)
+Page,Pagina
+Popup,Popup
+Catalog,Catalogo
+Search,Cerca
+Catalog,Catalogo
+"Clerk is not configured for this store. <a href=""%1"">Click here to configure</a>","Clerk non e' configurato per questo ecommerce. <a href=""%1"">Clicca qui per configurare</a>"
+Select a store to view dashboard,Seleziona un negozio per visualizzare il pannello di controllo
+Default,Predefinito
+Cart,Carrello
+Proceed to Checkout,Procedi al Pagamento
+Filters,Filtri
+Categories,Categorie
+Products,Prodotti
+Continue to Checkout,Procedi al Pagamento
+Continue Shopping,Continua a Curiosare
+Clerk,Clerk
+Dashboard,Pannello di Controllo
+Search Insights,Analisi della Ricerca
+Recommendations Insights,Analisi delle Raccomandazioni
+Email Insights,Analisi delle Email
+Audience Insights,Analisi dell'Audience
+Configuration,Configurazione
+General,Generale
+Version,Versione
+Public Key,Public Key
+Private Key,Private Key
+Synchronization,Sincronizzazione
+Use Real-time Updates,Usa gli Aggiornamenti in Tempo Reale
+Collect Emails,Raccogli Email
+Additional Fields,Campi Aggiuntivi
+A comma separated list of additional fields to sync to Clerk.io,"Una lista di campi aggiuntivi da sincronizzare con Clerk.io, separati dalla virgola"
+Only synchronize saleable products,Sincronizza solo i prodotti in stock
+Only synchronize product with visibility,Sincronizza solo i prodotti visibili
+Disable order synchronization,Disattiva la sincronizzazione degli ordini
+Image type,Tipo di immagine
+Select image type to send to Clerk,Seleziona il tipo di immagine da inviare a Clerk
+Search Settings,Impostazioni della Ricerca
+Enabled,Attivato
+Load more button text,"Testo del pulsante ""Carica di Piu'"""
+No results text,"Testo del ""Nessun Risultato"""
+Faceted Search Settings,Impostazioni dei Filtri di Ricerca
+Attributes,Attributi
+Multiselect Attributes,Attributi Multiselect
+Titles,Titoli
+Live Search Settings,Impostazioni di Live Search
+Include Categories,Includi le Categorie
+Powerstep,Powerstep
+Type,Tipo
+A comma separated list of clerk content to render,"Un lista di contenuti di Clerk da mostrare, separati ciascuno da una virgola"
+Exit Intent,Exit Intent
+Category Settings,Impostazioni della Categoria
+Product Settings,Impostazioni di Prodotto
+Cart Settings,Impostazioni del Carrello
+Clerk Content,Contenuto di Clerk
+Insert Clerk Content,Inserisci il Contenuto di Clerk
+Store,Negozio

@@ -176,19 +176,6 @@ class Index extends Action
                     'content' => $html
                 ])
             );
-
-//        /** @var \Magento\Framework\Data\Form\Element\Select $select */
-//        $select = $this->_objectManager->create('Magento\Framework\Data\Form\Element\Select');
-//        $select->setHtmlId('clerk_widget_content');
-//        $select->setId('clerk_widget_content');
-//        $select->setCssClass('clerk_content_select');
-//        $select->setName('parameters[content]');
-//        $select->setValues($this->sourceModelPool->get(Content::class)->toOptionArray());
-//        $select->setLabel(__('Content'));
-//        $select->setForm($form);
-
-//        $renderer = $this->_objectManager->create('\Magento\Backend\Block\Widget\Form\Renderer\Fieldset\Element');
-
     }
 
     public function getInvalidResponse()

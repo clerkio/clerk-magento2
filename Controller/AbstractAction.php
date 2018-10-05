@@ -104,10 +104,10 @@ abstract class AbstractAction extends Action
                 ->setHttpResponseCode(403)
                 ->representJson(
                     json_encode([
-                        'code'        => 403,
-                        'message'     => __('Invalid keys supplied'),
-                        'description' => __('The supplied public or private key is invalid'),
-                        'how_to_fix'  => __('Ensure that the proper keys are set up in the configuration'),
+                        'error' => [
+                            'code'        => 403,
+                            'message'     => __('Invalid keys supplied'),
+                        ]
                     ])
                 );
 
@@ -241,10 +241,11 @@ abstract class AbstractAction extends Action
                 ->setHeader('Content-Type', 'application/json', true)
                 ->representJson(
                     json_encode([
-                        'code'        => 500,
-                        'message'     => 'An exception occured',
-                        'description' => $e->getMessage(),
-                        'how_to_fix'  => 'Please report this error to the clerk support team',
+                        'error' => [
+                            'code'        => 500,
+                            'message'     => 'An exception occured',
+                            'description' => $e->getMessage(),
+                        ]
                     ])
                 );
         }
