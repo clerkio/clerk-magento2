@@ -3,6 +3,7 @@
 namespace Clerk\Clerk\Controller\Order;
 
 use Clerk\Clerk\Controller\AbstractAction;
+use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
@@ -78,7 +79,11 @@ class Index extends AbstractAction
 
         //Add email fieldhandler
         $this->addFieldHandler('email', function($item) {
-            return $item->getCustomerEmail();
+            if ($this->scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS)) {
+                return $item->getCustomerEmail();
+            }
+
+            return null;
         });
 
         //Add customer fieldhandler

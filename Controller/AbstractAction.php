@@ -218,7 +218,9 @@ abstract class AbstractAction extends Action
                         }
 
                         if (isset($this->fieldHandlers[$field])) {
-                            $item[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
+                            if (! is_null($this->fieldHandlers[$field]($resourceItem))) {
+                                $item[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
+                            }
                         }
                     }
 
