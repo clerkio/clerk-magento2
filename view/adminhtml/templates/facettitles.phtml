@@ -10,6 +10,7 @@ $values = json_decode($element->getValue(), true);
         <tr>
             <th class="col-store-view"><?php echo __('Default'); ?></th>
             <th class="col-store-view"><?php echo $block->getScopeLabel(); ?></th>
+            <th class="col-store-view"><?php echo __('Sort Order'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -20,7 +21,10 @@ $values = json_decode($element->getValue(), true);
                     <input class="input-text" id="_orig" value="<?php echo $attribute; ?>" type="text" readonly>
                 </td>
                 <td class="col-store-view">
-                    <input class="input-text" id="" name="<?php echo $element->getName(); ?>[<?php echo $attribute; ?>]" value="<?php echo $value; ?>" type="text">
+                    <input class="input-text" id="" name="<?php echo $element->getName(); ?>[<?php echo $attribute; ?>][label]" value="<?php echo $value['label']; ?>" type="text">
+                </td>
+                <td class="col-store-view">
+                    <input class="input-text" id="" name="<?php echo $element->getName(); ?>[<?php echo $attribute; ?>][sort_order]" value="<?php echo $value['sort_order']; ?>" type="text">
                 </td>
             </tr>
             <?php endforeach; ?>

@@ -49,16 +49,21 @@ class Result extends BaseResult
         ];
 
         if ($this->_scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED)) {
-            if ($attributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES)) {
-                $spanAttributes['data-facets-target'] = "#clerk-search-filters";
-                $spanAttributes['data-facets-attributes'] = '["' . str_replace(',', '","', $attributes) . '"]';
+            $spanAttributes['data-facets-target'] = "#clerk-search-filters";
+
+            if ($titles = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES)) {
+                $titles = json_decode($titles, true);
+
+                // sort alphabetically by name
+                uasort($titles, function($a, $b) {
+                    return $a['sort_order'] > $b['sort_order'];
+                });
+
+                $spanAttributes['data-facets-titles'] = json_encode(array_filter(array_combine(array_keys($titles), array_column($titles, 'label'))));
+                $spanAttributes['data-facets-attributes'] = json_encode(array_keys($titles));
 
                 if ($multiselectAttributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES)) {
                     $spanAttributes['data-facets-multiselect-attributes'] = '["' . str_replace(',', '","', $multiselectAttributes) . '"]';
-                }
-
-                if ($titles = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES)) {
-                    $spanAttributes['data-facets-titles'] = $titles;
                 }
             }
         }
