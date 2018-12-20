@@ -56,7 +56,11 @@ class Result extends BaseResult
 
                 // sort alphabetically by name
                 uasort($titles, function($a, $b) {
-                    return $a['sort_order'] > $b['sort_order'];
+                    if (isset($a['sort_order']) && isset($b['sort_order'])) {
+                        return $a['sort_order'] > $b['sort_order'];
+                    }
+
+                    return true;
                 });
 
                 $spanAttributes['data-facets-titles'] = json_encode(array_filter(array_combine(array_keys($titles), array_column($titles, 'label'))));
