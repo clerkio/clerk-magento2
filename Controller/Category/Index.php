@@ -3,12 +3,12 @@
 namespace Clerk\Clerk\Controller\Category;
 
 use Clerk\Clerk\Controller\AbstractAction;
-use Clerk\Clerk\Model\Config;
 use Magento\Cms\Helper\Page;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
+use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
@@ -37,11 +37,21 @@ class Index extends AbstractAction
     protected $pageHelper;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * Category controller constructor.
      *
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $categoryCollectionFactory
+     * @param LoggerInterface $logger
+     * @param PageCollectionFactory $pageCollectionFactory
+     * @param Page $pageHelper
+     * @param StoreManagerInterface $storeManager
+     * @param Magento\Catalog\Api\CategoryRepositoryInterface $categoryRepository
      */
     public function __construct(
         Context $context,
@@ -49,12 +59,14 @@ class Index extends AbstractAction
         CollectionFactory $categoryCollectionFactory,
         LoggerInterface $logger,
         PageCollectionFactory $pageCollectionFactory,
-        Page $pageHelper
+        Page $pageHelper,
+        StoreManagerInterface $storeManager
     )
     {
         $this->collectionFactory = $categoryCollectionFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
         $this->pageHelper = $pageHelper;
+        $this->storeManager = $storeManager;
 
         $this->addFieldHandlers();
 
@@ -94,9 +106,12 @@ class Index extends AbstractAction
     {
         $collection = $this->collectionFactory->create();
 
+        $rootCategory = $this->storeManager->getStore()->getRootCategoryId();
+
         $collection->addFieldToSelect('*');
         $collection->addAttributeToFilter('level', ['gteq' => 2]);
         $collection->addAttributeToFilter('name', ['neq' => null]);
+        $collection->addPathsFilter('1/' . $rootCategory . '/%');
 
         $collection->setPageSize($this->limit)
                    ->setCurPage($this->page)
