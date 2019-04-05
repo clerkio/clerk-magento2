@@ -23,7 +23,7 @@
     <?php foreach ($block->getTemplates() as $template) : ?>
         <span class="clerk"
               data-template="@<?php echo $template; ?>"
-              data-product="[<?php echo $block->getProduct()->getId(); ?>]"
+              data-products="[<?php echo $block->getProduct()->getId(); ?>]"
               data-category="<?php echo $block->getProduct()->getCategoryId(); ?>"
         ></span>
     <?php endforeach; ?>
