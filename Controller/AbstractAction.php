@@ -92,7 +92,6 @@ abstract class AbstractAction extends Action
      */
     public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger,ClerkLogger $ClerkLogger)
     {
-        $this->configWriter = $resourceConfig;
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
         $this->clerk_logger = $ClerkLogger;
