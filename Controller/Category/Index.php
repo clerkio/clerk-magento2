@@ -10,9 +10,15 @@ use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var
+     */
+    protected $clerk_logger;
+
     /**
      * @var array
      */
@@ -60,17 +66,19 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         PageCollectionFactory $pageCollectionFactory,
         Page $pageHelper,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        ClerkLogger $ClerkLogger
     )
     {
         $this->collectionFactory = $categoryCollectionFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
         $this->pageHelper = $pageHelper;
         $this->storeManager = $storeManager;
+        $this->clerk_logger = $ClerkLogger;
 
         $this->addFieldHandlers();
 
-        parent::__construct($context, $scopeConfig, $logger);
+        parent::__construct($context, $scopeConfig, $logger, $ClerkLogger);
     }
 
     /**
@@ -78,46 +86,29 @@ class Index extends AbstractAction
      */
     protected function addFieldHandlers()
     {
-        //Add parent fieldhandler
-        $this->addFieldHandler('parent', function($item) {
-            return $item->getParentId();
-        });
+        try {
+            //Add parent fieldhandler
+            $this->addFieldHandler('parent', function ($item) {
+                return $item->getParentId();
+            });
 
-        //Add url fieldhandler
-        $this->addFieldHandler('url', function($item) {
-            return $item->getUrl();
-        });
+            //Add url fieldhandler
+            $this->addFieldHandler('url', function ($item) {
+                return $item->getUrl();
+            });
 
-        //Add subcategories fieldhandler
-        $this->addFieldHandler('subcategories', function($item) {
-            $children = $item->getAllChildren(true);
-            //Remove own ID from subcategories array
-            return array_values(array_diff($children, [$item->getId()]));
-        });
-    }
+            //Add subcategories fieldhandler
+            $this->addFieldHandler('subcategories', function ($item) {
+                $children = $item->getAllChildren(true);
+                //Remove own ID from subcategories array
+                return array_values(array_diff($children, [$item->getId()]));
+            });
 
-    /**
-     * Prepare collection
-     *
-     * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    protected function prepareCollection()
-    {
-        $collection = $this->collectionFactory->create();
+        } catch (\Exception $e) {
 
-        $rootCategory = $this->storeManager->getStore()->getRootCategoryId();
+            $this->clerk_logger->error('Category addFieldHandlers ERROR', ['error' => $e]);
 
-        $collection->addFieldToSelect('*');
-        $collection->addAttributeToFilter('level', ['gteq' => 2]);
-        $collection->addAttributeToFilter('name', ['neq' => null]);
-        $collection->addPathsFilter('1/' . $rootCategory . '/%');
-
-        $collection->setPageSize($this->limit)
-                   ->setCurPage($this->page)
-                   ->addOrder($this->orderBy, $this->order);
-
-        return $collection;
+        }
     }
 
     /**
@@ -126,6 +117,8 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
+            $this->clerk_logger->log('Category Sync Started', ['response' => '']);
+
             $collection = $this->prepareCollection();
 
             $this->_eventManager->dispatch($this->eventPrefix . '_get_collection_after', [
@@ -160,8 +153,10 @@ class Index extends AbstractAction
 
             if ($this->debug) {
                 $this->getResponse()->setBody(json_encode($response, JSON_PRETTY_PRINT));
+                $this->clerk_logger->log('Category Sync Done', ['Note' => 'Only showing first 5 items in response ','response' => array_slice($response, 0, 5)]);
             } else {
                 $this->getResponse()->setBody(json_encode($response));
+                $this->clerk_logger->log('Category Sync Done', ['Note' => 'Only showing first 5 items in response ','response' => array_slice($response, 0, 5)]);
             }
         } catch (\Exception $e) {
             $this->getResponse()
@@ -170,12 +165,46 @@ class Index extends AbstractAction
                 ->representJson(
                     json_encode([
                         'error' => [
-                            'code'        => 500,
-                            'message'     => 'An exception occured',
+                            'code' => 500,
+                            'message' => 'An exception occured',
                             'description' => $e->getMessage(),
                         ]
                     ])
                 );
+
+            $this->clerk_logger->error('Category execute ERROR', ['error' => $e]);
+        }
+    }
+
+    /**
+     * Prepare collection
+     *
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function prepareCollection()
+    {
+        try {
+            
+        $collection = $this->collectionFactory->create();
+
+        $rootCategory = $this->storeManager->getStore()->getRootCategoryId();
+
+        $collection->addFieldToSelect('*');
+        $collection->addAttributeToFilter('level', ['gteq' => 2]);
+        $collection->addAttributeToFilter('name', ['neq' => null]);
+        $collection->addPathsFilter('1/' . $rootCategory . '/%');
+
+        $collection->setPageSize($this->limit)
+            ->setCurPage($this->page)
+            ->addOrder($this->orderBy, $this->order);
+
+        return $collection;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Category prepareCollection ERROR', ['error' => $e]);
+
         }
     }
 }

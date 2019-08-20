@@ -2,19 +2,32 @@
 
 namespace Clerk\Clerk\Controller;
 
+use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\Store;
 use Psr\Log\LoggerInterface;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
 abstract class AbstractAction extends Action
 {
     /**
+     * @var
+     */
+    protected $clerk_logger;
+
+    /**
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
+
+    /**
+     * @var
+     */
+    protected $configWriter;
 
     /**
      * @var bool
@@ -77,13 +90,16 @@ abstract class AbstractAction extends Action
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger)
+    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger,ClerkLogger $ClerkLogger)
     {
+        $this->configWriter = $resourceConfig;
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
-
+        $this->clerk_logger = $ClerkLogger;
         parent::__construct($context);
     }
+
+
 
     /**
      * Dispatch request
@@ -94,30 +110,40 @@ abstract class AbstractAction extends Action
      */
     public function dispatch(RequestInterface $request)
     {
-        //Validate supplied keys
-        if (!$this->verifyKeys($request)) {
-            $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
-            $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
 
-            //Display error
-            $this->getResponse()
-                ->setHttpResponseCode(403)
-                ->representJson(
-                    json_encode([
-                        'error' => [
-                            'code'        => 403,
-                            'message'     => __('Invalid keys supplied'),
-                        ]
-                    ])
-                );
+        try {
+            //Validate supplied keys
+            if (!$this->verifyKeys($request)) {
+                $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
+                $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
 
+                //Display error
+                $this->getResponse()
+                    ->setHttpResponseCode(403)
+                    ->representJson(
+                        json_encode([
+                            'error' => [
+                                'code' => 403,
+                                'message' => __('Invalid keys supplied'),
+                            ]
+                        ])
+                    );
+
+                $this->clerk_logger->warn('Invalid keys supplied', ['response' => parent::dispatch($request)]);
+
+                return parent::dispatch($request);
+            }
+
+            //Filter out request arguments
+            $this->getArguments($request);
+            $this->clerk_logger->log('Valid keys supplied', ['response' => parent::dispatch($request)]);
             return parent::dispatch($request);
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Validating API Keys ERROR', ['error' => $e]);
+
         }
-
-        //Filter out request arguments
-        $this->getArguments($request);
-
-        return parent::dispatch($request);
     }
 
     /**
@@ -128,14 +154,23 @@ abstract class AbstractAction extends Action
      */
     private function verifyKeys(RequestInterface $request)
     {
-        $privateKey = $request->getParam('private_key');
-        $publicKey = $request->getParam('key');
 
-        if ($privateKey !== $this->getPrivateKey() || $publicKey !== $this->getPublicKey()) {
-            return false;
+        try {
+
+            $privateKey = $request->getParam('private_key');
+            $publicKey = $request->getParam('key');
+
+            if ($privateKey !== $this->getPrivateKey() || $publicKey !== $this->getPublicKey()) {
+                return false;
+            }
+
+            return true;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('verifyKeys ERROR', ['error' => $e]);
+
         }
-
-        return true;
     }
 
     /**
@@ -145,10 +180,19 @@ abstract class AbstractAction extends Action
      */
     private function getPrivateKey()
     {
-        return $this->scopeConfig->getValue(
-            \Clerk\Clerk\Model\Config::XML_PATH_PRIVATE_KEY,
-            ScopeInterface::SCOPE_STORE
-        );
+        try {
+            $this->clerk_logger->log('Getting Privat Key Started', ['response' => '']);
+            $this->clerk_logger->log('Getting Privat Key Done', ['response' => '']);
+            return $this->scopeConfig->getValue(
+                \Clerk\Clerk\Model\Config::XML_PATH_PRIVATE_KEY,
+                ScopeInterface::SCOPE_STORE
+            );
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('getPrivateKey ERROR', ['error' => $e]);
+
+        }
     }
 
     /**
@@ -158,10 +202,19 @@ abstract class AbstractAction extends Action
      */
     private function getPublicKey()
     {
-        return $this->scopeConfig->getValue(
-            \Clerk\Clerk\Model\Config::XML_PATH_PUBLIC_KEY,
-            ScopeInterface::SCOPE_STORE
-        );
+        try {
+            $this->clerk_logger->log('Getting Public Key Started', ['response' => '']);
+            $this->clerk_logger->log('Getting Public Key Done', ['response' => '']);
+            return $this->scopeConfig->getValue(
+                \Clerk\Clerk\Model\Config::XML_PATH_PUBLIC_KEY,
+                ScopeInterface::SCOPE_STORE
+            );
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('getPublicKey ERROR', ['error' => $e]);
+
+        }
     }
 
     /**
@@ -169,27 +222,48 @@ abstract class AbstractAction extends Action
      */
     protected function getArguments(RequestInterface $request)
     {
-        $this->debug = (bool) $request->getParam('debug', false);
-        $this->limit = (int) $request->getParam('limit', 0);
-        $this->page = (int) $request->getParam('page', 0);
-        $this->orderBy = $request->getParam('orderby', 'entity_id');
+        try {
+            $this->clerk_logger->log('Getting Arguments Started', ['response' => '']);
 
-        if ($request->getParam('order') === 'desc') {
-            $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_DESC;
-        } else {
-            $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_ASC;
-        }
+            $this->debug = (bool)$request->getParam('debug', false);
+            $this->limit = (int)$request->getParam('limit', 0);
+            $this->page = (int)$request->getParam('page', 0);
+            $this->orderBy = $request->getParam('orderby', 'entity_id');
 
-        /**
-         * Explode fields on , and filter out "empty" entries
-         */
-        $fields = $request->getParam('fields');
-        if ($fields) {
-            $this->fields = array_filter(explode(',', $fields), 'strlen');
-        } else {
-            $this->fields = $this->getDefaultFields();
+            if ($request->getParam('order') === 'desc') {
+                $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_DESC;
+            } else {
+                $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_ASC;
+            }
+
+            /**
+             * Explode fields on , and filter out "empty" entries
+             */
+            $fields = $request->getParam('fields');
+            if ($fields) {
+                $this->fields = array_filter(explode(',', $fields), 'strlen');
+            } else {
+                $this->fields = $this->getDefaultFields();
+            }
+            $this->fields = array_merge(['entity_id'], $this->fields);
+
+            $this->clerk_logger->log('Getting Arguments Done', ['response' => $this->fields]);
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('getArguments ERROR', ['error' => $e]);
+
         }
-        $this->fields = array_merge(['entity_id'], $this->fields);
+    }
+
+    /**
+     * Get default fields
+     *
+     * @return array
+     */
+    protected function getDefaultFields()
+    {
+        return [];
     }
 
     /**
@@ -218,7 +292,7 @@ abstract class AbstractAction extends Action
                         }
 
                         if (isset($this->fieldHandlers[$field])) {
-                            if (! is_null($this->fieldHandlers[$field]($resourceItem))) {
+                            if (!is_null($this->fieldHandlers[$field]($resourceItem))) {
                                 $item[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
                             }
                         }
@@ -244,12 +318,43 @@ abstract class AbstractAction extends Action
                 ->representJson(
                     json_encode([
                         'error' => [
-                            'code'        => 500,
-                            'message'     => 'An exception occured',
+                            'code' => 500,
+                            'message' => 'An exception occured',
                             'description' => $e->getMessage(),
                         ]
                     ])
                 );
+            $this->clerk_logger->error('AbstractAction execute ERROR', ['error' => $e]);
+        }
+    }
+
+    /**
+     * Prepare collection
+     *
+     * @return mixed
+     */
+    protected function prepareCollection()
+    {
+
+        try {
+            $this->clerk_logger->log('Preparing Collection Started', ['response' => '']);
+
+            $collection = $this->collectionFactory->create();
+
+            $collection->addFieldToSelect('*');
+
+            $collection->setPageSize($this->limit)
+                ->setCurPage($this->page)
+                ->addOrder($this->orderBy, $this->order);
+
+            $this->clerk_logger->log('Preparing Collection Done', ['response' => $collection]);
+
+            return $collection;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('prepareCollection ERROR', ['error' => $e]);
+
         }
     }
 
@@ -261,50 +366,20 @@ abstract class AbstractAction extends Action
      */
     protected function getFieldName($field)
     {
-        if (isset($this->fieldMap[$field])) {
-            return $this->fieldMap[$field];
+
+        try {
+            $this->clerk_logger->log('Getting Field Name Started', ['response' => '']);
+            if (isset($this->fieldMap[$field])) {
+                return $this->fieldMap[$field];
+            }
+            $this->clerk_logger->log('Getting Field Name Done', ['response' => $field]);
+            return $field;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Field Name ERROR', ['error' => $e]);
+
         }
-
-        return $field;
-    }
-
-    /**
-     * Prepare collection
-     *
-     * @return mixed
-     */
-    protected function prepareCollection()
-    {
-        $collection = $this->collectionFactory->create();
-
-        $collection->addFieldToSelect('*');
-
-        $collection->setPageSize($this->limit)
-            ->setCurPage($this->page)
-            ->addOrder($this->orderBy, $this->order);
-
-        return $collection;
-    }
-
-    /**
-     * Add fieldhandler
-     *
-     * @param $field
-     * @param callable $handler
-     */
-    public function addFieldHandler($field, callable $handler)
-    {
-        $this->fieldHandlers[$field] = $handler;
-    }
-
-    /**
-     * Get default fields
-     *
-     * @return array
-     */
-    protected function getDefaultFields()
-    {
-        return [];
     }
 
     /**
@@ -317,5 +392,16 @@ abstract class AbstractAction extends Action
     protected function getAttributeValue($resourceItem, $field)
     {
         return $resourceItem[$field];
+    }
+
+    /**
+     * Add fieldhandler
+     *
+     * @param $field
+     * @param callable $handler
+     */
+    public function addFieldHandler($field, callable $handler)
+    {
+        $this->fieldHandlers[$field] = $handler;
     }
 }

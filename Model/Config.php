@@ -74,4 +74,12 @@ class Config
      */
     const XML_PATH_CART_ENABLED = 'clerk/cart/enabled';
     const XML_PATH_CART_CONTENT = 'clerk/cart/content';
+
+    /**
+     * Logger configuration
+     */
+    const XML_PATH_LOG_LEVEL = 'clerk/log/level';
+    const XML_PATH_LOG_TO = 'clerk/log/to';
+    const XML_PATH_LOG_ENABLED = 'clerk/log/enabled';
+
 }

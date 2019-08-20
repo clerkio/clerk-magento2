@@ -5,9 +5,15 @@ namespace Clerk\Clerk\Model;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Psr\Log\LoggerInterface;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
 class Api
 {
+    /**
+     * @var LoggerInterface
+     */
+    protected $clerk_logger;
+
     /**
      * @var LoggerInterface
      */
@@ -36,9 +42,11 @@ class Api
     public function __construct(
         LoggerInterface $logger,
         ScopeConfigInterface $scopeConfig,
-        ZendClientFactory $httpClientFactory
+        ZendClientFactory $httpClientFactory,
+        ClerkLogger $Clerklogger
     )
     {
+        $this->clerk_logger = $Clerklogger;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
         $this->httpClientFactory = $httpClientFactory;
@@ -49,11 +57,57 @@ class Api
      */
     public function addProduct($params)
     {
-        $params = [
-            'products' => [$params],
-        ];
+        try {
 
-        $this->post('product/add', $params);
+            $this->clerk_logger->log('Adding Products Started', ['response' => '']);
+            $params = [
+                'products' => [$params],
+            ];
+
+            $this->post('product/add', $params);
+            $this->clerk_logger->log('Adding Products Done', ['response' => $params]);
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Adding Products Error', ['error' => $e]);
+
+        }
+    }
+
+    /**
+     * Perform a POST request
+     *
+     * @param string $endpoint
+     * @param array $params
+     * @throws \Zend_Http_Client_Exception
+     */
+    private function post($endpoint, $params = [])
+    {
+        try {
+            $this->clerk_logger->log('POST Request Starting', ['response' => '']);
+            $params = array_merge($this->getDefaultParams(), $params);
+
+            /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
+            $httpClient = $this->httpClientFactory->create();
+            $httpClient->setUri($this->baseurl . $endpoint);
+            $httpClient->setRawData(json_encode($params), 'application/json');
+
+            $this->clerk_logger->log('POST Request Done', ['response' => $response]);
+            $result = $httpClient->request('POST');
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('POST Request Error', ['error' => $e]);
+
+        }
+    }
+
+    private function getDefaultParams()
+    {
+        return [
+            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
+            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
+        ];
     }
 
     /**
@@ -64,11 +118,54 @@ class Api
      */
     public function removeProduct($productId)
     {
-        $params = [
-            'products'     => $productId,
-        ];
+        try {
 
-        $this->get('product/remove', $params);
+            $this->clerk_logger->log('Removing Products Started', ['response' => '']);
+            $params = [
+                'products' => $productId,
+            ];
+
+            $this->get('product/remove', $params);
+            $this->clerk_logger->log('Removing Products Done', ['response' => $params]);
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Removing Products Error', ['error' => $e]);
+
+        }
+    }
+
+    /**
+     * Perform a GET request
+     *
+     * @param string $endpoint
+     * @param array $params
+     * @return \Zend_Http_Response
+     * @throws \Zend_Http_Client_Exception
+     */
+    private function get($endpoint, $params = [])
+    {
+        try {
+
+            $this->clerk_logger->log('GET Request Starting', ['response' => '']);
+
+            $params = array_merge($this->getDefaultParams(), $params);
+
+            /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
+            $httpClient = $this->httpClientFactory->create();
+            $httpClient->setUri($this->baseurl . $endpoint);
+            $httpClient->setParameterGet($params);
+            $response = $httpClient->request('GET');
+
+            $this->clerk_logger->log('GET Request Done', ['response' => $response]);
+
+            return $response;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('GET Request Error', ['error' => $e]);
+
+        }
     }
 
     /**
@@ -81,12 +178,24 @@ class Api
      */
     public function keysValid($publicKey, $privateKey)
     {
-        $params = [
-            'key' => $publicKey,
-            'private_key' => $privateKey,
-        ];
+        try {
 
-        return $this->get('client/account/info', $params)->getBody();
+            $this->clerk_logger->log('Key Validation Started', ['response' => '']);
+
+            $params = [
+                'key' => $publicKey,
+                'private_key' => $privateKey,
+            ];
+
+            $this->clerk_logger->log('Key Validation Done', ['response' => $this->get('client/account/info', $params)->getBody()]);
+
+            return $this->get('client/account/info', $params)->getBody();
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Key Validation Error', ['error' => $e]);
+
+        }
     }
 
     /**
@@ -97,7 +206,51 @@ class Api
      */
     public function getFacetAttributes()
     {
-        return $this->get('product/facets');
+        try {
+
+            $this->clerk_logger->log('Getting Facet Attributes Started', ['response' => '']);
+            $this->clerk_logger->log('Getting Facet Attributes Done', ['response' => $this->get('product/facets')]);
+
+            return $this->get('product/facets');
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Facet Attributes Error', ['error' => $e]);
+
+        }
+    }
+
+    public function getEndpointForContent($contentId)
+    {
+        try {
+
+            $this->clerk_logger->log('Getting Endpoint For Content Started', ['response' => '']);
+            $contentResult = json_decode($this->getContent());
+
+            if ($contentResult) {
+
+                foreach ($contentResult->contents as $content) {
+
+                    if ($content->type !== 'html') {
+
+                        continue;
+
+                    }
+
+                    if ($content->id === $contentId) {
+
+                        $this->clerk_logger->log('Getting Endpoint For Content Done', ['response' => $content->api]);
+                        return $content->api;
+
+                    }
+                }
+            }
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Endpoint For Content Error', ['error' => $e]);
+
+        }
     }
 
     /**
@@ -109,28 +262,23 @@ class Api
      */
     public function getContent($storeId = null)
     {
-        $params = [
-            'key'         => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
-            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
-        ];
+        try {
 
-        return $this->get('client/account/content/list', $params)->getBody();
-    }
+            $this->clerk_logger->log('Getting Content Started', ['response' => '']);
 
-    public function getEndpointForContent($contentId)
-    {
-        $contentResult = json_decode($this->getContent());
+            $params = [
+                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
+                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
+            ];
 
-        if ($contentResult) {
-            foreach ($contentResult->contents as $content) {
-                if ($content->type !== 'html') {
-                    continue;
-                }
+            $this->clerk_logger->log('Getting Content Done', ['response' => $this->get('client/account/content/list', $params)->getBody()]);
 
-                if ($content->id === $contentId) {
-                    return $content->api;
-                }
-            }
+            return $this->get('client/account/content/list', $params)->getBody();
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Content Error', ['error' => $e]);
+
         }
     }
 
@@ -217,53 +365,5 @@ class Api
         }
 
         return false;
-    }
-
-    /**
-     * Perform a GET request
-     *
-     * @param string $endpoint
-     * @param array $params
-     * @return \Zend_Http_Response
-     * @throws \Zend_Http_Client_Exception
-     */
-    private function get($endpoint, $params = [])
-    {
-        $params = array_merge($this->getDefaultParams(), $params);
-
-        /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
-        $httpClient = $this->httpClientFactory->create();
-        $httpClient->setUri($this->baseurl . $endpoint);
-        $httpClient->setParameterGet($params);
-        $response = $httpClient->request('GET');
-
-        return $response;
-    }
-
-    /**
-     * Perform a POST request
-     *
-     * @param string $endpoint
-     * @param array $params
-     * @throws \Zend_Http_Client_Exception
-     */
-    private function post($endpoint, $params = [])
-    {
-        $params = array_merge($this->getDefaultParams(), $params);
-
-        /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
-        $httpClient = $this->httpClientFactory->create();
-        $httpClient->setUri($this->baseurl . $endpoint);
-        $httpClient->setRawData(json_encode($params), 'application/json');
-
-        $result = $httpClient->request('POST');
-    }
-
-    private function getDefaultParams()
-    {
-        return [
-            'key'         => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
-            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
-        ];
     }
 }

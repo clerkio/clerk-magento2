@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Model\Adapter;
 
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -12,6 +13,11 @@ abstract class AbstractAdapter
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
+
+    /**
+     * @var
+     */
+    protected $clerk_logger;
 
     /**
      * @var ManagerInterface
@@ -55,9 +61,11 @@ abstract class AbstractAdapter
         ScopeConfigInterface $scopeConfig,
         ManagerInterface $eventManager,
         StoreManagerInterface $storeManager,
-        $collectionFactory
+        $collectionFactory,
+        ClerkLogger $clerkLogger
     )
     {
+        $this->clerk_logger = $clerkLogger;
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
         $this->storeManager = $storeManager;
@@ -67,9 +75,9 @@ abstract class AbstractAdapter
     }
 
     /**
-     * @return mixed
+     * Add default fieldhandlers
      */
-    abstract protected function prepareCollection($page, $limit, $orderBy, $order);
+    abstract protected function addFieldHandlers();
 
     /**
      * @param $fields
@@ -81,42 +89,71 @@ abstract class AbstractAdapter
      */
     public function getResponse($fields, $page, $limit, $orderBy, $order)
     {
-        $this->setFields($fields);
+        try {
 
-        $collection = $this->prepareCollection($page, $limit, $orderBy, $order);
+            $this->clerk_logger->log('Getting Response Started', ['response' => '']);
 
-        $response = [];
+            $this->setFields($fields);
 
-        if ($page <= $collection->getLastPageNumber()) {
-            //Build response
-            foreach ($collection as $resourceItem) {
-                $item = $this->getInfoForItem($resourceItem);
+            $collection = $this->prepareCollection($page, $limit, $orderBy, $order);
 
-                $response[] = $item;
+            $response = [];
+
+            if ($page <= $collection->getLastPageNumber()) {
+                //Build response
+                foreach ($collection as $resourceItem) {
+                    $item = $this->getInfoForItem($resourceItem);
+
+                    $response[] = $item;
+                }
             }
-        }
+            $this->clerk_logger->log('Getting Response Done', ['response' => $response]);
+            return $response;
 
-        return $response;
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Response ERROR', ['error' => $e]);
+
+        }
     }
 
     /**
-     * Set fields to get
+     * @return mixed
+     */
+    abstract protected function prepareCollection($page, $limit, $orderBy, $order);
+
+    /**
+     * Get information for single resource item
      *
      * @param $fields
+     * @param $resourceItem
+     * @return array
      */
-    public function setFields($fields)
+    public function getInfoForItem($resourceItem)
     {
-        $this->fields = array_merge(['entity_id'], $this->getDefaultFields(), (array)$fields);
-    }
+        try {
+            
+            $this->clerk_logger->log('Getting Info For Item Started', ['response' => $info]);
+            
+            $info = [];
 
-    /**
-     * Add field to get
-     *
-     * @param $field
-     */
-    public function addField($field)
-    {
-        $this->fields[] = $field;
+            foreach ($this->getFields() as $field) {
+                if (isset($resourceItem[$field])) {
+                    $info[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
+                }
+
+                if (isset($this->fieldHandlers[$field])) {
+                    $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
+                }
+            }
+            $this->clerk_logger->log('Getting Info For Item Done', ['response' => $info]);
+            
+            return $info;
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Response ERROR', ['error' => $e]);
+
+        }
     }
 
     /**
@@ -127,6 +164,16 @@ abstract class AbstractAdapter
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * Set fields to get
+     *
+     * @param $fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = array_merge(['entity_id'], $this->getDefaultFields(), (array)$fields);
     }
 
     /**
@@ -157,6 +204,16 @@ abstract class AbstractAdapter
     }
 
     /**
+     * Add field to get
+     *
+     * @param $field
+     */
+    public function addField($field)
+    {
+        $this->fields[] = $field;
+    }
+
+    /**
      * Add fieldhandler
      *
      * @param $field
@@ -168,37 +225,8 @@ abstract class AbstractAdapter
     }
 
     /**
-     * Add default fieldhandlers
-     */
-    abstract protected function addFieldHandlers();
-
-    /**
      * Get default fields
      * @return array
      */
     abstract protected function getDefaultFields();
-
-    /**
-     * Get information for single resource item
-     *
-     * @param $fields
-     * @param $resourceItem
-     * @return array
-     */
-    public function getInfoForItem($resourceItem)
-    {
-        $info = [];
-
-        foreach ($this->getFields() as $field) {
-            if (isset($resourceItem[$field])) {
-                $info[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
-            }
-
-            if (isset($this->fieldHandlers[$field])) {
-                $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
-            }
-        }
-
-        return $info;
-    }
 }

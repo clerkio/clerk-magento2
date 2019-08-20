@@ -4,9 +4,11 @@ namespace Clerk\Clerk\Controller\Checkout\Cart;
 
 use Clerk\Clerk\Model\Config;
 use Magento\Checkout\Controller\Cart\Add as BaseAdd;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
 class Add extends BaseAdd
 {
+    protected $clerk_logger;
     /**
      * Get resolved back url
      *
@@ -16,6 +18,8 @@ class Add extends BaseAdd
      */
     protected function getBackUrl($defaultUrl = null)
     {
+        $this->clerk_logger = new ClerkLogger();
+        try {
         $returnUrl = $this->getRequest()->getParam('return_url');
         if ($returnUrl && $this->_isInternalUrl($returnUrl)) {
             $this->messageManager->getMessages()->clear();
@@ -55,5 +59,11 @@ class Add extends BaseAdd
         }
 
         return $defaultUrl;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Checkout/Cart getBackUrl ERROR', ['error' => $e]);
+
+        }
     }
 }
