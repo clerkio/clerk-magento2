@@ -92,94 +92,6 @@ class ClerkLogger
 
         } else {
 
-            if ($this->scopeConfig->getValue('clerk/log/livesearchfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/livesearchfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/searchfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/searchfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/powerstepfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/powerstepfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/realtimeupdatesfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/realtimeupdatesfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/collectemailsfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/collectemailsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/onlysynchronizesaleableproductsfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/onlysynchronizesaleableproductsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/disableordersynchronizationfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/disableordersynchronizationfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/facetedsearchsettingsfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/facetedsearchsettingsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/categorysettingsfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/categorysettingsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/productsettingsfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/productsettingsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
-            if ($this->scopeConfig->getValue('clerk/log/cartsettingsfirst') !== false) {
-
-            } else {
-
-                $this->configWriter->saveConfig('clerk/log/cartsettingsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
-
-            }
-
             $realtimeupdates_initiated = $this->scopeConfig->getValue('clerk/log/realtimeupdatesfirst');
 
             $collectemails_initiated = $this->scopeConfig->getValue('clerk/log/collectemailsfirst');
@@ -203,14 +115,14 @@ class ClerkLogger
             $powerstep_initiated = $this->scopeConfig->getValue('clerk/log/powerstepfirst');
 
             //Realtime Updates Initialize
-            if ($this->scopeConfig->getValue('clerk/product_synchronization/use_realtime_updates') == 1 && !$realtimeupdates_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/product_synchronization/use_realtime_updates') == '1' && !$realtimeupdates_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/realtimeupdatesfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Realtime Updates initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/product_synchronization/use_realtime_updates') == 1 && $realtimeupdates_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/product_synchronization/use_realtime_updates') == '1' && $realtimeupdates_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/realtimeupdatesfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Realtime Updates uninitiated', ['' => '']);
@@ -218,14 +130,14 @@ class ClerkLogger
             }
 
             //Collect Emails Initialize
-            if ($this->scopeConfig->getValue('clerk/product_synchronization/collect_emails') == 1 && !$collectemails_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/product_synchronization/collect_emails') == '1' && !$collectemails_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/collectemailsfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Collect Emails initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/product_synchronization/collect_emails') == 1 && $collectemails_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/product_synchronization/collect_emails') == '1' && $collectemails_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/collectemailsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Collect Emails uninitiated', ['' => '']);
@@ -233,14 +145,14 @@ class ClerkLogger
             }
 
             //Only Sync Saleable Products Initialize
-            if ($this->scopeConfig->getValue('clerk/product_synchronization/saleable_only') == 1 && !$onlysynchronizesaleableproducts_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/product_synchronization/saleable_only') == '1' && !$onlysynchronizesaleableproducts_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/onlysynchronizesaleableproductsfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Only Sync Saleable Products initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/product_synchronization/saleable_only') == 1 && $onlysynchronizesaleableproducts_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/product_synchronization/saleable_only') == '1' && $onlysynchronizesaleableproducts_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/onlysynchronizesaleableproductsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Only Sync Saleable Products uninitiated', ['' => '']);
@@ -248,14 +160,14 @@ class ClerkLogger
             }
 
             //Disable Order Synchronization Initialize
-            if ($this->scopeConfig->getValue('clerk/product_synchronization/disable_order_synchronization') == 1 && !$disableordersynchronization_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/product_synchronization/disable_order_synchronization') == '1' && !$disableordersynchronization_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/disableordersynchronizationfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Disable Order Synchronization initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/product_synchronization/disable_order_synchronization') == 1 && $disableordersynchronization_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/product_synchronization/disable_order_synchronization') == '1' && $disableordersynchronization_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/disableordersynchronizationfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Disable Order Synchronization uninitiated', ['' => '']);
@@ -263,14 +175,14 @@ class ClerkLogger
             }
 
             //Faceted Search Settings Initialize
-            if ($this->scopeConfig->getValue('clerk/faceted_search/enabled') == 1 && !$facetedsearchsettings_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/faceted_search/enabled') == '1' && !$facetedsearchsettings_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/facetedsearchsettingsfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Faceted Search Settings initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/faceted_search/enabled') == 1 && $facetedsearchsettings_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/faceted_search/enabled') == '1' && $facetedsearchsettings_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/facetedsearchsettingsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Faceted Search Settings uninitiated', ['' => '']);
@@ -278,14 +190,14 @@ class ClerkLogger
             }
 
             //Category Settings Initialize
-            if ($this->scopeConfig->getValue('clerk/category/enabled') == 1 && !$categorysettings_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/category/enabled') == '1' && !$categorysettings_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/categorysettingsfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Category Settings initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/category/enabled') == 1 && $categorysettings_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/category/enabled') == '1' && $categorysettings_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/categorysettingsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Category Settings uninitiated', ['' => '']);
@@ -293,14 +205,14 @@ class ClerkLogger
             }
 
             //Product Settings Initialize
-            if ($this->scopeConfig->getValue('clerk/product/enabled') == 1 && !$productsettings_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/product/enabled') == '1' && !$productsettings_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/productsettingsfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Product Settings initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/product/enabled') == 1 && $productsettings_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/product/enabled') == '1' && $productsettings_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/productsettingsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Product Settings uninitiated', ['' => '']);
@@ -308,14 +220,14 @@ class ClerkLogger
             }
 
             //Cart Settings Initialize
-            if ($this->scopeConfig->getValue('clerk/cart/enabled') == 1 && !$cartsettings_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/cart/enabled') == '1' && !$cartsettings_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/cartsettingsfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Cart Settings initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/cart/enabled') == 1 && $cartsettings_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/cart/enabled') == '1' && $cartsettings_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/cartsettingsfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Cart Settings uninitiated', ['' => '']);
@@ -323,14 +235,14 @@ class ClerkLogger
             }
 
             //Live Search Initialize
-            if ($this->scopeConfig->getValue('clerk/livesearch/enabled') == 1 && !$livesearch_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/livesearch/enabled') == '1' && !$livesearch_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/livesearchfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Live Search initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/livesearch/enabled') == 1 && $livesearch_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/livesearch/enabled') == '1' && $livesearch_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/livesearchfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Live Search uninitiated', ['' => '']);
@@ -338,14 +250,14 @@ class ClerkLogger
             }
 
             //Search Initialize
-            if ($this->scopeConfig->getValue('clerk/search/enabled') == 1 && !$search_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/search/enabled') == '1' && !$search_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/searchfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Search initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/search/enabled') == 1 && $search_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/search/enabled') == '1' && $search_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/searchfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Search uninitiated', ['' => '']);
@@ -353,14 +265,14 @@ class ClerkLogger
             }
 
             //Powerstep Initialize
-            if ($this->scopeConfig->getValue('clerk/powerstep/enabled') == 1 && !$powerstep_initiated == 1) {
+            if ($this->scopeConfig->getValue('clerk/powerstep/enabled') == '1' && !$powerstep_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/powerstepfirst', '1', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Powerstep initiated', ['' => '']);
 
             }
 
-            if (!$this->scopeConfig->getValue('clerk/powerstep/enabled') == 1 && $powerstep_initiated == 1) {
+            if (!$this->scopeConfig->getValue('clerk/powerstep/enabled') == '1' && $powerstep_initiated == 1) {
 
                 $this->configWriter->saveConfig('clerk/log/powerstepfirst', '0', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, Store::DEFAULT_STORE_ID);
                 $this->log('Powerstep uninitiated', ['' => '']);

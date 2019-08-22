@@ -60,7 +60,7 @@ class Index extends AbstractAction
     {
 
         try {
-            $this->clerk_logger->log('Order Sync Started', ['response' => '']);
+
             //Add time fieldhandler
             $this->addFieldHandler('time', function ($item) {
                 return strtotime($item->getCreatedAt());
@@ -90,7 +90,6 @@ class Index extends AbstractAction
                         'price' => (float)$productItem->getPrice(),
                     ];
                 }
-                $this->clerk_logger->log('Order Sync Done', ['Note' => 'Only showing first 5 items in response ', 'response' => array_slice($response, 0, 5)]);
                 return $products;
             });
 
@@ -108,6 +107,7 @@ class Index extends AbstractAction
     {
         try {
 
+            $this->clerk_logger->log('Order Sync Started', ['response' => '']);
             $disabled = $this->scopeConfig->isSetFlag(
                 \Clerk\Clerk\Model\Config::XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION,
                 ScopeInterface::SCOPE_STORE
@@ -118,8 +118,13 @@ class Index extends AbstractAction
                     ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true)
                     ->setBody(json_encode([]));
+
+                $this->clerk_logger->log('Order Sync Disabled', ['response' => '']);
+
                 return;
             }
+
+            $this->clerk_logger->log('Order Sync Done', ['response' => '']);
 
             parent::execute();
 
