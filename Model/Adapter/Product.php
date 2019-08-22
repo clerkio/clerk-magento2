@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Model\Adapter;
 
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Clerk\Clerk\Model\Config;
 use Clerk\Clerk\Helper\Image;
 use Magento\Catalog\Model\Product\Visibility;
@@ -14,6 +15,11 @@ use Magento\Bundle\Model\Product\Type as Bundle;
 
 class Product extends AbstractAdapter
 {
+    /**
+     * @var LoggerInterface
+     */
+    protected $clerk_logger;
+
     /**
      * @var CollectionFactory
      */
@@ -49,9 +55,11 @@ class Product extends AbstractAdapter
         ManagerInterface $eventManager,
         CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManager,
-        Image $imageHelper
+        Image $imageHelper,
+        ClerkLogger $Clerklogger
     )
     {
+        $this->clerk_logger = $Clerklogger;
         $this->imageHelper = $imageHelper;
         parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory);
     }
@@ -63,39 +71,47 @@ class Product extends AbstractAdapter
      */
     protected function prepareCollection($page, $limit, $orderBy, $order)
     {
-        $collection = $this->collectionFactory->create();
+        try {
 
-        $collection->addFieldToSelect('*');
+            $collection = $this->collectionFactory->create();
 
-        //Filter on is_saleable if defined
-        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-            $collection->addFieldToFilter('is_saleable', true);
+            $collection->addFieldToSelect('*');
+
+            //Filter on is_saleable if defined
+            if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                $collection->addFieldToFilter('is_saleable', true);
+            }
+
+            $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
+
+            switch ($visibility) {
+                case Visibility::VISIBILITY_IN_CATALOG:
+                    $collection->setVisibility([Visibility::VISIBILITY_IN_CATALOG]);
+                    break;
+                case Visibility::VISIBILITY_IN_SEARCH:
+                    $collection->setVisibility([Visibility::VISIBILITY_IN_SEARCH]);
+                    break;
+                case Visibility::VISIBILITY_BOTH:
+                    $collection->setVisibility([Visibility::VISIBILITY_BOTH]);
+                    break;
+            }
+
+            $collection->setPageSize($limit)
+                ->setCurPage($page)
+                ->addOrder($orderBy, $order);
+
+            $this->eventManager->dispatch('clerk_' . $this->eventPrefix . '_get_collection_after', [
+                'adapter' => $this,
+                'collection' => $collection
+            ]);
+
+            return $collection;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Prepare Collection Error', ['error' => $e]);
+
         }
-
-        $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
-
-        switch ($visibility) {
-            case Visibility::VISIBILITY_IN_CATALOG:
-                $collection->setVisibility([Visibility::VISIBILITY_IN_CATALOG]);
-                break;
-            case Visibility::VISIBILITY_IN_SEARCH:
-                $collection->setVisibility([Visibility::VISIBILITY_IN_SEARCH]);
-                break;
-            case Visibility::VISIBILITY_BOTH:
-                $collection->setVisibility([Visibility::VISIBILITY_BOTH]);
-                break;
-        }
-
-        $collection->setPageSize($limit)
-            ->setCurPage($page)
-            ->addOrder($orderBy, $order);
-
-        $this->eventManager->dispatch('clerk_' . $this->eventPrefix . '_get_collection_after', [
-            'adapter' => $this,
-            'collection' => $collection
-        ]);
-
-        return $collection;
     }
 
     /**
@@ -107,13 +123,21 @@ class Product extends AbstractAdapter
      */
     protected function getAttributeValue($resourceItem, $field)
     {
-        $attribute = $resourceItem->getResource()->getAttribute($field);
+        try {
 
-        if ($attribute->usesSource()) {
-            return $attribute->getSource()->getOptionText($resourceItem[$field]);
+            $attribute = $resourceItem->getResource()->getAttribute($field);
+
+            if ($attribute->usesSource()) {
+                return $attribute->getSource()->getOptionText($resourceItem[$field]);
+            }
+
+            return parent::getAttributeValue($resourceItem, $field);
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Attribute Value Error', ['error' => $e]);
+
         }
-
-        return parent::getAttributeValue($resourceItem, $field);
     }
 
     /**
@@ -121,86 +145,95 @@ class Product extends AbstractAdapter
      */
     protected function addFieldHandlers()
     {
-        //Add price fieldhandler
-        $this->addFieldHandler('price', function($item) {
-            try {
-                if ($item->getTypeId() === Bundle::TYPE_CODE) {
-                    //Get minimum price for bundle products
-                    $price = $item
-                        ->getPriceInfo()
-                        ->getPrice('final_price')
-                        ->getMinimalPrice()
-                        ->getValue();
-                } else {
-                    $price = $item->getFinalPrice();
+
+        try {
+
+            //Add price fieldhandler
+            $this->addFieldHandler('price', function ($item) {
+                try {
+                    if ($item->getTypeId() === Bundle::TYPE_CODE) {
+                        //Get minimum price for bundle products
+                        $price = $item
+                            ->getPriceInfo()
+                            ->getPrice('final_price')
+                            ->getMinimalPrice()
+                            ->getValue();
+                    } else {
+                        $price = $item->getFinalPrice();
+                    }
+
+                    return (float)$price;
+                } catch (\Exception $e) {
+                    return 0;
                 }
+            });
 
-                return (float) $price;
-            } catch(\Exception $e) {
-                return 0;
-            }
-        });
+            //Add list_price fieldhandler
+            $this->addFieldHandler('list_price', function ($item) {
+                try {
+                    $price = $item->getPrice();
 
-        //Add list_price fieldhandler
-        $this->addFieldHandler('list_price', function($item) {
-            try {
-                $price = $item->getPrice();
+                    //Fix for configurable products
+                    if ($item->getTypeId() === Configurable::TYPE_CODE) {
+                        $price = $item->getPriceInfo()->getPrice('regular_price')->getValue();
+                    }
 
-                //Fix for configurable products
-                if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                    $price = $item->getPriceInfo()->getPrice('regular_price')->getValue();
+                    if ($item->getTypeId() === Bundle::TYPE_CODE) {
+                        $price = $item
+                            ->getPriceInfo()
+                            ->getPrice('regular_price')
+                            ->getMinimalPrice()
+                            ->getValue();
+                    }
+
+                    return (float)$price;
+                } catch (\Exception $e) {
+                    return 0;
                 }
+            });
 
-                if ($item->getTypeId() === Bundle::TYPE_CODE) {
-                    $price = $item
-                        ->getPriceInfo()
-                        ->getPrice('regular_price')
-                        ->getMinimalPrice()
-                        ->getValue();
+            //Add image fieldhandler
+            $this->addFieldHandler('image', function ($item) {
+                $imageUrl = $this->imageHelper->getUrl($item);
+
+                return $imageUrl;
+            });
+
+            //Add url fieldhandler
+            $this->addFieldHandler('url', function ($item) {
+                return $item->getUrlModel()->getUrl($item);
+            });
+
+            //Add categories fieldhandler
+            $this->addFieldHandler('categories', function ($item) {
+                return $item->getCategoryIds();
+            });
+
+            //Add age fieldhandler
+            $this->addFieldHandler('age', function ($item) {
+                $createdAt = strtotime($item->getCreatedAt());
+                $now = time();
+                $diff = $now - $createdAt;
+                return floor($diff / (60 * 60 * 24));
+            });
+
+            //Add on_sale fieldhandler
+            $this->addFieldHandler('on_sale', function ($item) {
+                try {
+                    $finalPrice = $item->getFinalPrice();
+                    $price = $item->getPrice();
+
+                    return $finalPrice < $price;
+                } catch (\Exception $e) {
+                    return false;
                 }
+            });
 
-                return (float) $price;
-            } catch(\Exception $e) {
-                return 0;
-            }
-        });
+        } catch (\Exception $e) {
 
-        //Add image fieldhandler
-        $this->addFieldHandler('image', function($item) {
-            $imageUrl = $this->imageHelper->getUrl($item);
+            $this->clerk_logger->error('Getting Field Handlers Error', ['error' => $e]);
 
-            return $imageUrl;
-        });
-
-        //Add url fieldhandler
-        $this->addFieldHandler('url', function($item) {
-            return $item->getUrlModel()->getUrl($item);
-        });
-
-        //Add categories fieldhandler
-        $this->addFieldHandler('categories', function($item) {
-            return $item->getCategoryIds();
-        });
-
-        //Add age fieldhandler
-        $this->addFieldHandler('age', function($item) {
-            $createdAt = strtotime($item->getCreatedAt());
-            $now = time();
-            $diff = $now - $createdAt;
-            return floor($diff/(60*60*24));
-        });
-
-        //Add on_sale fieldhandler
-        $this->addFieldHandler('on_sale', function($item) {
-            try {
-                $finalPrice = $item->getFinalPrice();
-                $price = $item->getPrice();
-
-                return $finalPrice < $price;
-            } catch (\Exception $e) {
-                return false;
-            }
-        });
+        }
     }
 
     /**
@@ -210,26 +243,35 @@ class Product extends AbstractAdapter
      */
     protected function getDefaultFields()
     {
-        $fields = [
-            'name',
-            'description',
-            'price',
-            'list_price',
-            'image',
-            'url',
-            'categories',
-            'brand',
-            'sku',
-            'age',
-            'on_sale'
-        ];
 
-        $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS);
+        try {
 
-        if ($additionalFields) {
-            $fields = array_merge($fields, explode(',', $additionalFields));
+            $fields = [
+                'name',
+                'description',
+                'price',
+                'list_price',
+                'image',
+                'url',
+                'categories',
+                'brand',
+                'sku',
+                'age',
+                'on_sale'
+            ];
+
+            $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS);
+
+            if ($additionalFields) {
+                $fields = array_merge($fields, explode(',', $additionalFields));
+            }
+
+            return $fields;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Default Fields Error', ['error' => $e]);
+
         }
-
-        return $fields;
     }
 }

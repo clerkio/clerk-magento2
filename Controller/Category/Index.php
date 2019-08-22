@@ -153,10 +153,10 @@ class Index extends AbstractAction
 
             if ($this->debug) {
                 $this->getResponse()->setBody(json_encode($response, JSON_PRETTY_PRINT));
-                $this->clerk_logger->log('Category Sync Done', ['Note' => 'Only showing first 5 items in response ','response' => array_slice($response, 0, 5)]);
+                $this->clerk_logger->log('Category Sync Done', ['Note' => 'Only showing first 5 items in response ', 'response' => array_slice($response, 0, 5)]);
             } else {
                 $this->getResponse()->setBody(json_encode($response));
-                $this->clerk_logger->log('Category Sync Done', ['Note' => 'Only showing first 5 items in response ','response' => array_slice($response, 0, 5)]);
+                $this->clerk_logger->log('Category Sync Done', ['Note' => 'Only showing first 5 items in response ', 'response' => array_slice($response, 0, 5)]);
             }
         } catch (\Exception $e) {
             $this->getResponse()
@@ -185,21 +185,21 @@ class Index extends AbstractAction
     protected function prepareCollection()
     {
         try {
-            
-        $collection = $this->collectionFactory->create();
 
-        $rootCategory = $this->storeManager->getStore()->getRootCategoryId();
+            $collection = $this->collectionFactory->create();
 
-        $collection->addFieldToSelect('*');
-        $collection->addAttributeToFilter('level', ['gteq' => 2]);
-        $collection->addAttributeToFilter('name', ['neq' => null]);
-        $collection->addPathsFilter('1/' . $rootCategory . '/%');
+            $rootCategory = $this->storeManager->getStore()->getRootCategoryId();
 
-        $collection->setPageSize($this->limit)
-            ->setCurPage($this->page)
-            ->addOrder($this->orderBy, $this->order);
+            $collection->addFieldToSelect('*');
+            $collection->addAttributeToFilter('level', ['gteq' => 2]);
+            $collection->addAttributeToFilter('name', ['neq' => null]);
+            $collection->addPathsFilter('1/' . $rootCategory . '/%');
 
-        return $collection;
+            $collection->setPageSize($this->limit)
+                ->setCurPage($this->page)
+                ->addOrder($this->orderBy, $this->order);
+
+            return $collection;
 
         } catch (\Exception $e) {
 

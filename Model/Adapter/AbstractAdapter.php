@@ -133,8 +133,6 @@ abstract class AbstractAdapter
     {
         try {
             
-            $this->clerk_logger->log('Getting Info For Item Started', ['response' => $info]);
-            
             $info = [];
 
             foreach ($this->getFields() as $field) {
@@ -146,7 +144,6 @@ abstract class AbstractAdapter
                     $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
                 }
             }
-            $this->clerk_logger->log('Getting Info For Item Done', ['response' => $info]);
             
             return $info;
         } catch (\Exception $e) {

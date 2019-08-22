@@ -90,7 +90,7 @@ class Index extends AbstractAction
                         'price' => (float)$productItem->getPrice(),
                     ];
                 }
-                $this->clerk_logger->log('Order Sync Done', ['Note' => 'Only showing first 5 items in response ','response' => array_slice($response, 0, 5)]);
+                $this->clerk_logger->log('Order Sync Done', ['Note' => 'Only showing first 5 items in response ', 'response' => array_slice($response, 0, 5)]);
                 return $products;
             });
 
@@ -107,21 +107,22 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
-        $disabled = $this->scopeConfig->isSetFlag(
-            \Clerk\Clerk\Model\Config::XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION,
-            ScopeInterface::SCOPE_STORE
-        );
 
-        if ($disabled) {
-            $this->getResponse()
-                ->setHttpResponseCode(200)
-                ->setHeader('Content-Type', 'application/json', true)
-                ->setBody(json_encode([]));
-            return;
-        }
+            $disabled = $this->scopeConfig->isSetFlag(
+                \Clerk\Clerk\Model\Config::XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION,
+                ScopeInterface::SCOPE_STORE
+            );
 
-        parent::execute();
-        
+            if ($disabled) {
+                $this->getResponse()
+                    ->setHttpResponseCode(200)
+                    ->setHeader('Content-Type', 'application/json', true)
+                    ->setBody(json_encode([]));
+                return;
+            }
+
+            parent::execute();
+
         } catch (\Exception $e) {
 
             $this->clerk_logger->error('Order execute ERROR', ['error' => $e]);
@@ -135,10 +136,10 @@ class Index extends AbstractAction
     protected function getArguments(RequestInterface $request)
     {
         try {
-        parent::getArguments($request);
+            parent::getArguments($request);
 
-        //Use increment id instead of entity_id
-        $this->fields = str_replace('entity_id', 'increment_id', $this->fields);
+            //Use increment id instead of entity_id
+            $this->fields = str_replace('entity_id', 'increment_id', $this->fields);
 
         } catch (\Exception $e) {
 

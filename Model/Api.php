@@ -58,8 +58,7 @@ class Api
     public function addProduct($params)
     {
         try {
-
-            $this->clerk_logger->log('Adding Products Started', ['response' => '']);
+            
             $params = [
                 'products' => [$params],
             ];
@@ -84,7 +83,7 @@ class Api
     private function post($endpoint, $params = [])
     {
         try {
-            $this->clerk_logger->log('POST Request Starting', ['response' => '']);
+            
             $params = array_merge($this->getDefaultParams(), $params);
 
             /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
@@ -119,8 +118,7 @@ class Api
     public function removeProduct($productId)
     {
         try {
-
-            $this->clerk_logger->log('Removing Products Started', ['response' => '']);
+            
             $params = [
                 'products' => $productId,
             ];
@@ -146,9 +144,7 @@ class Api
     private function get($endpoint, $params = [])
     {
         try {
-
-            $this->clerk_logger->log('GET Request Starting', ['response' => '']);
-
+            
             $params = array_merge($this->getDefaultParams(), $params);
 
             /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
@@ -179,9 +175,7 @@ class Api
     public function keysValid($publicKey, $privateKey)
     {
         try {
-
-            $this->clerk_logger->log('Key Validation Started', ['response' => '']);
-
+            
             $params = [
                 'key' => $publicKey,
                 'private_key' => $privateKey,
@@ -207,10 +201,7 @@ class Api
     public function getFacetAttributes()
     {
         try {
-
-            $this->clerk_logger->log('Getting Facet Attributes Started', ['response' => '']);
-            $this->clerk_logger->log('Getting Facet Attributes Done', ['response' => $this->get('product/facets')]);
-
+            
             return $this->get('product/facets');
 
         } catch (\Exception $e) {
@@ -223,8 +214,7 @@ class Api
     public function getEndpointForContent($contentId)
     {
         try {
-
-            $this->clerk_logger->log('Getting Endpoint For Content Started', ['response' => '']);
+            
             $contentResult = json_decode($this->getContent());
 
             if ($contentResult) {
@@ -263,9 +253,7 @@ class Api
     public function getContent($storeId = null)
     {
         try {
-
-            $this->clerk_logger->log('Getting Content Started', ['response' => '']);
-
+            
             $params = [
                 'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
                 'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),

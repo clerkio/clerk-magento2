@@ -43,6 +43,7 @@ class Added extends Product
     public function execute()
     {
         try {
+            
             $product = $this->_initProduct();
 
             if (!$product) {

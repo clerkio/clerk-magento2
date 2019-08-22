@@ -116,6 +116,7 @@ class Index extends Action
     public function getParametersResponse()
     {
         try {
+            
             $content = $this->getRequest()->getParam('content');
 
             $endpoint = $this->api->getEndpointForContent($content);
@@ -209,6 +210,7 @@ class Index extends Action
     public function getInvalidResponse()
     {
         try {
+            
             $this->getResponse()
                 ->setHttpResponseCode(422)
                 ->setHeader('Content-Type', 'application/json', true)

@@ -180,8 +180,7 @@ abstract class AbstractAction extends Action
     private function getPrivateKey()
     {
         try {
-            $this->clerk_logger->log('Getting Privat Key Started', ['response' => '']);
-            $this->clerk_logger->log('Getting Privat Key Done', ['response' => '']);
+
             return $this->scopeConfig->getValue(
                 \Clerk\Clerk\Model\Config::XML_PATH_PRIVATE_KEY,
                 ScopeInterface::SCOPE_STORE
@@ -202,8 +201,7 @@ abstract class AbstractAction extends Action
     private function getPublicKey()
     {
         try {
-            $this->clerk_logger->log('Getting Public Key Started', ['response' => '']);
-            $this->clerk_logger->log('Getting Public Key Done', ['response' => '']);
+
             return $this->scopeConfig->getValue(
                 \Clerk\Clerk\Model\Config::XML_PATH_PUBLIC_KEY,
                 ScopeInterface::SCOPE_STORE
@@ -222,7 +220,6 @@ abstract class AbstractAction extends Action
     protected function getArguments(RequestInterface $request)
     {
         try {
-            $this->clerk_logger->log('Getting Arguments Started', ['response' => '']);
 
             $this->debug = (bool)$request->getParam('debug', false);
             $this->limit = (int)$request->getParam('limit', 0);
@@ -245,9 +242,7 @@ abstract class AbstractAction extends Action
                 $this->fields = $this->getDefaultFields();
             }
             $this->fields = array_merge(['entity_id'], $this->fields);
-
-            $this->clerk_logger->log('Getting Arguments Done', ['response' => $this->fields]);
-
+            
         } catch (\Exception $e) {
 
             $this->clerk_logger->error('getArguments ERROR', ['error' => $e]);
@@ -271,6 +266,7 @@ abstract class AbstractAction extends Action
     public function execute()
     {
         try {
+            
             $collection = $this->prepareCollection();
 
             $this->_eventManager->dispatch($this->eventPrefix . '_get_collection_after', [
@@ -336,7 +332,6 @@ abstract class AbstractAction extends Action
     {
 
         try {
-            $this->clerk_logger->log('Preparing Collection Started', ['response' => '']);
 
             $collection = $this->collectionFactory->create();
 
@@ -345,9 +340,7 @@ abstract class AbstractAction extends Action
             $collection->setPageSize($this->limit)
                 ->setCurPage($this->page)
                 ->addOrder($this->orderBy, $this->order);
-
-            $this->clerk_logger->log('Preparing Collection Done', ['response' => $collection]);
-
+            
             return $collection;
 
         } catch (\Exception $e) {
@@ -367,11 +360,11 @@ abstract class AbstractAction extends Action
     {
 
         try {
-            $this->clerk_logger->log('Getting Field Name Started', ['response' => '']);
+
             if (isset($this->fieldMap[$field])) {
                 return $this->fieldMap[$field];
             }
-            $this->clerk_logger->log('Getting Field Name Done', ['response' => $field]);
+
             return $field;
 
         } catch (\Exception $e) {
