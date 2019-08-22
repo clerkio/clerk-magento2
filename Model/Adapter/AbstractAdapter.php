@@ -90,9 +90,7 @@ abstract class AbstractAdapter
     public function getResponse($fields, $page, $limit, $orderBy, $order)
     {
         try {
-
-            $this->clerk_logger->log('Getting Response Started', ['response' => '']);
-
+            
             $this->setFields($fields);
 
             $collection = $this->prepareCollection($page, $limit, $orderBy, $order);
@@ -107,7 +105,7 @@ abstract class AbstractAdapter
                     $response[] = $item;
                 }
             }
-            $this->clerk_logger->log('Getting Response Done', ['response' => $response]);
+            
             return $response;
 
         } catch (\Exception $e) {

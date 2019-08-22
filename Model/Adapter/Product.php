@@ -61,7 +61,7 @@ class Product extends AbstractAdapter
     {
         $this->clerk_logger = $Clerklogger;
         $this->imageHelper = $imageHelper;
-        parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory);
+        parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger);
     }
 
     /**

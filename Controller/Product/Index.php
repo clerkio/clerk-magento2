@@ -17,10 +17,10 @@ use Clerk\Clerk\Controller\Logger\ClerkLogger;
 class Index extends AbstractAction
 {
     /**
-     * @var 
+     * @var
      */
     protected $clerk_logger;
-    
+
     /**
      * @var ProductAdapter
      */
@@ -59,9 +59,9 @@ class Index extends AbstractAction
                 ->setHeader('Content-Type', 'application/json', true);
 
             $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order);
-            $this->clerk_logger->log('Product Sync Done', ['Note' => 'Only showing first 5 items in response ','response' => array_slice($response, 0, 5)]);
+            $this->clerk_logger->log('Product Sync Done', ['Note' => 'Only showing first 5 items in response ', 'response' => array_slice($response, 0, 5)]);
             $this->getResponse()->setBody(json_encode($response));
-            
+
         } catch (\Exception $e) {
 
             $this->clerk_logger->error('Product execute ERROR', ['error' => $e]);
@@ -76,25 +76,25 @@ class Index extends AbstractAction
     protected function getArguments(RequestInterface $request)
     {
         try {
-            
-        $this->debug = (bool) $request->getParam('debug', false);
-        $this->limit = (int) $request->getParam('limit', 0);
-        $this->page = (int) $request->getParam('page', 0);
-        $this->orderBy = $request->getParam('orderby', 'entity_id');
 
-        if ($request->getParam('order') === 'desc') {
-            $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_DESC;
-        } else {
-            $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_ASC;
-        }
+            $this->debug = (bool)$request->getParam('debug', false);
+            $this->limit = (int)$request->getParam('limit', 0);
+            $this->page = (int)$request->getParam('page', 0);
+            $this->orderBy = $request->getParam('orderby', 'entity_id');
 
-        /**
-         * Explode fields on , and filter out "empty" entries
-         */
-        $fields = $request->getParam('fields');
-        if ($fields) {
-            $this->fields = array_filter(explode(',', $fields), 'strlen');
-        }
+            if ($request->getParam('order') === 'desc') {
+                $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_DESC;
+            } else {
+                $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_ASC;
+            }
+
+            /**
+             * Explode fields on , and filter out "empty" entries
+             */
+            $fields = $request->getParam('fields');
+            if ($fields) {
+                $this->fields = array_filter(explode(',', $fields), 'strlen');
+            }
 
         } catch (\Exception $e) {
 

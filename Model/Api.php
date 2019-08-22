@@ -90,8 +90,7 @@ class Api
             $httpClient = $this->httpClientFactory->create();
             $httpClient->setUri($this->baseurl . $endpoint);
             $httpClient->setRawData(json_encode($params), 'application/json');
-
-            $this->clerk_logger->log('POST Request Done', ['response' => $response]);
+            
             $result = $httpClient->request('POST');
 
         } catch (\Exception $e) {
@@ -152,9 +151,7 @@ class Api
             $httpClient->setUri($this->baseurl . $endpoint);
             $httpClient->setParameterGet($params);
             $response = $httpClient->request('GET');
-
-            $this->clerk_logger->log('GET Request Done', ['response' => $response]);
-
+            
             return $response;
 
         } catch (\Exception $e) {
@@ -228,8 +225,7 @@ class Api
                     }
 
                     if ($content->id === $contentId) {
-
-                        $this->clerk_logger->log('Getting Endpoint For Content Done', ['response' => $content->api]);
+                        
                         return $content->api;
 
                     }
@@ -258,8 +254,6 @@ class Api
                 'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
                 'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
             ];
-
-            $this->clerk_logger->log('Getting Content Done', ['response' => $this->get('client/account/content/list', $params)->getBody()]);
 
             return $this->get('client/account/content/list', $params)->getBody();
 

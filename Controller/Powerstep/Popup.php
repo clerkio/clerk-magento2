@@ -8,12 +8,12 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
-use  Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
 class Popup extends Action
 {
     /**
-     * @var 
+     * @var
      */
     protected $clerk_logger;
     /**
@@ -36,14 +36,15 @@ class Popup extends Action
     public function execute()
     {
         try {
-        /** @var Page $response */
-        $response = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
-        $layout = $response->addHandle('clerk_clerk_powerstep_popup')->getLayout();
+            
+            /** @var Page $response */
+            $response = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
+            $layout = $response->addHandle('clerk_clerk_powerstep_popup')->getLayout();
 
-        $response = $layout->getBlock('page.block')->toHtml();
-        $this->getResponse()->setBody($response);
+            $response = $layout->getBlock('page.block')->toHtml();
+            $this->getResponse()->setBody($response);
 
-        return;
+            return;
 
         } catch (\Exception $e) {
 
