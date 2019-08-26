@@ -53,7 +53,7 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
-            throw new \Exception('HEJ');
+            
             $this->clerk_logger->log('Product Sync Started', ['response' => '']);
             $this->getResponse()
                 ->setHttpResponseCode(200)
