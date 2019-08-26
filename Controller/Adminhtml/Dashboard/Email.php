@@ -50,7 +50,7 @@ class Email extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Email execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Email execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }

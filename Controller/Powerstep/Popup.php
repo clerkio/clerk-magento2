@@ -48,7 +48,7 @@ class Popup extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Powerstep execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Powerstep execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }

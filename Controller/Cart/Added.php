@@ -56,7 +56,7 @@ class Added extends Product
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Cart execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Cart execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }

@@ -110,7 +110,7 @@ abstract class AbstractAdapter
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Response ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Getting Response ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -146,7 +146,7 @@ abstract class AbstractAdapter
             return $info;
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Response ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Getting Response ERROR', ['error' => $e->getMessage()]);
 
         }
     }

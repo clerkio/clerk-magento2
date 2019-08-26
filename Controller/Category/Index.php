@@ -106,7 +106,7 @@ class Index extends AbstractAction
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Category addFieldHandlers ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Category addFieldHandlers ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -172,7 +172,7 @@ class Index extends AbstractAction
                     ])
                 );
 
-            $this->clerk_logger->error('Category execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Category execute ERROR', ['error' => $e->getMessage()]);
         }
     }
 
@@ -203,7 +203,7 @@ class Index extends AbstractAction
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Category prepareCollection ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Category prepareCollection ERROR', ['error' => $e->getMessage()]);
 
         }
     }

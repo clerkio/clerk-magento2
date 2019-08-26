@@ -53,6 +53,7 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
+            throw new \Exception('HEJ');
             $this->clerk_logger->log('Product Sync Started', ['response' => '']);
             $this->getResponse()
                 ->setHttpResponseCode(200)
@@ -64,7 +65,7 @@ class Index extends AbstractAction
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Product execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Product execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -98,7 +99,7 @@ class Index extends AbstractAction
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Product getArguments ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Product getArguments ERROR', ['error' => $e->getMessage()]);
 
         }
     }

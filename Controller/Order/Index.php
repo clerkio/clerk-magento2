@@ -95,7 +95,7 @@ class Index extends AbstractAction
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Order addFieldHandlers ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Order addFieldHandlers ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -130,7 +130,7 @@ class Index extends AbstractAction
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Order execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Order execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -148,7 +148,7 @@ class Index extends AbstractAction
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Order getArguments ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Order getArguments ERROR', ['error' => $e->getMessage()]);
 
         }
     }

@@ -109,7 +109,7 @@ class Product extends AbstractAdapter
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Prepare Collection Error', ['error' => $e]);
+            $this->clerk_logger->error('Prepare Collection Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -135,7 +135,7 @@ class Product extends AbstractAdapter
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Attribute Value Error', ['error' => $e]);
+            $this->clerk_logger->error('Getting Attribute Value Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -231,7 +231,7 @@ class Product extends AbstractAdapter
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Field Handlers Error', ['error' => $e]);
+            $this->clerk_logger->error('Getting Field Handlers Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -270,7 +270,7 @@ class Product extends AbstractAdapter
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Default Fields Error', ['error' => $e]);
+            $this->clerk_logger->error('Getting Default Fields Error', ['error' => $e->getMessage()]);
 
         }
     }

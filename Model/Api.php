@@ -64,11 +64,11 @@ class Api
             ];
 
             $this->post('product/add', $params);
-            $this->clerk_logger->log('Adding Products Done', ['response' => $params]);
+            $this->clerk_logger->log('Added Product', ['response' => $params]);
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Adding Products Error', ['error' => $e]);
+            $this->clerk_logger->error('Adding Products Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -95,7 +95,7 @@ class Api
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('POST Request Error', ['error' => $e]);
+            $this->clerk_logger->error('POST Request Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -123,11 +123,11 @@ class Api
             ];
 
             $this->get('product/remove', $params);
-            $this->clerk_logger->log('Removing Products Done', ['response' => $params]);
+            $this->clerk_logger->log('Removed Product', ['response' => $params]);
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Removing Products Error', ['error' => $e]);
+            $this->clerk_logger->error('Removing Products Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -156,7 +156,7 @@ class Api
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('GET Request Error', ['error' => $e]);
+            $this->clerk_logger->error('GET Request Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -177,14 +177,12 @@ class Api
                 'key' => $publicKey,
                 'private_key' => $privateKey,
             ];
-
-            $this->clerk_logger->log('Key Validation Done', ['response' => $this->get('client/account/info', $params)->getBody()]);
-
+            
             return $this->get('client/account/info', $params)->getBody();
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Key Validation Error', ['error' => $e]);
+            $this->clerk_logger->error('Key Validation Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -203,7 +201,7 @@ class Api
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Facet Attributes Error', ['error' => $e]);
+            $this->clerk_logger->error('Getting Facet Attributes Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -234,7 +232,7 @@ class Api
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Endpoint For Content Error', ['error' => $e]);
+            $this->clerk_logger->error('Getting Endpoint For Content Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -259,7 +257,7 @@ class Api
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Content Error', ['error' => $e]);
+            $this->clerk_logger->error('Getting Content Error', ['error' => $e->getMessage()]);
 
         }
     }

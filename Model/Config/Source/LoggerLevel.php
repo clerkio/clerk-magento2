@@ -34,9 +34,9 @@ class LoggerLevel implements ArrayInterface
     public function toArray()
     {
         return [
-            self::LEVEL_WARN => __('Warn'),
-            self::LEVEL_ERROR => __('Error'),
-            self::LEVEL_ALL => __('All')
+            self::LEVEL_WARN => __('Error + Warn'),
+            self::LEVEL_ERROR => __('Only Error'),
+            self::LEVEL_ALL => __('Error + Warn + Debug Mode')
         ];
     }
 }

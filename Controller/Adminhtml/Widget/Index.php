@@ -73,7 +73,7 @@ class Index extends Action
             }
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Widget execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Widget execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -108,7 +108,7 @@ class Index extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Widget getContentResponse ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Widget getContentResponse ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -202,7 +202,7 @@ class Index extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Widget getParametersResponse ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Widget getParametersResponse ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -223,7 +223,7 @@ class Index extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Widget getInvalidResponse ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Widget getInvalidResponse ERROR', ['error' => $e->getMessage()]);
 
         }
     }

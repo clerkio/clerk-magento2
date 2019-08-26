@@ -48,7 +48,7 @@ class Search extends Action
             return $resultPage;
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Search execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Search execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }

@@ -48,7 +48,7 @@ class Recommendations extends Action
             return $resultPage;
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Recommendations execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Recommendations execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }

@@ -50,7 +50,7 @@ class Audience extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Audience execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Audience execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }

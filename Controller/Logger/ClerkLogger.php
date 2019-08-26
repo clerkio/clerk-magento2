@@ -17,7 +17,6 @@ class ClerkLogger
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
-
     /**
      * @var
      */
@@ -289,10 +288,27 @@ class ClerkLogger
      */
     public function log($Message, $Metadata)
     {
-        //print_r($this->Enabled);
-        //exit;
 
-        $JSON_Metadata_Encode = json_encode($Metadata);
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+
+            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+        else {
+
+            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+        }
+
+        if ($_GET) {
+
+            $Metadata['params'] = $_GET;
+
+        }elseif ($_POST) {
+
+            $Metadata['params'] = $_POST;
+
+        }
+
         $Type = 'log';
 
         if ($this->Enabled !== '1') {
@@ -306,26 +322,28 @@ class ClerkLogger
 
                 if ($this->Log_to == 'collect') {
 
-                    if ($this->Log_level == 'all') {
+                    $Endpoint = 'http://api.clerk.io/v2/log/debug';
 
-                        $Endpoint = 'api.clerk.io/v2/log/debug?&key=' . $this->Key . '&source=' . $this->Platform . '&time=' . $this->Time . '&type=' . $Type . '&message=' . $Message . '&metadata=' . urlencode($JSON_Metadata_Encode);
-
-                    } else {
-
-                        $Endpoint = 'api.clerk.io/v2/log/debug?key=' . $this->Key . '&source=' . $this->Platform . '&time=' . $this->Time . '&type=' . $Type . '&message=' . $Message . '&metadata=' . urlencode($JSON_Metadata_Encode);
-
-                    }
+                    $data_string = json_encode([
+                        'key' =>$this->Key,
+                        'source' => $this->Platform,
+                        'time' => $this->Time,
+                        'type' => $Type,
+                        'message' => $Message,
+                        'metadata' => $Metadata]);
 
                     $curl = curl_init();
 
                     curl_setopt($curl, CURLOPT_URL, $Endpoint);
+                    curl_setopt($curl, CURLOPT_POST, true);
                     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
                     curl_exec($curl);
                     curl_close($curl);
 
                 } elseif ($this->Log_to == 'file') {
 
-                    $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . $JSON_Metadata_Encode . PHP_EOL .
+                    $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . json_encode($Metadata) . PHP_EOL .
                         '-------------------------' . PHP_EOL;
                     $path = $this->_dir->getPath('log') . '/clerk_log.log';
 
@@ -346,8 +364,26 @@ class ClerkLogger
     public function error($Message, $Metadata)
     {
 
-        //Customize $Platform and the function for getting the public key.
-        $JSON_Metadata_Encode = json_encode($Metadata);
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+
+            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+        else {
+
+            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+        }
+
+        if ($_GET) {
+
+            $Metadata['params'] = $_GET;
+
+        }elseif ($_POST) {
+
+            $Metadata['params'] = $_POST;
+
+        }
+
         $Type = 'error';
 
         if ($this->Enabled !== '1') {
@@ -357,26 +393,29 @@ class ClerkLogger
 
             if ($this->Log_to == 'collect') {
 
-                if ($this->Log_level == 'all') {
+                $Endpoint = 'http://api.clerk.io/v2/log/debug';
 
-                    $Endpoint = 'api.clerk.io/v2/log/debug?debug=1&key=' . $this->Key . '&source=' . $this->Platform . '&time=' . $this->Time . '&type=' . $Type . '&message=' . $Message . '&metadata=' . urlencode($JSON_Metadata_Encode);
-
-                } else {
-
-                    $Endpoint = 'api.clerk.io/v2/log/debug?key=' . $this->Key . '&source=' . $this->Platform . '&time=' . $this->Time . '&type=' . $Type . '&message=' . $Message . '&metadata=' . urlencode($JSON_Metadata_Encode);
-
-                }
+                $data_string = json_encode([
+                    'debug' => '1',
+                    'key' =>$this->Key,
+                    'source' => $this->Platform,
+                    'time' => $this->Time,
+                    'type' => $Type,
+                    'message' => $Message,
+                    'metadata' => $Metadata]);
 
                 $curl = curl_init();
 
                 curl_setopt($curl, CURLOPT_URL, $Endpoint);
+                curl_setopt($curl, CURLOPT_POST, true);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
                 curl_exec($curl);
                 curl_close($curl);
 
             } elseif ($this->Log_to == 'file') {
 
-                $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . $JSON_Metadata_Encode . PHP_EOL .
+                $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . json_encode($Metadata) . PHP_EOL .
                     '-------------------------' . PHP_EOL;
                 $path = $this->_dir->getPath('log') . '/clerk_log.log';
 
@@ -396,8 +435,26 @@ class ClerkLogger
     public function warn($Message, $Metadata)
     {
 
-        //Customize $Platform and the function for getting the public key.
-        $JSON_Metadata_Encode = json_encode($Metadata);
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+
+            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+        else {
+
+            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+        }
+
+        if ($_GET) {
+
+            $Metadata['params'] = $_GET;
+
+        }elseif ($_POST) {
+
+            $Metadata['params'] = $_POST;
+
+        }
+
         $Type = 'warn';
 
         if ($this->Enabled !== '1') {
@@ -412,26 +469,29 @@ class ClerkLogger
 
                 if ($this->Log_to == 'collect') {
 
-                    if ($this->Log_level == 'all') {
+                    $Endpoint = 'http://api.clerk.io/v2/log/debug';
 
-                        $Endpoint = 'api.clerk.io/v2/log/debug?debug=1&key=' . $this->Key . '&source=' . $this->Platform . '&time=' . $this->Time . '&type=' . $Type . '&message=' . $Message . '&metadata=' . urlencode($JSON_Metadata_Encode);
-
-                    } else {
-
-                        $Endpoint = 'api.clerk.io/v2/log/debug?key=' . $this->Key . '&source=' . $this->Platform . '&time=' . $this->Time . '&type=' . $Type . '&message=' . $Message . '&metadata=' . urlencode($JSON_Metadata_Encode);
-
-                    }
+                    $data_string = json_encode([
+                        'debug' => '1',
+                        'key' =>$this->Key,
+                        'source' => $this->Platform,
+                        'time' => $this->Time,
+                        'type' => $Type,
+                        'message' => $Message,
+                        'metadata' => $Metadata]);
 
                     $curl = curl_init();
 
                     curl_setopt($curl, CURLOPT_URL, $Endpoint);
+                    curl_setopt($curl, CURLOPT_POST, true);
                     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
                     curl_exec($curl);
                     curl_close($curl);
 
                 } elseif ($this->Log_to == 'file') {
 
-                    $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . $JSON_Metadata_Encode . PHP_EOL .
+                    $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . json_encode($Metadata) . PHP_EOL .
                         '-------------------------' . PHP_EOL;
                     $path = $this->_dir->getPath('log') . '/clerk_log.log';
 

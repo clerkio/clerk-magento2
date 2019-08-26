@@ -32,7 +32,7 @@ class LoggerTo implements ArrayInterface
     public function toArray()
     {
         return [
-            self::TO_COLLECTION => __('Collect'),
+            self::TO_COLLECTION => __('my.clerk.io'),
             self::TO_FILE => __('File')
         ];
     }

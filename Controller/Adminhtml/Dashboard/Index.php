@@ -50,7 +50,7 @@ class Index extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Dashboard execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Dashboard execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }

@@ -135,12 +135,11 @@ abstract class AbstractAction extends Action
 
             //Filter out request arguments
             $this->getArguments($request);
-            $this->clerk_logger->log('Valid keys supplied', ['response' => parent::dispatch($request)]);
             return parent::dispatch($request);
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Validating API Keys ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Validating API Keys ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -167,7 +166,7 @@ abstract class AbstractAction extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('verifyKeys ERROR', ['error' => $e]);
+            $this->clerk_logger->error('verifyKeys ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -188,7 +187,7 @@ abstract class AbstractAction extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('getPrivateKey ERROR', ['error' => $e]);
+            $this->clerk_logger->error('getPrivateKey ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -209,7 +208,7 @@ abstract class AbstractAction extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('getPublicKey ERROR', ['error' => $e]);
+            $this->clerk_logger->error('getPublicKey ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -245,7 +244,7 @@ abstract class AbstractAction extends Action
             
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('getArguments ERROR', ['error' => $e]);
+            $this->clerk_logger->error('getArguments ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -319,7 +318,7 @@ abstract class AbstractAction extends Action
                         ]
                     ])
                 );
-            $this->clerk_logger->error('AbstractAction execute ERROR', ['error' => $e]);
+            $this->clerk_logger->error('AbstractAction execute ERROR', ['error' => $e->getMessage()]);
         }
     }
 
@@ -345,7 +344,7 @@ abstract class AbstractAction extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('prepareCollection ERROR', ['error' => $e]);
+            $this->clerk_logger->error('prepareCollection ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -369,7 +368,7 @@ abstract class AbstractAction extends Action
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Getting Field Name ERROR', ['error' => $e]);
+            $this->clerk_logger->error('Getting Field Name ERROR', ['error' => $e->getMessage()]);
 
         }
     }
