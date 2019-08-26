@@ -46,6 +46,11 @@
                 <enabled>0</enabled>
                 <content>cart-others-also-bought</content>
             </cart>
+            <log>
+                <enabled>1</enabled>
+                <level>warn</level>
+                <to>collect</to>
+            </log>
         </clerk>
     </default>
 </config>
