@@ -9,7 +9,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Data\Form;
 use Magento\Framework\Data\FormFactory;
 use Magento\Framework\Option\ArrayPool;
-use ClerkLogger;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
 class Index extends Action
 {
