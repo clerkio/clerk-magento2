@@ -338,17 +338,20 @@ class ClerkLogger
                     curl_setopt($curl, CURLOPT_POST, true);
                     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-                    curl_exec($curl);
+
+                    $response = json_decode(curl_exec($curl));
+
+                    if ($response->status == 'error') {
+
+                        $this->LogToFile($Message,$Metadata);
+
+                    }
+
                     curl_close($curl);
 
                 } elseif ($this->Log_to == 'file') {
 
-                    $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . json_encode($Metadata) . PHP_EOL .
-                        '-------------------------' . PHP_EOL;
-                    $path = $this->_dir->getPath('log') . '/clerk_log.log';
-
-                    fopen($path, "a+");
-                    file_put_contents($path, $log, FILE_APPEND);
+                    $this->LogToFile($Message,$Metadata);
 
                 }
             }
@@ -410,17 +413,20 @@ class ClerkLogger
                 curl_setopt($curl, CURLOPT_POST, true);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-                curl_exec($curl);
+
+                $response = json_decode(curl_exec($curl));
+
+                if ($response->status == 'error') {
+
+                    $this->LogToFile($Message,$Metadata);
+
+                }
+
                 curl_close($curl);
 
             } elseif ($this->Log_to == 'file') {
 
-                $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . json_encode($Metadata) . PHP_EOL .
-                    '-------------------------' . PHP_EOL;
-                $path = $this->_dir->getPath('log') . '/clerk_log.log';
-
-                fopen($path, "a+");
-                file_put_contents($path, $log, FILE_APPEND);
+                $this->LogToFile($Message,$Metadata);
 
             }
         }
@@ -486,20 +492,34 @@ class ClerkLogger
                     curl_setopt($curl, CURLOPT_POST, true);
                     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-                    curl_exec($curl);
+
+                    $response = json_decode(curl_exec($curl));
+
+                    if ($response->status == 'error') {
+                        
+                        $this->LogToFile($Message,$Metadata);
+
+                    }
+
                     curl_close($curl);
 
                 } elseif ($this->Log_to == 'file') {
 
-                    $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . json_encode($Metadata) . PHP_EOL .
-                        '-------------------------' . PHP_EOL;
-                    $path = $this->_dir->getPath('log') . '/clerk_log.log';
-
-                    fopen($path, "a+");
-                    file_put_contents($path, $log, FILE_APPEND);
+                    $this->LogToFile($Message,$Metadata);
 
                 }
             }
         }
+    }
+
+    public function LogToFile($Message,$Metadata) {
+
+        $log = $this->Date->format('Y-m-d H:i:s') . ' MESSAGE: ' . $Message . ' METADATA: ' . json_encode($Metadata) . PHP_EOL .
+            '-------------------------' . PHP_EOL;
+        $path = $this->_dir->getPath('log') . '/clerk_log.log';
+
+        fopen($path, "a+");
+        file_put_contents($path, $log, FILE_APPEND);
+
     }
 }

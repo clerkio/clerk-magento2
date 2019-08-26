@@ -36,7 +36,7 @@ require(
                             this.closeModal(event);
                         }
                     }, {
-                        text: $.mage.__('Im Sure'),
+                        text: $.mage.__('I\'m Sure'),
                         class: 'action-primary action-accept',
                         click: function (event) {
                             this.closeModal(event, true);

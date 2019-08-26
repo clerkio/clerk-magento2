@@ -111,6 +111,7 @@ abstract class AbstractAction extends Action
     {
 
         try {
+            
             //Validate supplied keys
             if (!$this->verifyKeys($request)) {
                 $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
