@@ -55,6 +55,16 @@ abstract class AbstractAction extends Action
     protected $page;
 
     /**
+     * @var
+     */
+    protected $start_date;
+
+    /**
+     * @var
+     */
+    protected $end_date;
+
+    /**
      * @var string
      */
     protected $orderBy;
@@ -222,6 +232,8 @@ abstract class AbstractAction extends Action
         try {
 
             $this->debug = (bool)$request->getParam('debug', false);
+            $this->start_date = $request->getParam('start_date', 0);
+            $this->end_date = $request->getParam('end_date', time());
             $this->limit = (int)$request->getParam('limit', 0);
             $this->page = (int)$request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
@@ -337,9 +349,19 @@ abstract class AbstractAction extends Action
 
             $collection->addFieldToSelect('*');
 
-            $collection->setPageSize($this->limit)
-                ->setCurPage($this->page)
-                ->addOrder($this->orderBy, $this->order);
+            if($this->start_date) {
+
+                $collection->setPageSize($this->limit)
+                    ->setCurPage($this->page)
+                    ->addAttributeToFilter('created_at', array('from'=>$this->start_date, 'to'=>$this->end_date))
+                    ->addOrder($this->orderBy, $this->order);
+            } else {
+
+                $collection->setPageSize($this->limit)
+                    ->setCurPage($this->page)
+                    ->addOrder($this->orderBy, $this->order);
+
+            }
             
             return $collection;
 

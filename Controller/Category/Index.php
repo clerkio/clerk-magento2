@@ -117,6 +117,7 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
+
             $this->clerk_logger->log('Category Sync Started', ['response' => '']);
 
             $collection = $this->prepareCollection();
@@ -131,9 +132,11 @@ class Index extends AbstractAction
             if ($this->page <= $collection->getLastPageNumber()) {
                 //Build response
                 foreach ($collection as $resourceItem) {
+
                     $item = [];
 
                     foreach ($this->fields as $field) {
+
                         if (isset($resourceItem[$field])) {
                             $item[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
                         }
@@ -194,6 +197,7 @@ class Index extends AbstractAction
             $collection->addAttributeToFilter('level', ['gteq' => 2]);
             $collection->addAttributeToFilter('name', ['neq' => null]);
             $collection->addPathsFilter('1/' . $rootCategory . '/%');
+            $collection->addFieldToFilter('is_active',array("in"=>array('1')));
 
             $collection->setPageSize($this->limit)
                 ->setCurPage($this->page)
