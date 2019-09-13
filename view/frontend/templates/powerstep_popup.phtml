@@ -19,7 +19,7 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
     $Issetdataexclude = false;
     $dataexcludestring = '';
     foreach ($block->getTemplates() as $template) :
-        $id = $block->generateRandomString();
+        $id = 'clerk_'.$block->generateRandomString();
     ?>
         <span class="clerk"
               id="<?php echo $id ?>"
