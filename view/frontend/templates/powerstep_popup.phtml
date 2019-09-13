@@ -15,13 +15,29 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
         <button class="action clerk_powerstep_button clerk_powerstep_close"><?php echo __('Continue Shopping'); ?></button>
     </div>
     <div class="clerk_powerstep_templates">
-    <?php foreach ($block->getTemplates() as $template) : ?>
+    <?php
+    $Issetdataexclude = false;
+    $dataexcludestring = '';
+    foreach ($block->getTemplates() as $template) :
+        $id = $block->generateRandomString();
+    ?>
         <span class="clerk"
+              id="<?php echo $id ?>"
+              <?php if($Issetdataexclude) {
+                  echo 'data-exclude-from="'.$dataexcludestring.'"';
+
+
+              } ?>
               data-template="@<?php echo $block->escapeHtmlAttr($template); ?>"
               data-products="[<?php echo $block->escapeHtmlAttr($block->getProduct()->getId()); ?>]"
               data-category="<?php echo $block->escapeHtmlAttr(reset($categoryIds)); ?>"
         ></span>
-    <?php endforeach; ?>
+
+
+    <?php
+        $dataexcludestring .= '#'.$id.':limit(4),';
+        $Issetdataexclude = true;
+    endforeach; ?>
     </div>
 </div>
 <script>
