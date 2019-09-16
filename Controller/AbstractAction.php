@@ -314,8 +314,10 @@ abstract class AbstractAction extends Action
                 ->setHeader('Content-Type', 'application/json', true);
 
             if ($this->debug) {
+                $this->clerk_logger->log('Fetched page '.$this->page.' with '.count($response).' Orders', ['response' => $response]);
                 $this->getResponse()->setBody(json_encode($response, JSON_PRETTY_PRINT));
             } else {
+                $this->clerk_logger->log('Fetched page '.$this->page.' with '.count($response).' Orders', ['response' => $response]);
                 $this->getResponse()->setBody(json_encode($response));
             }
         } catch (\Exception $e) {

@@ -54,13 +54,12 @@ class Index extends AbstractAction
     {
         try {
             
-            $this->clerk_logger->log('Product Sync Started', ['response' => '']);
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
 
             $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order);
-            $this->clerk_logger->log('Product Sync Done', ['Note' => 'Only showing first 5 items in response ', 'response' => array_slice($response, 0, 5)]);
+            $this->clerk_logger->log('Fechedp page '.$this->page.' with '.count($response) .' products', ['response' => $response]);
             $this->getResponse()->setBody(json_encode($response));
 
         } catch (\Exception $e) {

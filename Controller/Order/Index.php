@@ -107,7 +107,6 @@ class Index extends AbstractAction
     {
         try {
 
-            $this->clerk_logger->log('Order Sync Started', ['response' => '']);
             $disabled = $this->scopeConfig->isSetFlag(
                 \Clerk\Clerk\Model\Config::XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION,
                 ScopeInterface::SCOPE_STORE
@@ -123,8 +122,6 @@ class Index extends AbstractAction
 
                 return;
             }
-
-            $this->clerk_logger->log('Order Sync Done', ['response' => '']);
 
             parent::execute();
 

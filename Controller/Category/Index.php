@@ -118,8 +118,6 @@ class Index extends AbstractAction
     {
         try {
 
-            $this->clerk_logger->log('Category Sync Started', ['response' => '']);
-
             $collection = $this->prepareCollection();
 
             $this->_eventManager->dispatch($this->eventPrefix . '_get_collection_after', [
@@ -156,10 +154,10 @@ class Index extends AbstractAction
 
             if ($this->debug) {
                 $this->getResponse()->setBody(json_encode($response, JSON_PRETTY_PRINT));
-                $this->clerk_logger->log('Category Sync Done', ['Note' => 'Only showing first 5 items in response ', 'response' => array_slice($response, 0, 5)]);
+                $this->clerk_logger->log('Fetched '.$this->page.' with '.count($response).' Categories', ['response' => $response]);
             } else {
                 $this->getResponse()->setBody(json_encode($response));
-                $this->clerk_logger->log('Category Sync Done', ['Note' => 'Only showing first 5 items in response ', 'response' => array_slice($response, 0, 5)]);
+                $this->clerk_logger->log('Fetched page '.$this->page.' with '.count($response).' Categories', ['response' => $response]);
             }
         } catch (\Exception $e) {
             $this->getResponse()
