@@ -64,7 +64,6 @@ class Index extends AbstractAction
             foreach ($response as $key => $product) {
 
                 $price = '';
-                $list_price = '';
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product['id']);
                 $productType = $product->getTypeID();
@@ -85,18 +84,6 @@ class Index extends AbstractAction
 
                                 $price = $associatedProduct->getPrice();
 
-                            } elseif ($price < $associatedProduct->getPrice()) {
-
-                                if(empty($list_price)) {
-
-                                    $list_price = $associatedProduct->getPrice();
-
-                                } elseif ($list_price < $associatedProduct->getPrice()) {
-
-                                    $list_price = $associatedProduct->getPrice();
-
-                                }
-
                             }
 
                         }
@@ -104,7 +91,7 @@ class Index extends AbstractAction
                     }
 
                     $response[$key]['price'] = (float) floatval($price)  ? (float) floatval($price) : 0;
-                    $response[$key]['list_price'] = (float)floatval($list_price) ? floatval($list_price) : 0;
+                    $response[$key]['list_price'] = (float)floatval($price) ? floatval($price) : 0;
 
                 }
                 
