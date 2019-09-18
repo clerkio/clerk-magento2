@@ -49,17 +49,69 @@ class Index extends AbstractAction
 
     /**
      * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function execute()
     {
         try {
-            
+
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
 
             $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order);
-            $this->clerk_logger->log('Fechedp page '.$this->page.' with '.count($response) .' products', ['response' => $response]);
+
+            foreach ($response as $key => $product) {
+
+                $price = '';
+                $list_price = '';
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product['id']);
+                $productType = $product->getTypeID();
+
+                if ($productType == "grouped") {
+                    $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
+
+                    if (!empty($associatedProducts)) {
+
+
+                        foreach ($associatedProducts as $associatedProduct) {
+
+                            if (empty($price)) {
+
+                                $price = $associatedProduct->getPrice();
+
+                            } elseif ($price > $associatedProduct->getPrice()) {
+
+                                $price = $associatedProduct->getPrice();
+
+                            } elseif ($price < $associatedProduct->getPrice()) {
+
+                                if(empty($list_price)) {
+
+                                    $list_price = $associatedProduct->getPrice();
+
+                                } elseif ($list_price < $associatedProduct->getPrice()) {
+
+                                    $list_price = $associatedProduct->getPrice();
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    $response[$key]['price'] = (float) floatval($price)  ? (float) floatval($price) : 0;
+                    $response[$key]['list_price'] = (float)floatval($list_price) ? floatval($list_price) : 0;
+
+                }
+                
+            }
+
+            $this->clerk_logger->log('Feched page ' . $this->page . ' with ' . count($response) . ' products', ['response' => $response]);
+
             $this->getResponse()->setBody(json_encode($response));
 
         } catch (\Exception $e) {
