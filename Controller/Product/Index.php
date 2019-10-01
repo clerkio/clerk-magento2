@@ -22,6 +22,11 @@ class Index extends AbstractAction
     protected $clerk_logger;
 
     /**
+     * @var \Magento\Catalog\Helper\Data
+     */
+    protected $taxHelper;
+
+    /**
      * @var ProductAdapter
      */
     protected $productAdapter;
@@ -39,17 +44,18 @@ class Index extends AbstractAction
         ScopeConfigInterface $scopeConfig,
         LoggerInterface $logger,
         ProductAdapter $productAdapter,
-        ClerkLogger $ClerkLogger
+        ClerkLogger $ClerkLogger,
+        \Magento\Catalog\Helper\Data $taxHelper
     )
     {
+        $this->taxHelper = $taxHelper;
         $this->productAdapter = $productAdapter;
         $this->clerk_logger = $ClerkLogger;
         parent::__construct($context, $scopeConfig, $logger, $ClerkLogger);
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
-     * @throws \Magento\Framework\Exception\FileSystemException
+     *
      */
     public function execute()
     {
@@ -64,6 +70,7 @@ class Index extends AbstractAction
             foreach ($response as $key => $product) {
 
                 $price = '';
+                $list_price = '';
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product['id']);
                 $productType = $product->getTypeID();
@@ -78,11 +85,11 @@ class Index extends AbstractAction
 
                             if (empty($price)) {
 
-                                $price = $associatedProduct->getPrice();
+                                $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
 
                             } elseif ($price > $associatedProduct->getPrice()) {
 
-                                $price = $associatedProduct->getPrice();
+                                $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
 
                             }
 
