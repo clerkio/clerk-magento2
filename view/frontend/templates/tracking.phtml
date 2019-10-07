@@ -3,13 +3,18 @@
 ?>
 <!-- Start of Clerk.io E-commerce Personalisation tool - www.clerk.io -->
 <script type="text/javascript">
-    window.clerkAsyncInit = function() {
-        Clerk.config({
+
+    (function(w,d){
+        var e=d.createElement('script');e.type='text/javascript';e.async=true;
+        e.src=(d.location.protocol=='https:'?'https':'http')+'://cdn.clerk.io/clerk.js';
+        var s=d.getElementsByTagName('script')[0];s.parentNode.insertBefore(e,s);
+        w.__clerk_q=w.__clerk_q||[];w.Clerk=w.Clerk||function(){w.__clerk_q.push(arguments)};
+    })(window,document);
+    
+        Clerk('config', {
             key: '<?php echo $block->escapeJsQuote($block->getPublicKey()); ?>',
             collect_email: <?php echo $block->getCollectionEmails(); ?>
         });
-    };
-
-    require(['clerk'], function() {});
+    
 </script>
 <!-- End of Clerk.io E-commerce Personalisation tool - www.clerk.io -->

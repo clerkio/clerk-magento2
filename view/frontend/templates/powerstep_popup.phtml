@@ -3,7 +3,7 @@
 $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [];
 ?>
 <?php if ($block->shouldShow()) : ?>
-<div id="clerk_powerstep" style="display: none;">
+<div id="clerk_powerstep" class="clerk-popup" style="display: none;">
     <div class="clerk_powerstep_header">
         <h2><?php echo $block->getHeaderText(); ?></h2>
     </div>
@@ -24,34 +24,32 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
         <span class="clerk"
               id="<?php echo $id ?>"
               <?php if($Issetdataexclude) {
-                  echo 'data-exclude-from="'.$dataexcludestring.'"';
 
+                  echo 'data-exclude-from="'.$dataexcludestring.'"';
 
               } ?>
               data-template="@<?php echo $block->escapeHtmlAttr($template); ?>"
               data-products="[<?php echo $block->escapeHtmlAttr($block->getProduct()->getId()); ?>]"
               data-category="<?php echo $block->escapeHtmlAttr(reset($categoryIds)); ?>"
         ></span>
-
-
     <?php
+
         $dataexcludestring .= '#'.$id.':limit(4),';
         $Issetdataexclude = true;
+
     endforeach; ?>
     </div>
 </div>
 <script>
 require(['jquery', 'clerk'], function($, Clerk) {
-    var popup = Clerk.ui.popup("#clerk_powerstep");
+    var popup = $("#clerk_powerstep");
 
     $(".clerk_powerstep_close").on("click", function() {
-        popup.close();
+        popup.hide();
     });
 
-    popup.show();
-
     <?php if ($block->isAjax()) : ?>
-    Clerk.renderBlocks(".clerk_powerstep_templates .clerk");
+    popup.show();
     <?php endif; ?>
 });
 </script>
