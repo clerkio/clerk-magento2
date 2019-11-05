@@ -5,6 +5,7 @@
             <general>
                 <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
                 <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <include_pages>1</include_pages>
             </general>
             <product_synchronization>
                 <use_realtime_updates>1</use_realtime_updates>

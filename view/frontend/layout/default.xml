@@ -5,8 +5,10 @@
         <css src="Clerk_Clerk::css/powerstep.css"/>
     </head>
     <body>
-        <referenceBlock name="before.body.end">
+        <referenceBlock name="before.head.end">
             <block class="Clerk\Clerk\Block\Tracking" name="clerk.tracking.js" template="Clerk_Clerk::tracking.phtml"/>
+        </referenceBlock>
+        <referenceBlock name="before.body.end">
             <block class="Clerk\Clerk\Block\LiveSearch" name="clerk.livesearch" template="Clerk_Clerk::livesearch.phtml" ifconfig="clerk/livesearch/enabled"/>
             <block class="Clerk\Clerk\Block\ExitIntent" name="clerk.exit_intent" template="Clerk_Clerk::exit_intent.phtml" ifconfig="clerk/exit_intent/enabled"/>
             <block class="Clerk\Clerk\Block\PowerstepScripts" name="clerk.powerstep_script" template="Clerk_Clerk::powerstep_script.phtml" ifconfig="clerk/powerstep/enabled"/>

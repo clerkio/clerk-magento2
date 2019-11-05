@@ -16,6 +16,6 @@ class Index extends Action
     public function execute()
     {
         $this->getResponse()->setHeader('Content-Type', 'application/json', true);
-        $this->getResponse()->setBody(json_encode(['products' => [], 'categories' => [], 'sales' => []], JSON_PRETTY_PRINT));
+        $this->getResponse()->setBody(json_encode(['products' => [], 'categories' => [], 'sales' => [], 'pages' => []], JSON_PRETTY_PRINT));
     }
 }
