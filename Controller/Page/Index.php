@@ -98,7 +98,13 @@ class Index extends AbstractAction
                 $pages_raw = $this->_PageRepositoryInterface->getList($searchCriteria)->getItems();
 
                 foreach ($pages_raw as $page_raw) {
-                    
+
+                    if (empty($page_raw['content'])) {
+
+                        continue;
+
+                    }
+
                     try {
 
                         $url = $this->_objectManager->create('Magento\Cms\Helper\Page')
