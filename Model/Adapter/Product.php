@@ -34,6 +34,10 @@ class Product extends AbstractAdapter
      * @var string
      */
     protected $eventPrefix = 'product';
+    /**
+     * @var
+     */
+    protected $_stockFilter;
 
     /**
      * @var array
@@ -56,9 +60,12 @@ class Product extends AbstractAdapter
         CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManager,
         Image $imageHelper,
-        ClerkLogger $Clerklogger
+        ClerkLogger $Clerklogger,
+        \Magento\CatalogInventory\Helper\Stock $stockFilter
+
     )
     {
+        $this->_stockFilter = $stockFilter;
         $this->clerk_logger = $Clerklogger;
         $this->imageHelper = $imageHelper;
         parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger);
@@ -77,10 +84,26 @@ class Product extends AbstractAdapter
 
             $collection->addFieldToSelect('*');
 
-            //Filter on is_saleable if defined
-            if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-                $collection->addFieldToFilter('is_saleable', true);
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+            $version = $productMetadata->getVersion();
+
+            if (!$version >= '2.3.3') {
+
+                //Filter on is_saleable if defined
+                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                    $collection->addFieldToFilter('is_saleable', true);
+                }
+
+            } else {
+
+                if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                    $this->_stockFilter->addInStockFilterToCollection($collection,true);
+                }
+
             }
+
+
 
             $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
 
