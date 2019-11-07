@@ -16,6 +16,7 @@ require(['jquery'], function($) {
             success: function(res) {
                 if (res.length > 0) {
                     $('body').append(res);
+                    Clerk('ui', 'popup', '.clerk-popup', 'show');
                 }
             }
         });
