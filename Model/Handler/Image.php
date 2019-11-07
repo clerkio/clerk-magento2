@@ -51,10 +51,10 @@ class Image
         $imageUrl = null;
         // get image thumbnail from settings
         $imageType = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_IMAGE_TYPE);
+        /** @var \Magento\Catalog\Helper\Image $helper */
+        $helper = $this->helperFactory->create()->init($item, $imageType);
+
         if ($imageType) {
-            /** @var \Magento\Catalog\Helper\Image $helper */
-            $helper = $this->helperFactory->create()
-                ->init($item, $imageType);
             $imageUrl = $helper->getUrl();
             if ($imageUrl == $helper->getDefaultPlaceholderUrl()) {
                 // allow to try other types
