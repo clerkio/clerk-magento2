@@ -65,7 +65,12 @@ class Image
         if (!$imageUrl) {
             $store = $this->storeManager->getStore();
             $itemImage = $item->getImage() ?? $item->getSmallImage() ?? $item->getThumbnail();
-            $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
+
+            if ($itemImage === 'no_selection') {
+                $imageUrl = $helper->getDefaultPlaceholderUrl('small_image');
+            } else {
+                $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
+            }
         }
 
         return $imageUrl;
