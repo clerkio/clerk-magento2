@@ -217,7 +217,10 @@ class Rows
         $productObject = new \Magento\Framework\DataObject();
         $productObject->setData($productItem);
 
-        $this->eventManager->dispatch('clerk_product_sync_before', ['product' => $productObject]);
+        $this->eventManager->dispatch('clerk_product_sync_before', [
+            'product_object' => $productObject,
+            'product' => $product
+        ]);
 
         $this->api->addProduct($productObject->toArray());
 
