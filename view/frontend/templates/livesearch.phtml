@@ -4,10 +4,11 @@
 <span
     class="clerk"
     data-template="@<?php echo $block->getLiveSearchTemplate(); ?>"
-    data-live-search-categories="<?php echo $block->shouldIncludeCategories(); ?>"
-    data-live-search-categories-title="<?php echo __('Categories'); ?>"
-    data-live-search-products-title="<?php echo __('Products'); ?>"
-    data-bind-live-search="#search">
+    data-instant-search-suggestions="<?php echo $block->getSuggestions(); ?>"
+    data-instant-search-categories="<?php echo $block->getCategories(); ?>"
+    data-instant-search-pages="<?php echo $block->getPages(); ?>"
+    data-instant-search-pages-type="<?php echo $block->getPagesType(); ?>"
+    data-instant-search="#search">
 </span>
 <style type="text/css">
 #search_autocomplete { display: none !important; }

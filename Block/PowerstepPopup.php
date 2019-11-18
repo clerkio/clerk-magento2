@@ -124,7 +124,7 @@ class PowerstepPopup extends Template
      */
     public function shouldShow()
     {
-        return ($this->getRequest()->getParam('isAjax')) || ($this->checkoutSession->getClerkShowPowerstep(true) === true);
+        return ($this->getRequest()->getParam('isAjax')) || ($this->checkoutSession->getClerkShowPowerstep(true));
     }
 
     /**

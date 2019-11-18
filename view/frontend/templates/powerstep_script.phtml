@@ -10,13 +10,15 @@ require(['jquery'], function($) {
         $("#clerk_powerstep .clerk-slider").remove();
         var data = isAjax ? { isAjax: true } : {};
         $.ajax({
-            url: '/clerk/powerstep/popup',
+            url: 'clerk/powerstep/popup',
             data: data,
             type: 'get',
             success: function(res) {
                 if (res.length > 0) {
                     $('body').append(res);
                     Clerk('ui', 'popup', '.clerk-popup', 'show');
+                    Clerk("content",".clerk_powerstep_templates > span");
+
                 }
             }
         });

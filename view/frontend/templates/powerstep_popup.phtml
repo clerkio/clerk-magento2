@@ -3,7 +3,7 @@
 $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [];
 ?>
 <?php if ($block->shouldShow()) : ?>
-<div id="clerk_powerstep" class="clerk-popup" style="display: none;">
+<div id="clerk_powerstep" class="clerk-popup">
     <div class="clerk_powerstep_header">
         <h2><?php echo $block->getHeaderText(); ?></h2>
     </div>

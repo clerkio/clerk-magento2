@@ -43,7 +43,6 @@ class Popup extends Action
 
             $response = $layout->getBlock('page.block')->toHtml();
             $this->getResponse()->setBody($response);
-            $this->checkoutSession->setClerkShowPowerstep(false);
             return;
 
         } catch (\Exception $e) {

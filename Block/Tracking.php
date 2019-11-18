@@ -20,6 +20,14 @@ class Tracking extends Template
         );
     }
 
+    public function getLanguage()
+    {
+        return $this->_scopeConfig->getValue(
+            Config::XML_PATH_LANGUAGE,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
     /**
      * Get collect emails
      *

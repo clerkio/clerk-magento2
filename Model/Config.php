@@ -9,6 +9,7 @@ class Config
      */
     const XML_PATH_PRIVATE_KEY = 'clerk/general/private_key';
     const XML_PATH_PUBLIC_KEY = 'clerk/general/public_key';
+    const XML_PATH_LANGUAGE = 'clerk/general/language';
     const XML_PATH_INCLUDE_PAGES = 'clerk/general/include_pages';
     const XML_PATH_PAGES_ADDITIONAL_FIELDS = 'clerk/general/pages_additional_fields';
     
@@ -45,6 +46,10 @@ class Config
      */
     const XML_PATH_LIVESEARCH_ENABLED = 'clerk/livesearch/enabled';
     const XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES = 'clerk/livesearch/include_categories';
+    const XML_PATH_LIVESEARCH_CATEGORIES = 'clerk/livesearch/categories';
+    const XML_PATH_LIVESEARCH_SUGGESTIONS = 'clerk/livesearch/suggestions';
+    const XML_PATH_LIVESEARCH_PAGES = 'clerk/livesearch/pages';
+    const XML_PATH_LIVESEARCH_PAGES_TYPE = 'clerk/livesearch/pages_type';
     const XML_PATH_LIVESEARCH_TEMPLATE = 'clerk/livesearch/template';
 
     /**

@@ -26,4 +26,23 @@ class LiveSearch extends Template
     {
         return ($this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES)) ? 'true' : 'false';
     }
+    public function getSuggestions()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_SUGGESTIONS);
+    }
+
+    public function getCategories()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_CATEGORIES);
+    }
+
+    public function getPages()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES);
+    }
+
+    public function getPagesType()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES_TYPE);
+    }
 }
