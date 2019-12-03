@@ -8,8 +8,8 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Store\Model\Store;
-use Psr\Log\LoggerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\Module\ModuleList;
 
 class ClerkLogger
 {
@@ -54,6 +54,8 @@ class ClerkLogger
      */
     private $Log_to;
 
+    protected $moduleList;
+
     /**
      * ClerkLogger constructor.
      * @param ScopeConfigInterface $scopeConfig
@@ -63,7 +65,7 @@ class ClerkLogger
      * @param ConfigInterface $configWriter
      * @throws \Magento\Framework\Exception\FileSystemException
      */
-    function __construct(ScopeConfigInterface $scopeConfig, DirectoryList $dir, LoggerInterface $logger, TimezoneInterface $date, ConfigInterface $configWriter)
+    function __construct(ScopeConfigInterface $scopeConfig, DirectoryList $dir, TimezoneInterface $date, ConfigInterface $configWriter, ModuleList $moduleList)
     {
 
         $this->configWriter = $configWriter;
@@ -76,6 +78,7 @@ class ClerkLogger
         $this->Log_level = $this->scopeConfig->getValue(Config::XML_PATH_LOG_LEVEL);
         $this->Log_to = $this->scopeConfig->getValue(Config::XML_PATH_LOG_TO);
         $this->Enabled = $this->scopeConfig->getValue(Config::XML_PATH_LOG_ENABLED);
+        $this->moduleList = $moduleList;
         $this->InitializeSearchPowerstep();
 
     }
@@ -288,7 +291,10 @@ class ClerkLogger
      */
     public function log($Message, $Metadata)
     {
-
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+        $version = $productMetadata->getVersion();
+        header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
         if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI']))
 
             $Metadata['uri'] = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
@@ -366,7 +372,10 @@ class ClerkLogger
      */
     public function error($Message, $Metadata)
     {
-
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+        $version = $productMetadata->getVersion();
+        header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
         if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI']))
 
             $Metadata['uri'] = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
@@ -440,7 +449,10 @@ class ClerkLogger
      */
     public function warn($Message, $Metadata)
     {
-
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+        $version = $productMetadata->getVersion();
+        header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
         if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI']))
 
             $Metadata['uri'] = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];

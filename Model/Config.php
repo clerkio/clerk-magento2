@@ -50,6 +50,7 @@ class Config
     const XML_PATH_LIVESEARCH_SUGGESTIONS = 'clerk/livesearch/suggestions';
     const XML_PATH_LIVESEARCH_PAGES = 'clerk/livesearch/pages';
     const XML_PATH_LIVESEARCH_PAGES_TYPE = 'clerk/livesearch/pages_type';
+    const XML_PATH_LIVESEARCH_DROPDOWN_POSITION = 'clerk/livesearch/dropdown_position';
     const XML_PATH_LIVESEARCH_TEMPLATE = 'clerk/livesearch/template';
 
     /**

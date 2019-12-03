@@ -7,6 +7,7 @@ use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Module\ModuleList;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -44,6 +45,8 @@ class Index extends AbstractAction
 
     protected $_scopeConfig;
 
+    protected $moduleList;
+
     /**
      * Index constructor.
      * @param Context $context
@@ -61,7 +64,8 @@ class Index extends AbstractAction
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         LoggerInterface $logger,
         ObjectManagerInterface $objectManager,
-        ClerkLogger $ClerkLogger
+        ClerkLogger $ClerkLogger,
+        ModuleList $moduleList
     )
     {
         $this->_searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
@@ -70,7 +74,8 @@ class Index extends AbstractAction
         $this->_objectManager = $objectManager;
         $this->clerk_logger = $ClerkLogger;
         $this->_scopeConfig = $scopeConfig;
-        parent::__construct($context, $scopeConfig, $logger, $ClerkLogger);
+        $this->moduleList = $moduleList;
+        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**
@@ -99,21 +104,21 @@ class Index extends AbstractAction
 
                 foreach ($pages_raw as $page_raw) {
 
-                    if (empty($page_raw['content'])) {
-
-                        continue;
-
-                    }
-
                     try {
 
                         $url = $this->_objectManager->create('Magento\Cms\Helper\Page')
                             ->getPageUrl($page_raw['page_id']);
                         $page['id'] = $page_raw['page_id'];
-                        $page['type'] = 'CMS Page';
+                        $page['type'] = 'cms page';
                         $page['url'] = $url;
                         $page['title'] = $page_raw['title'];
                         $page['text'] = $page_raw['content'];
+
+                        if (!$this->ValidatePage($page)) {
+
+                            continue;
+
+                        }
 
                         foreach ($Pages_Additional_Fields as $Pages_Additional_Field) {
 
@@ -146,6 +151,23 @@ class Index extends AbstractAction
             $this->clerk_logger->error('Product execute ERROR', ['error' => $e->getMessage()]);
 
         }
+    }
+
+
+    public function ValidatePage($Page) {
+
+        foreach ($Page as $key => $content) {
+
+            if (empty($content)) {
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
     }
     
 }

@@ -45,4 +45,8 @@ class LiveSearch extends Template
     {
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES_TYPE);
     }
+    public function getDropdownPosition()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_DROPDOWN_POSITION);
+    }
 }

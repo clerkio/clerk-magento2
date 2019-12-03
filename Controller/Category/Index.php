@@ -8,6 +8,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
+use Magento\Framework\Module\ModuleList;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
@@ -47,6 +48,8 @@ class Index extends AbstractAction
      */
     protected $storeManager;
 
+    protected $moduleList;
+
     /**
      * Category controller constructor.
      *
@@ -67,9 +70,11 @@ class Index extends AbstractAction
         PageCollectionFactory $pageCollectionFactory,
         Page $pageHelper,
         StoreManagerInterface $storeManager,
-        ClerkLogger $ClerkLogger
+        ClerkLogger $ClerkLogger,
+        ModuleList $moduleList
     )
     {
+        $this->moduleList = $moduleList;
         $this->collectionFactory = $categoryCollectionFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
         $this->pageHelper = $pageHelper;
@@ -78,7 +83,7 @@ class Index extends AbstractAction
 
         $this->addFieldHandlers();
 
-        parent::__construct($context, $scopeConfig, $logger, $ClerkLogger);
+        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**

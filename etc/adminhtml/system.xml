@@ -150,6 +150,10 @@
                     <label>Pages Type</label>
                     <source_model>Clerk\Clerk\Model\Config\Source\PagesType</source_model>
                 </field>
+                <field id="dropdown_position" translate="label" type="select" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Dropdown Positioning</label>
+                    <source_model>Clerk\Clerk\Model\Config\Source\DropDownPosition</source_model>
+                </field>
                 <field id="template" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Content</label>
                     <depends>

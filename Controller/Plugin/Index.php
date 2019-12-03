@@ -1,13 +1,13 @@
 <?php
 
-namespace Clerk\Clerk\Controller\Version;
+namespace Clerk\Clerk\Controller\Plugin;
 
 use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Module\ModuleList;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Psr\Log\LoggerInterface;
-use  Clerk\Clerk\Controller\Logger\ClerkLogger;
 
 class Index extends AbstractAction
 {
@@ -36,20 +36,11 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
-            $version = $productMetadata->getVersion();
-
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
 
-            $response = [
-                'platform' => 'Magento2',
-                'platform_version' => $version,
-                'clerk_version' => $this->moduleList->getOne('Clerk_Clerk')['setup_version'],
-                'php_version' => phpversion()
-            ];
+            $response = $this->moduleList->getAll();
 
             if ($this->debug) {
                 $this->getResponse()->setBody(json_encode($response, JSON_PRETTY_PRINT));
@@ -58,7 +49,7 @@ class Index extends AbstractAction
             }
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Version execute ERROR', ['error' => $e->getMessage()]);
+            $this->clerk_logger->error('Plugin execute ERROR', ['error' => $e->getMessage()]);
 
         }
 

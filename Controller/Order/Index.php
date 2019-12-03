@@ -7,6 +7,7 @@ use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Module\ModuleList;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
@@ -31,6 +32,8 @@ class Index extends AbstractAction
      */
     protected $eventPrefix = 'clerk_order';
 
+    protected $moduleList;
+
     /**
      * Order controller constructor.
      *
@@ -43,14 +46,16 @@ class Index extends AbstractAction
         ScopeConfigInterface $scopeConfig,
         CollectionFactory $orderCollectionFactory,
         LoggerInterface $logger,
+        ModuleList $moduleList,
         ClerkLogger $ClerkLogger
     )
     {
         $this->collectionFactory = $orderCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
+        $this->moduleList = $moduleList;
         $this->addFieldHandlers();
 
-        parent::__construct($context, $scopeConfig, $logger, $ClerkLogger);
+        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**

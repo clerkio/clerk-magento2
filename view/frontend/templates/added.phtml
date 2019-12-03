@@ -23,15 +23,15 @@
     <?php
     $Issetdataexclude = false;
     $dataexcludestring = '';
+    $count = 0;
     foreach ($block->getTemplates() as $template) :
+        $count++;
         $id = 'clerk_'.$block->generateRandomString();
         ?>
         <span class="clerk"
               id="<?php echo $id ?>"
               <?php if($Issetdataexclude) {
                   echo 'data-exclude-from="'.$dataexcludestring.'"';
-
-
               } ?>
               data-template="@<?php echo str_replace(' ','',$template); ?>"
               data-products="[<?php echo $block->getProduct()->getId(); ?>]"
@@ -40,7 +40,16 @@
 
 
         <?php
-        $dataexcludestring .= '#'.$id.':limit(4),';
+
+        if ($count == 1) {
+
+            $dataexcludestring .= '#'.$id.':limit(4)';
+
+        }else {
+
+            $dataexcludestring .= ',#'.$id.':limit(4)';
+
+        }
         $Issetdataexclude = true;
     endforeach; ?>
 </div>

@@ -11,6 +11,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
@@ -26,6 +27,8 @@ class Index extends AbstractAction
      */
     protected $productAdapter;
 
+    protected $moduleList;
+
     /**
      * Index constructor.
      *
@@ -37,16 +40,18 @@ class Index extends AbstractAction
     public function __construct(
         Context $context,
         ScopeConfigInterface $scopeConfig,
-        LoggerInterface $logger,
         ProductAdapter $productAdapter,
         ClerkLogger $ClerkLogger,
-        \Magento\Catalog\Helper\Data $taxHelper
+        LoggerInterface $logger,
+        \Magento\Catalog\Helper\Data $taxHelper,
+        ModuleList $moduleList
     )
     {
         $this->taxHelper = $taxHelper;
+        $this->moduleList = $moduleList;
         $this->productAdapter = $productAdapter;
         $this->clerk_logger = $ClerkLogger;
-        parent::__construct($context, $scopeConfig, $logger, $ClerkLogger);
+        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**

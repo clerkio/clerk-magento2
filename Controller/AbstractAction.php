@@ -7,6 +7,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Module\ModuleList;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store;
 use Psr\Log\LoggerInterface;
@@ -95,16 +96,21 @@ abstract class AbstractAction extends Action
     protected $eventPrefix = '';
 
     /**
+     * @var ModuleList 
+     */
+    protected $moduleList;
+    
+    /**
      * Constructor
      *
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger,ClerkLogger $ClerkLogger)
+    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
     {
+        $this->moduleList = $moduleList;
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
-        $this->clerk_logger = $ClerkLogger;
         parent::__construct($context);
     }
 
@@ -121,7 +127,12 @@ abstract class AbstractAction extends Action
     {
 
         try {
-            
+
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+            $version = $productMetadata->getVersion();
+            header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
+
             //Validate supplied keys
             if (!$this->verifyKeys($request)) {
                 $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
