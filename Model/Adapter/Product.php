@@ -92,18 +92,17 @@ class Product extends AbstractAdapter
 
                 //Filter on is_saleable if defined
                 if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-                    $collection->addFieldToFilter('is_saleable', true);
+                    $this->_stockFilter->addInStockFilterToCollection($collection);
                 }
+
 
             } else {
 
                 if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-                    $this->_stockFilter->addInStockFilterToCollection($collection,true);
+                    $collection->setFlag('has_stock_status_filter', true);
                 }
 
             }
-
-
 
             $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
 
@@ -287,6 +286,12 @@ class Product extends AbstractAdapter
 
             if ($additionalFields) {
                 $fields = array_merge($fields, explode(',', $additionalFields));
+            }
+            
+            foreach ($fields as $key => $field) {
+
+                $fields[$key] = $field;
+                
             }
 
             return $fields;

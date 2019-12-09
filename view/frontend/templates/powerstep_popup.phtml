@@ -18,7 +18,9 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
     <?php
     $Issetdataexclude = false;
     $dataexcludestring = '';
+    $count = 0;
     foreach ($block->getTemplates() as $template) :
+        $count++;
         $id = 'clerk_'.$block->generateRandomString();
     ?>
         <span class="clerk"
@@ -34,7 +36,15 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
         ></span>
     <?php
 
-        $dataexcludestring .= '#'.$id.':limit(4),';
+        if ($count == 1) {
+
+            $dataexcludestring .= '#'.$id.':limit(4)';
+
+        }else {
+
+            $dataexcludestring .= ',#'.$id.':limit(4)';
+
+        }
         $Issetdataexclude = true;
 
     endforeach; ?>

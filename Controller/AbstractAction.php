@@ -266,6 +266,12 @@ abstract class AbstractAction extends Action
             }
             $this->fields = array_merge(['entity_id'], $this->fields);
             
+            foreach ($this->fields as $key => $field) {
+
+                $this->fields[$key] = str_replace(' ', '', $field);
+                
+            }
+            
         } catch (\Exception $e) {
 
             $this->clerk_logger->error('getArguments ERROR', ['error' => $e->getMessage()]);
@@ -317,6 +323,7 @@ abstract class AbstractAction extends Action
                     }
 
                     $response[] = $item;
+
                 }
             }
 

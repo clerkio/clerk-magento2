@@ -12,6 +12,7 @@ use Magento\Checkout\Helper\Cart;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
+use function GuzzleHttp\Psr7\str;
 
 class PowerstepPopup extends Template
 {
@@ -146,6 +147,12 @@ class PowerstepPopup extends Template
     {
         $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES);
         $templates = explode(',', $configTemplates);
+        
+        foreach ($templates as $key => $template) {
+
+            $templates[$key] = str_replace(' ','', $template);
+            
+        }
 
         return (array) $templates;
     }

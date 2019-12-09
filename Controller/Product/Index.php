@@ -66,6 +66,20 @@ class Index extends AbstractAction
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
 
+            if (isset($this->fields)) {
+
+                if (!in_array('qty', $this->fields)) {
+
+                    $this->fields[] = 'qty';
+
+                }
+
+            } else {
+
+                $this->fields[] = 'qty';
+
+            }
+
             $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order);
 
             foreach ($response as $key => $product) {
@@ -75,8 +89,10 @@ class Index extends AbstractAction
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product['id']);
                 $productType = $product->getTypeID();
+                $stockItem = $product->getExtensionAttributes()->getStockItem();
 
                 if ($productType == "grouped") {
+
                     $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
 
                     if (!empty($associatedProducts)) {
@@ -102,9 +118,10 @@ class Index extends AbstractAction
 
                     $response[$key]['price'] = (float) floatval($price)  ? (float) floatval($price) : 0;
                     $response[$key]['list_price'] = (float)floatval($price) ? floatval($price) : 0;
-
                 }
-                
+
+                $response[$key]['stock'] = $stockItem->getQty();
+
             }
 
             $this->clerk_logger->log('Feched page ' . $this->page . ' with ' . count($response) . ' products', ['response' => $response]);

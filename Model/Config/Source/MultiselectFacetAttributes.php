@@ -46,7 +46,7 @@ class MultiselectFacetAttributes implements ArrayInterface
         $values = [];
 
         foreach (explode(',', $attributes) as $attribute) {
-            $values[$attribute] = $attribute;
+            $values[$attribute] = str_replace(' ','', $attribute);
         }
 
         return $values;

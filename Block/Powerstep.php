@@ -60,6 +60,12 @@ class Powerstep extends AbstractProduct
     {
         $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES);
         $templates = explode(',', $configTemplates);
+        
+        foreach ($templates as $key => $template) {
+
+            $templates[$key] = str_replace(' ','',$template);
+            
+        }
 
         return (array) $templates;
     }
