@@ -6,6 +6,7 @@ use Magento\Catalog\Helper\Image;
 use Magento\Framework\Option\ArrayInterface;
 use Magento\Framework\View\ConfigInterface;
 use Magento\Theme\Model\ResourceModel\Theme\CollectionFactory;
+use mysql_xdevapi\Exception;
 
 class ImageType implements ArrayInterface
 {
@@ -46,13 +47,22 @@ class ImageType implements ArrayInterface
 
         /** @var ThemeInterface $theme */
         foreach ($themes as $theme) {
-            $config = $this->viewConfig->getViewConfig([
-                'themeModel' => $theme,
-            ]);
-            $mediaEntities = $config->getMediaEntities('Magento_Catalog', Image::MEDIA_TYPE_CONFIG_NODE);
-            $types[$theme->getCode()] = $mediaEntities;
 
-            $common = $common ? array_intersect_key($common, $types[$theme->getCode()]) : $types[$theme->getCode()];
+            try {
+
+                $config = $this->viewConfig->getViewConfig([
+                    'themeModel' => $theme,
+                ]);
+                $mediaEntities = $config->getMediaEntities('Magento_Catalog', Image::MEDIA_TYPE_CONFIG_NODE);
+                $types[$theme->getCode()] = $mediaEntities;
+
+                $common = $common ? array_intersect_key($common, $types[$theme->getCode()]) : $types[$theme->getCode()];
+
+            }catch(\Exception $e) {
+
+                continue;
+
+            }
         }
 
         foreach ($types as $theme => $mediaEntities) {
