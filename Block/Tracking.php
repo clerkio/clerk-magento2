@@ -7,6 +7,16 @@ use Magento\Framework\View\Element\Template;
 
 class Tracking extends Template
 {
+
+    protected $formKey;
+
+    public function __construct(
+        \Magento\Backend\Block\Widget\Context $context,
+        \Magento\Framework\Data\Form\FormKey $formKey
+    ) {
+        parent::__construct($context);
+        $this->formKey = $formKey;
+    }
     /**
      * Get public key
      *
@@ -39,5 +49,11 @@ class Tracking extends Template
             Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         ) ? 'true' : 'false');
+    }
+
+    public function getFormKey() {
+
+        return $this->formKey->getFormKey();
+
     }
 }
