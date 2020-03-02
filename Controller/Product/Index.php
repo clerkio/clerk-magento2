@@ -6,10 +6,12 @@ use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Clerk\Clerk\Model\Handler\Image;
 use Magento\Catalog\Model\Product\Visibility;
+use Magento\CatalogInventory\Helper\Stock;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\App\ProductMetadataInterface;
 use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
@@ -32,6 +34,16 @@ class Index extends AbstractAction
     protected $imageHandler;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    protected $productMetadata;
+
+    /**
+     * @var Stock
+     */
+    protected $_stockFilter;
+
+    /**
      * Popup controller constructor.
      *
      * @param Context $context
@@ -42,12 +54,16 @@ class Index extends AbstractAction
         ScopeConfigInterface $scopeConfig,
         CollectionFactory $productCollectionFactory,
         Image $imageHandler,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ProductMetadataInterface $productMetadata,
+        Stock $stockFilter
     )
     {
         $this->collectionFactory = $productCollectionFactory;
         $this->imageHandler = $imageHandler;
         $this->addFieldHandlers();
+        $this->productMetadata = $productMetadata;
+        $this->_stockFilter = $stockFilter;
 
         parent::__construct($context, $scopeConfig, $logger);
     }
@@ -161,12 +177,18 @@ class Index extends AbstractAction
 
         $collection->addFieldToSelect('*');
 
-        //Filter on is_saleable if defined
-        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
-            $collection->getSelect()->where(
-                'stock_status_index.stock_status = ?',
-                \Magento\CatalogInventory\Model\Stock\Status::STATUS_IN_STOCK
-            );
+        $version = $this->productMetadata->getVersion();
+
+        if (!$version >= '2.3.3') {
+            if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                // Filter on is_saleable if defined
+                $this->_stockFilter->addInStockFilterToCollection($collection);
+            }
+        } else {
+            if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                // To bypass removing out of stock products in results
+                $collection->setFlag('has_stock_status_filter', true);
+            }
         }
 
         $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
