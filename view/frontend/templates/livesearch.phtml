@@ -9,8 +9,40 @@
     data-instant-search-pages="<?php echo $block->getPages(); ?>"
     data-instant-search-pages-type="<?php echo $block->getPagesType(); ?>"
     data-instant-search-positioning="<?php echo $block->getDropdownPosition(); ?>"
-    data-instant-search="#search">
+    <?php if (empty($block->getInputSelector())) {
+        echo "data-instant-search=\"#search\">";
+    } else {
+        echo "data-instant-search=\"".$block->getInputSelector()."\">";
+    }?>
+
 </span>
+<?php
+$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+if (!empty($block->getFormSelector())) {?>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', (event) => {
+
+        ClerkSearchPage = function(){
+
+            $("<?php echo $block->getFormSelector(); ?>").each(function (){
+                $(this).attr('action', '<?php echo $actual_link."catalogsearch/result/"; ?>');
+            });
+
+        };
+
+        if(window.jQuery) $( document ).ready(function() { ClerkSearchPage()  });
+        else{
+            var script = document.createElement('script');
+            document.head.appendChild(script);
+            script.type = 'text/javascript';
+            script.src = "https://code.jquery.com/jquery-3.4.1.min.js";
+            script.integrity = "sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=";
+            script.crossorigin = "anonymous";
+            script.onload = ClerkSearchPage;
+        }
+    });
+</script>
+<?php } ?>
 <style type="text/css">
 #search_autocomplete { display: none !important; }
 </style>
