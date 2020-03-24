@@ -184,7 +184,7 @@ class Product extends AbstractAdapter
                         $price = $item->getFinalPrice();
                     }
 
-                    return (float)$price;
+                    return number_format( (float)$price, 2 );
                 } catch (\Exception $e) {
                     return 0;
                 }
@@ -208,7 +208,7 @@ class Product extends AbstractAdapter
                             ->getValue();
                     }
 
-                    return (float)$price;
+                    return number_format( (float)$price, 2);
                 } catch (\Exception $e) {
                     return 0;
                 }
@@ -282,10 +282,10 @@ class Product extends AbstractAdapter
                 'on_sale'
             ];
 
-            $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS);
+            $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
             if ($additionalFields) {
-                $fields = array_merge($fields, explode(',', $additionalFields));
+                $fields = array_merge($fields, str_replace(' ','' ,explode(',', $additionalFields)));
             }
             
             foreach ($fields as $key => $field) {

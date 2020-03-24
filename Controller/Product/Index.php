@@ -90,7 +90,7 @@ class Index extends AbstractAction
                 $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product['id']);
                 $productType = $product->getTypeID();
                 $stockItem = $product->getExtensionAttributes()->getStockItem();
-
+                
                 if ($productType == "grouped") {
 
                     $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
@@ -116,8 +116,8 @@ class Index extends AbstractAction
 
                     }
 
-                    $response[$key]['price'] = (float) floatval($price)  ? (float) floatval($price) : 0;
-                    $response[$key]['list_price'] = (float)floatval($price) ? floatval($price) : 0;
+                    $response[$key]['price'] = number_format((float) floatval($price)  ? (float) floatval($price) : 0, 2);
+                    $response[$key]['list_price'] = number_format((float) floatval($price) ? (float) floatval($price) : 0, 2);
                 }
 
                 $response[$key]['stock'] = $stockItem->getQty();
