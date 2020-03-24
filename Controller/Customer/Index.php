@@ -95,8 +95,10 @@ class Index extends AbstractAction
             } else {
 
                 $this->getResponse()
-                    ->setHttpResponseCode(404)
+                    ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true);
+
+                $this->getResponse()->setBody(json_encode([]));
 
             }
 
