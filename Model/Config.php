@@ -26,6 +26,12 @@ class Config
     const XML_PATH_PRODUCT_SYNCHRONIZATION_IMAGE_TYPE = 'clerk/product_synchronization/image_type';
 
     /**
+     * Customer Synchronization configuration
+     */
+    const XML_PATH_CUSTOMER_SYNCHRONIZATION_ENABLED = 'clerk/customer_synchronization/enabled';
+    const XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES = 'clerk/customer_synchronization/extra_attributes';
+
+    /**
      * Search configuration
      */
     const XML_PATH_SEARCH_ENABLED = 'clerk/search/enabled';
@@ -52,6 +58,8 @@ class Config
     const XML_PATH_LIVESEARCH_PAGES_TYPE = 'clerk/livesearch/pages_type';
     const XML_PATH_LIVESEARCH_DROPDOWN_POSITION = 'clerk/livesearch/dropdown_position';
     const XML_PATH_LIVESEARCH_TEMPLATE = 'clerk/livesearch/template';
+    const XML_PATH_LIVESEARCH_INPUT_SELECTOR = 'clerk/livesearch/input_selector';
+    const XML_PATH_LIVESEARCH_FORM_SELECTOR = 'clerk/livesearch/form_selector';
 
     /**
      * Powerstep configuration
