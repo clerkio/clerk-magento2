@@ -100,8 +100,7 @@ class ProductSaveAfterObserver implements ObserverInterface
     {
         $storeId = $this->request->getParam('store', 0);
         $product = $observer->getEvent()->getProduct();
-
-        if ($storeId === 0) {
+        if ($storeId == 0) {
             //Update all stores
             foreach ($this->storeManager->getStores() as $store) {
                 $this->updateStore($product, $store->getId());
@@ -118,17 +117,16 @@ class ProductSaveAfterObserver implements ObserverInterface
     protected function updateStore(Product $product, $storeId)
     {
         $this->emulation->startEnvironmentEmulation($storeId);
-
-        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED)) {
+        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
             if ($product->getId()) {
 
                 //Cancel if product visibility is not as defined
-                if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY)) {
+                if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
                     return;
                 }
 
                 //Cancel if product is not saleable
-                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
                     if (!$product->isSalable()) {
                         return;
                     }
