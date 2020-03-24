@@ -14,6 +14,6 @@ class ExitIntent extends Template
      */
     public function getExitIntentTemplate()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE);
+        return explode(',',$this->_scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE));
     }
 }
