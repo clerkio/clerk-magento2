@@ -88,7 +88,8 @@ class Index extends AbstractAction
         try {
 
             $Include_pages = $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES);
-            $Pages_Additional_Fields = explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS));
+            $Pages_Additional_Fields = explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+
             $pages = [];
 
             if ($Include_pages) {
