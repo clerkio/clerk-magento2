@@ -1,7 +1,19 @@
 <?php
 /** @var \Clerk\Clerk\Block\ExitIntent $block */
+
+$templates = $block->getExitIntentTemplate();
+
+foreach ($templates as $template) {
+
+    ?>
+
+    <span class="clerk"
+          data-template="@<?php echo str_replace(' ','', $template); ?>"
+          data-exit-intent="true">
+    </span>
+
+    <?php
+    
+    }
+
 ?>
-<span class="clerk"
-      data-template="@<?php echo $block->getExitIntentTemplate(); ?>"
-      data-exit-intent="true">
-</span>
