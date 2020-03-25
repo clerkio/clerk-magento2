@@ -34,7 +34,7 @@ class ProductDeleteAfterDoneObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED)) {
+        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
             $product = $observer->getProduct();
 
             if ($product && $product->getId()) {

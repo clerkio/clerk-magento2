@@ -91,20 +91,20 @@ class Product extends AbstractAdapter
             if (!$version >= '2.3.3') {
 
                 //Filter on is_saleable if defined
-                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
                     $this->_stockFilter->addInStockFilterToCollection($collection);
                 }
 
 
             } else {
 
-                if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY)) {
+                if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
                     $collection->setFlag('has_stock_status_filter', true);
                 }
 
             }
 
-            $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY);
+            $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
             switch ($visibility) {
                 case Visibility::VISIBILITY_IN_CATALOG:

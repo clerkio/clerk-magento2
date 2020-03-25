@@ -72,12 +72,12 @@ class ClerkLogger
         $this->_dir = $dir;
         $this->scopeConfig = $scopeConfig;
         $this->Platform = 'Magento 2';
-        $this->Key = $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY);
+        $this->Key = $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $this->Date = $date->date();
         $this->Time = $date->scopeTimeStamp();
-        $this->Log_level = $this->scopeConfig->getValue(Config::XML_PATH_LOG_LEVEL);
-        $this->Log_to = $this->scopeConfig->getValue(Config::XML_PATH_LOG_TO);
-        $this->Enabled = $this->scopeConfig->getValue(Config::XML_PATH_LOG_ENABLED);
+        $this->Log_level = $this->scopeConfig->getValue(Config::XML_PATH_LOG_LEVEL, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $this->Log_to = $this->scopeConfig->getValue(Config::XML_PATH_LOG_TO, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $this->Enabled = $this->scopeConfig->getValue(Config::XML_PATH_LOG_ENABLED, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $this->moduleList = $moduleList;
         $this->InitializeSearchPowerstep();
 

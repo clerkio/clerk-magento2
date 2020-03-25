@@ -103,8 +103,8 @@ class Api
     private function getDefaultParams()
     {
         return [
-            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
-            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
+            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
         ];
     }
 
@@ -249,8 +249,8 @@ class Api
         try {
             
             $params = [
-                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY),
-                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY),
+                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
             ];
 
             return $this->get('client/account/content/list', $params)->getBody();
