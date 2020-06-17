@@ -33,7 +33,7 @@ case "$1" in
                 echo "------------------------------"
                 echo "- Installing Clerk Extension -"
                 echo "------------------------------"
-                php -d memory_limit=3G bin/magento module:enable Clerk_Clerk;
+                php -d memory_limit=5G bin/magento module:enable Clerk_Clerk;
                 echo "----------------------"
                 echo "- Install Completed! -"
                 echo "----------------------"
@@ -42,7 +42,7 @@ case "$1" in
                 echo "-----------------------"
                 echo "- Magento 2 Upgrading -"
                 echo "-----------------------"
-                php -d memory_limit=3G bin/magento setup:upgrade;
+                php -d memory_limit=5G bin/magento setup:upgrade;
                 echo "------------------------"
                 echo "- Upgrading Completed! -"
                 echo "------------------------"
@@ -51,7 +51,7 @@ case "$1" in
                 echo "------------------"
                 echo "- Clearing Cache -"
                 echo "------------------"
-                php -d memory_limit=3G bin/magento setup:di:compile;
+                php -d memory_limit=5G bin/magento setup:di:compile;
                 echo "-----------------------------"
                 echo "- Clearing Cache Completed! -"
                 echo "-----------------------------"
@@ -89,7 +89,7 @@ case "$1" in
                 echo "------------------------------"
                 echo "- Installing Clerk Extension -"
                 echo "------------------------------"
-                php -d memory_limit=3G bin/magento module:enable Clerk_Clerk;
+                php -d memory_limit=5G bin/magento module:enable Clerk_Clerk;
                 echo "----------------------"
                 echo "- Install Completed! -"
                 echo "----------------------"
@@ -98,7 +98,7 @@ case "$1" in
                 echo "-----------------------"
                 echo "- Magento 2 Upgrading -"
                 echo "-----------------------"
-                php -d memory_limit=3G bin/magento setup:upgrade;
+                php -d memory_limit=5G bin/magento setup:upgrade;
                 echo "------------------------"
                 echo "- Upgrading Completed! -"
                 echo "------------------------"
@@ -107,7 +107,7 @@ case "$1" in
                 echo "------------------"
                 echo "- Clearing Cache -"
                 echo "------------------"
-                php -d memory_limit=3G bin/magento setup:di:compile;
+                php -d memory_limit=5G bin/magento setup:di:compile;
                 echo "-----------------------------"
                 echo "- Clearing Cache Completed! -"
                 echo "-----------------------------"
