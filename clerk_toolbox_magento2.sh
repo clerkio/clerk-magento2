@@ -24,7 +24,7 @@ case "$1" in
                 echo "-------------------------------"
                 echo "- Downloading Clerk Extension -"
                 echo "-------------------------------"
-                php -d memory_limit=5G composer require clerk/magento2;
+                COMPOSER_MEMORY_LIMIT=5G composer require clerk/magento2;
                 echo "-----------------------"
                 echo "- Download Completed! -"
                 echo "-----------------------"
@@ -80,7 +80,7 @@ case "$1" in
                 echo "-------------------------------"
                 echo "- Downloading Clerk Extension -"
                 echo "-------------------------------"
-                php -d memory_limit=5G composer require clerk/magento2 "$version";
+                COMPOSER_MEMORY_LIMIT=5G composer require clerk/magento2 "$version";
                 echo "-----------------------"
                 echo "- Download Completed! -"
                 echo "-----------------------"
@@ -126,7 +126,7 @@ case "$1" in
 			echo "- Uninstalling Clerk.io Magento 2 Extension -"
 			echo "---------------------------------------------"
 			php -d memory_limit=5G bin/magento module:disable Clerk_Clerk;
-			php -d memory_limit=5G composer remove clerk/magento2;
+			COMPOSER_MEMORY_LIMIT=5G composer remove clerk/magento2;
 			echo "---------------------------"
 			echo "- Uninstalling Completed! -"
 			echo "---------------------------"
