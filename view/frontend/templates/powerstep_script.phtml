@@ -10,7 +10,7 @@ require(['jquery'], function($) {
         $("#clerk_powerstep .clerk-slider").remove();
         var data = isAjax ? { isAjax: true } : {};
         $.ajax({
-            url: '/clerk/powerstep/popup',
+            url: '<?= $block->getUrl('clerk/powerstep/popup') ?>',
             data: data,
             type: 'get',
             success: function(res) {
