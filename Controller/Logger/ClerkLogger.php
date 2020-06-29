@@ -10,6 +10,7 @@ use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Store\Model\Store;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Module\ModuleList;
+use Magento\Store\Model\ScopeInterface;
 
 class ClerkLogger
 {
@@ -72,12 +73,12 @@ class ClerkLogger
         $this->_dir = $dir;
         $this->scopeConfig = $scopeConfig;
         $this->Platform = 'Magento 2';
-        $this->Key = $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $this->Key = $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE);
         $this->Date = $date->date();
         $this->Time = $date->scopeTimeStamp();
-        $this->Log_level = $this->scopeConfig->getValue(Config::XML_PATH_LOG_LEVEL, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $this->Log_to = $this->scopeConfig->getValue(Config::XML_PATH_LOG_TO, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $this->Enabled = $this->scopeConfig->getValue(Config::XML_PATH_LOG_ENABLED, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $this->Log_level = $this->scopeConfig->getValue(Config::XML_PATH_LOG_LEVEL, ScopeInterface::SCOPE_STORE);
+        $this->Log_to = $this->scopeConfig->getValue(Config::XML_PATH_LOG_TO, ScopeInterface::SCOPE_STORE);
+        $this->Enabled = $this->scopeConfig->getValue(Config::XML_PATH_LOG_ENABLED, ScopeInterface::SCOPE_STORE);
         $this->moduleList = $moduleList;
         $this->InitializeSearchPowerstep();
 
@@ -508,7 +509,7 @@ class ClerkLogger
                     $response = json_decode(curl_exec($curl));
 
                     if ($response->status == 'error') {
-                        
+
                         $this->LogToFile($Message,$Metadata);
 
                     }

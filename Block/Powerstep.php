@@ -6,6 +6,7 @@ use Clerk\Clerk\Model\Config;
 use Magento\Catalog\Block\Product\AbstractProduct;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Model\Product;
+use Magento\Store\Model\ScopeInterface;
 
 class Powerstep extends AbstractProduct
 {
@@ -58,18 +59,18 @@ class Powerstep extends AbstractProduct
 
     public function getTemplates()
     {
-        $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES);
+        $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, ScopeInterface::SCOPE_STORE);
         $templates = explode(',', $configTemplates);
-        
+
         foreach ($templates as $key => $template) {
 
             $templates[$key] = str_replace(' ','',$template);
-            
+
         }
 
         return (array) $templates;
     }
-    
+
     public function generateRandomString($length = 25) {
 
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

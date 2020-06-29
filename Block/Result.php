@@ -4,6 +4,7 @@ namespace Clerk\Clerk\Block;
 
 use Clerk\Clerk\Model\Config;
 use Magento\CatalogSearch\Block\Result as BaseResult;
+use Magento\Store\Model\ScopeInterface;
 
 class Result extends BaseResult
 {
@@ -26,7 +27,7 @@ class Result extends BaseResult
      */
     public function getSearchTemplate()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_TEMPLATE);
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_TEMPLATE, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -48,10 +49,10 @@ class Result extends BaseResult
             'data-after-render' => '_clerk_after_load_event',
         ];
 
-        if ($this->_scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED)) {
+        if ($this->_scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED, ScopeInterface::SCOPE_STORE)) {
             $spanAttributes['data-facets-target'] = "#clerk-search-filters";
 
-            if ($titles = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES)) {
+            if ($titles = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES, ScopeInterface::SCOPE_STORE)) {
                 $titles = json_decode($titles, true);
 
                 // sort alphabetically by name
@@ -66,7 +67,7 @@ class Result extends BaseResult
                 $spanAttributes['data-facets-titles'] = json_encode(array_filter(array_combine(array_keys($titles), array_column($titles, 'label'))));
                 $spanAttributes['data-facets-attributes'] = json_encode(array_keys($titles));
 
-                if ($multiselectAttributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES)) {
+                if ($multiselectAttributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES, ScopeInterface::SCOPE_STORE)) {
                     $spanAttributes['data-facets-multiselect-attributes'] = '["' . str_replace(',', '","', $multiselectAttributes) . '"]';
                 }
             }
@@ -97,7 +98,7 @@ class Result extends BaseResult
      */
     public function getNoResultsText()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_NO_RESULTS_TEXT);
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_NO_RESULTS_TEXT, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -107,6 +108,6 @@ class Result extends BaseResult
      */
     public function getLoadMoreText()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_LOAD_MORE_TEXT);
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_LOAD_MORE_TEXT, ScopeInterface::SCOPE_STORE);
     }
 }

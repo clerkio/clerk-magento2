@@ -97,7 +97,7 @@ abstract class AbstractAction extends Action
     protected $eventPrefix = '';
 
     /**
-     * @var ModuleList 
+     * @var ModuleList
      */
     protected $moduleList;
 
@@ -213,7 +213,7 @@ abstract class AbstractAction extends Action
         try {
 
             return $this->scopeConfig->getValue(
-                \Clerk\Clerk\Model\Config::XML_PATH_PRIVATE_KEY,
+                Config::XML_PATH_PRIVATE_KEY,
                 ScopeInterface::SCOPE_STORE
             );
 
@@ -234,7 +234,7 @@ abstract class AbstractAction extends Action
         try {
 
             return $this->scopeConfig->getValue(
-                \Clerk\Clerk\Model\Config::XML_PATH_PUBLIC_KEY,
+                Config::XML_PATH_PUBLIC_KEY,
                 ScopeInterface::SCOPE_STORE
             );
 
@@ -275,13 +275,13 @@ abstract class AbstractAction extends Action
                 $this->fields = $this->getDefaultFields();
             }
             $this->fields = array_merge(['entity_id'], $this->fields);
-            
+
             foreach ($this->fields as $key => $field) {
 
                 $this->fields[$key] = str_replace(' ', '', $field);
-                
+
             }
-            
+
         } catch (\Exception $e) {
 
             $this->clerk_logger->error('getArguments ERROR', ['error' => $e->getMessage()]);
@@ -392,7 +392,7 @@ abstract class AbstractAction extends Action
                     ->addOrder($this->orderBy, $this->order);
 
             }
-            
+
             return $collection;
 
         } catch (\Exception $e) {

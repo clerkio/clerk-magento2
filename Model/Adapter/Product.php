@@ -7,6 +7,7 @@ use Clerk\Clerk\Model\Config;
 use Clerk\Clerk\Helper\Image;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -91,20 +92,20 @@ class Product extends AbstractAdapter
             if (!$version >= '2.3.3') {
 
                 //Filter on is_saleable if defined
-                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
+                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE)) {
                     $this->_stockFilter->addInStockFilterToCollection($collection);
                 }
 
 
             } else {
 
-                if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
+                if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE)) {
                     $collection->setFlag('has_stock_status_filter', true);
                 }
 
             }
 
-            $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE);
 
             switch ($visibility) {
                 case Visibility::VISIBILITY_IN_CATALOG:
@@ -282,16 +283,16 @@ class Product extends AbstractAdapter
                 'on_sale'
             ];
 
-            $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, ScopeInterface::SCOPE_STORE);
 
             if ($additionalFields) {
                 $fields = array_merge($fields, str_replace(' ','' ,explode(',', $additionalFields)));
             }
-            
+
             foreach ($fields as $key => $field) {
 
                 $fields[$key] = $field;
-                
+
             }
 
             return $fields;

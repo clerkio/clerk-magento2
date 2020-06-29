@@ -7,6 +7,7 @@ use Magento\Checkout\Model\Cart;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Magento\Widget\Block\BlockInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class Content extends \Magento\Framework\View\Element\Template implements \Magento\Widget\Block\BlockInterface
 {
@@ -69,19 +70,19 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
     protected function _toHtml()
     {
         if ($this->getType() === 'cart') {
-            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CART_ENABLED)) {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CART_ENABLED, ScopeInterface::SCOPE_STORE)) {
                 return;
             }
         }
 
         if ($this->getType() === 'category') {
-            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CATEGORY_ENABLED)) {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CATEGORY_ENABLED, ScopeInterface::SCOPE_STORE)) {
                 return;
             }
         }
 
         if ($this->getType() === 'product') {
-            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_ENABLED)) {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_ENABLED, ScopeInterface::SCOPE_STORE)) {
                 return;
             }
         }
@@ -174,7 +175,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     protected function getCategoryContents()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_CONTENT);
+        return $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_CONTENT, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -198,7 +199,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     protected function getProductContents()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_CONTENT);
+        return $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_CONTENT, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -218,7 +219,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     protected function getCartContents()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_CART_CONTENT);
+        return $this->_scopeConfig->getValue(Config::XML_PATH_CART_CONTENT, ScopeInterface::SCOPE_STORE);
     }
 
     private function getHtmlForContent($content)

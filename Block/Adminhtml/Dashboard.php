@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Block\Adminhtml;
 use Clerk\Clerk\Model\Config;
 use Magento\Backend\Block\Template;
 use Magento\Store\Api\StoreRepositoryInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class Dashboard extends Template
 {
@@ -34,12 +35,12 @@ class Dashboard extends Template
         }
 
         $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORES,
+            ScopeInterface::SCOPE_STORES,
             $this->getStore()->getCode()
         );
 
         $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORES,
+            ScopeInterface::SCOPE_STORES,
             $this->getStore()->getCode()
         );
 

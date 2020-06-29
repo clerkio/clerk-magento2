@@ -6,6 +6,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Magento\Store\Model\ScopeInterface;
 
 class Api
 {
@@ -58,7 +59,7 @@ class Api
     public function addProduct($params)
     {
         try {
-            
+
             $params = [
                 'products' => [$params],
             ];
@@ -83,14 +84,14 @@ class Api
     private function post($endpoint, $params = [])
     {
         try {
-            
+
             $params = array_merge($this->getDefaultParams(), $params);
 
             /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
             $httpClient = $this->httpClientFactory->create();
             $httpClient->setUri($this->baseurl . $endpoint);
             $httpClient->setRawData(json_encode($params), 'application/json');
-            
+
             $result = $httpClient->request('POST');
 
         } catch (\Exception $e) {
@@ -103,8 +104,8 @@ class Api
     private function getDefaultParams()
     {
         return [
-            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
-            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE),
+            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE),
         ];
     }
 
@@ -117,7 +118,7 @@ class Api
     public function removeProduct($productId)
     {
         try {
-            
+
             $params = [
                 'products' => $productId,
             ];
@@ -143,7 +144,7 @@ class Api
     private function get($endpoint, $params = [])
     {
         try {
-            
+
             $params = array_merge($this->getDefaultParams(), $params);
 
             /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
@@ -151,7 +152,7 @@ class Api
             $httpClient->setUri($this->baseurl . $endpoint);
             $httpClient->setParameterGet($params);
             $response = $httpClient->request('GET');
-            
+
             return $response;
 
         } catch (\Exception $e) {
@@ -172,12 +173,12 @@ class Api
     public function keysValid($publicKey, $privateKey)
     {
         try {
-            
+
             $params = [
                 'key' => $publicKey,
                 'private_key' => $privateKey,
             ];
-            
+
             return $this->get('client/account/info', $params)->getBody();
 
         } catch (\Exception $e) {
@@ -196,7 +197,7 @@ class Api
     public function getFacetAttributes()
     {
         try {
-            
+
             return $this->get('product/facets');
 
         } catch (\Exception $e) {
@@ -209,7 +210,7 @@ class Api
     public function getEndpointForContent($contentId)
     {
         try {
-            
+
             $contentResult = json_decode($this->getContent());
 
             if ($contentResult) {
@@ -223,7 +224,7 @@ class Api
                     }
 
                     if ($content->id === $contentId) {
-                        
+
                         return $content->api;
 
                     }
@@ -247,10 +248,10 @@ class Api
     public function getContent($storeId = null)
     {
         try {
-            
+
             $params = [
-                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
-                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE),
+                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE),
             ];
 
             return $this->get('client/account/content/list', $params)->getBody();

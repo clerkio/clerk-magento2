@@ -4,6 +4,7 @@ namespace Clerk\Clerk\Block\Adminhtml\System\Config\Field;
 
 use Clerk\Clerk\Model\Config;
 use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Store\Model\ScopeInterface;
 
 class FacetTitles extends Field
 {
@@ -40,7 +41,7 @@ class FacetTitles extends Field
      */
     public function getConfiguredAttributes()
     {
-        $attributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES);
+        $attributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE);
         $configuredAttributes = explode(',', $attributes);
 
         return $configuredAttributes;

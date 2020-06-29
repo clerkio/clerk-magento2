@@ -56,7 +56,7 @@ class ControllerActionLayoutRenderBeforeObserver implements ObserverInterface
      */
     private function isClerkSearchEnabled()
     {
-        return $this->scopeConfig->isSetFlag(Config::XML_PATH_SEARCH_ENABLED);
+        return $this->scopeConfig->isSetFlag(Config::XML_PATH_SEARCH_ENABLED, ScopeInterface::SCOPE_STORE);
     }
 
     /**

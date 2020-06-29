@@ -7,6 +7,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\View\Layout;
+use Magento\Store\Model\ScopeInterface;
 
 class LayoutLoadBeforeObserver implements ObserverInterface
 {
@@ -48,6 +49,6 @@ class LayoutLoadBeforeObserver implements ObserverInterface
      */
     private function isClerkSearchEnabled()
     {
-        return $this->scopeConfig->isSetFlag(Config::XML_PATH_SEARCH_ENABLED);
+        return $this->scopeConfig->isSetFlag(Config::XML_PATH_SEARCH_ENABLED, ScopeInterface::SCOPE_STORE);
     }
 }

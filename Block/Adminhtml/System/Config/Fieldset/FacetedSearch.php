@@ -7,6 +7,7 @@ use Clerk\Clerk\Model\Config;
 use Magento\Config\Model\ResourceModel\Config as SystemConfig;
 use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Store\Model\ScopeInterface;
 
 class FacetedSearch extends Fieldset
 {
@@ -77,7 +78,7 @@ class FacetedSearch extends Fieldset
      */
     private function isConfigured()
     {
-        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY));
+        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE));
     }
 
     /**
@@ -87,8 +88,8 @@ class FacetedSearch extends Fieldset
      */
     private function keysValid()
     {
-        $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY);
-        $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY);
+        $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE);
+        $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE);
 
         $keysValid = json_decode($this->api->keysValid($publicKey, $privateKey));
 

@@ -4,6 +4,7 @@ namespace Clerk\Clerk\Block;
 
 use Clerk\Clerk\Model\Config;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Catalog\Block\Product\AbstractProduct;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Helper\Image;
@@ -145,29 +146,29 @@ class PowerstepPopup extends Template
      */
     public function getTemplates()
     {
-        $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES);
+        $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, ScopeInterface::SCOPE_STORE);
         $templates = explode(',', $configTemplates);
-        
+
         foreach ($templates as $key => $template) {
 
             $templates[$key] = str_replace(' ','', $template);
-            
+
         }
 
         return (array) $templates;
     }
 
     public function generateRandomString($length = 25) {
-        
+
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
-        
+
         for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
-        
+
         return $randomString;
-        
+
     }
 }

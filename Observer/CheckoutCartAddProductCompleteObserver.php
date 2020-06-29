@@ -7,6 +7,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class CheckoutCartAddProductCompleteObserver implements ObserverInterface
 {
@@ -38,7 +39,7 @@ class CheckoutCartAddProductCompleteObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        if ($this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TYPE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE) == Config\Source\PowerstepType::TYPE_POPUP) {
+        if ($this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TYPE, ScopeInterface::SCOPE_STORE) == Config\Source\PowerstepType::TYPE_POPUP) {
             $product = $observer->getProduct();
 
             $this->checkoutSession->setClerkShowPowerstep(true);

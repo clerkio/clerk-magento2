@@ -2,7 +2,6 @@
 
 namespace Clerk\Clerk\Controller\Page;
 
-
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
@@ -15,17 +14,18 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Cms\Api\PageRepositoryInterface;
 use Psr\Log\LoggerInterface;
+use Magento\Store\Model\ScopeInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
 class Index extends AbstractAction
 {
     /**
-     * @var ClerkLogger 
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
     /**
-     * @var PageRepositoryInterface 
+     * @var PageRepositoryInterface
      */
     protected $_PageRepositoryInterface;
 
@@ -89,8 +89,8 @@ class Index extends AbstractAction
 
         try {
 
-            $Include_pages = $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-            $Pages_Additional_Fields = explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+            $Include_pages = $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES, ScopeInterface::SCOPE_STORE);
+            $Pages_Additional_Fields = explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, ScopeInterface::SCOPE_STORE));
 
             $pages = [];
 
@@ -172,5 +172,5 @@ class Index extends AbstractAction
         return true;
 
     }
-    
+
 }

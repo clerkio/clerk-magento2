@@ -7,6 +7,7 @@ use Magento\Checkout\Controller\Cart\Add as BaseAdd;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Context;
+use Magento\Store\Model\ScopeInterface;
 
 class Add extends BaseAdd
 {
@@ -28,12 +29,12 @@ class Add extends BaseAdd
 
         $shouldRedirectPowerstep = $this->_scopeConfig->getValue(
             Config::XML_PATH_POWERSTEP_ENABLED,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         $powerstepType = $this->_scopeConfig->getValue(
             Config::XML_PATH_POWERSTEP_TYPE,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         $productId = (int)$this->getRequest()->getParam('product');
@@ -47,7 +48,7 @@ class Add extends BaseAdd
 
         $shouldRedirectToCart = $this->_scopeConfig->getValue(
             'checkout/cart/redirect_to_cart',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         if ($shouldRedirectToCart || $this->getRequest()->getParam('in_cart')) {
