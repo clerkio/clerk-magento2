@@ -3,23 +3,25 @@
 ?>
 <!-- Start of Clerk.io E-commerce Personalisation tool - www.clerk.io -->
 <script type="text/javascript">
-
+    <?php print_r($block->getLanguage()) ?>
     (function(w,d){
         var e=d.createElement('script');e.type='text/javascript';e.async=true;
         e.src=(d.location.protocol=='https:'?'https':'http')+'://cdn.clerk.io/clerk.js';
         var s=d.getElementsByTagName('script')[0];s.parentNode.insertBefore(e,s);
         w.__clerk_q=w.__clerk_q||[];w.Clerk=w.Clerk||function(){w.__clerk_q.push(arguments)};
     })(window,document);
-    
+
         Clerk('config', {
             key: '<?php echo $block->escapeJsQuote($block->getPublicKey()); ?>',
             collect_email: <?php echo $block->getCollectionEmails(); ?>,
-            language: '<?php echo str_replace('auto_','',$block->escapeJsQuote($block->getLanguage())); ?>',
+            <?php if (strpos($block->getLanguage(), 'auto_') === false) {
+                echo "language: '".$block->escapeJsQuote($block->getLanguage())."',";
+            }?>
             globals: {
                 uenc: '<?php echo base64_encode((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"); ?>',
                 formkey: '<?php echo $block->getFormKey(); ?>'
             }
         });
-    
+
 </script>
 <!-- End of Clerk.io E-commerce Personalisation tool - www.clerk.io -->
