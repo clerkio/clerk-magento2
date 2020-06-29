@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Controller\Product;
 use Clerk\Clerk\Model\Adapter\Product as ProductAdapter;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Adapter\Product;
+use Magento\Store\Model\StoreManagerInterface;
 use Clerk\Clerk\Model\Config;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\App\Action\Action;
@@ -40,6 +41,7 @@ class Index extends AbstractAction
     public function __construct(
         Context $context,
         ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager,
         ProductAdapter $productAdapter,
         ClerkLogger $ClerkLogger,
         LoggerInterface $logger,
@@ -51,7 +53,7 @@ class Index extends AbstractAction
         $this->moduleList = $moduleList;
         $this->productAdapter = $productAdapter;
         $this->clerk_logger = $ClerkLogger;
-        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**
@@ -121,6 +123,7 @@ class Index extends AbstractAction
                 }
 
                 $response[$key]['stock'] = $stockItem->getQty();
+                $response[$key]['product_type'] = $productType;
 
             }
 

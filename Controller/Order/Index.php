@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Controller\Order;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Module\ModuleList;
@@ -45,6 +46,7 @@ class Index extends AbstractAction
         Context $context,
         ScopeConfigInterface $scopeConfig,
         CollectionFactory $orderCollectionFactory,
+        StoreManagerInterface $storeManager,
         LoggerInterface $logger,
         ModuleList $moduleList,
         ClerkLogger $ClerkLogger
@@ -55,7 +57,7 @@ class Index extends AbstractAction
         $this->moduleList = $moduleList;
         $this->addFieldHandlers();
 
-        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**

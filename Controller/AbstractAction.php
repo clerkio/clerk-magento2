@@ -6,6 +6,7 @@ use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Module\ModuleList;
 use Magento\Store\Model\ScopeInterface;
@@ -99,18 +100,27 @@ abstract class AbstractAction extends Action
      * @var ModuleList 
      */
     protected $moduleList;
-    
+
     /**
-     * Constructor
-     *
-     * @param Context $context
-     * @param ScopeConfigInterface $scopeConfig
+     * @var StoreManagerInterface
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    protected $_storeManager;
+
+    /**
+     * AbstractAction constructor.
+     * @param Context $context
+     * @param StoreManagerInterface $storeManager
+     * @param ScopeConfigInterface $scopeConfig
+     * @param LoggerInterface $logger
+     * @param ModuleList $moduleList
+     * @param ClerkLogger $ClerkLogger
+     */
+    public function __construct(Context $context, StoreManagerInterface $storeManager,  ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
     {
         $this->moduleList = $moduleList;
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
+        $this->_storeManager = $storeManager;
         parent::__construct($context);
     }
 
@@ -295,8 +305,8 @@ abstract class AbstractAction extends Action
     public function execute()
     {
         try {
-            
-            $collection = $this->prepareCollection();
+
+            $collection = $this->prepareCollection()->addFieldToFilter('store_id', $this->_storeManager->getStore()->getId());
 
             $this->_eventManager->dispatch($this->eventPrefix . '_get_collection_after', [
                 'controller' => $this,

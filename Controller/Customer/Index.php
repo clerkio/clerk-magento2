@@ -6,6 +6,7 @@ use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
 use Magento\Framework\Module\ModuleList;
@@ -31,13 +32,13 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $customerCollectionFactory
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, CustomerMetadataInterface $customerMetadata, CollectionFactory $customerCollectionFactory, LoggerInterface $logger,  ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $customerCollectionFactory, LoggerInterface $logger,  ModuleList $moduleList, ClerkLogger $ClerkLogger)
     {
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
         $this->_customerMetadata = $customerMetadata;
 
-        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     public function execute()

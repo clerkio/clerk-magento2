@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Controller\Category;
 use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Cms\Helper\Page;
 use Magento\Framework\App\Action\Context;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
@@ -65,6 +66,7 @@ class Index extends AbstractAction
     public function __construct(
         Context $context,
         ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager,
         CollectionFactory $categoryCollectionFactory,
         LoggerInterface $logger,
         PageCollectionFactory $pageCollectionFactory,
@@ -83,7 +85,7 @@ class Index extends AbstractAction
 
         $this->addFieldHandlers();
 
-        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**

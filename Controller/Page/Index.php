@@ -6,6 +6,7 @@ namespace Clerk\Clerk\Controller\Page;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Module\ModuleList;
 use Magento\Framework\ObjectManagerInterface;
@@ -61,6 +62,7 @@ class Index extends AbstractAction
         ScopeConfigInterface $scopeConfig,
         PageRepositoryInterface $PageRepositoryInterface,
         SearchCriteriaBuilder $SearchCriteriaBuilder,
+        StoreManagerInterface $storeManager,
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         LoggerInterface $logger,
         ObjectManagerInterface $objectManager,
@@ -75,7 +77,7 @@ class Index extends AbstractAction
         $this->clerk_logger = $ClerkLogger;
         $this->_scopeConfig = $scopeConfig;
         $this->moduleList = $moduleList;
-        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**
