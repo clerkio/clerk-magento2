@@ -77,7 +77,7 @@ class FacetedSearch extends Fieldset
      */
     private function isConfigured()
     {
-        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY));
     }
 
     /**
