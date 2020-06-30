@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Controller\Version;
 use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use  Clerk\Clerk\Controller\Logger\ClerkLogger;
@@ -16,6 +17,11 @@ class Index extends AbstractAction
     protected $moduleList;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * Version controller constructor.
      *
      * @param Context $context
@@ -23,11 +29,11 @@ class Index extends AbstractAction
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, StoreManagerInterface $storeManager, ClerkLogger $ClerkLogger)
     {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $ClerkLogger;
-        parent::__construct($context, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
     /**
