@@ -29,7 +29,7 @@
             <powerstep>
                 <enabled>0</enabled>
                 <type>1</type>
-                <template>power-step-others-also-bought</template>
+                <template>power-step-others-also-bought,power-step-visitor-complementary,power-step-popular,power-step-popular-on-sale</template>
             </powerstep>
             <exit_intent>
                 <enabled>0</enabled>
@@ -41,7 +41,7 @@
             </category>
             <product>
                 <enabled>0</enabled>
-                <content>product-page-alternatives</content>
+                <content>product-page-alternatives,product-page-others-also-bought</content>
             </product>
             <cart>
                 <enabled>0</enabled>

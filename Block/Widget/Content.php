@@ -203,13 +203,14 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
     }
 
     /**
-     * Get product ids from cart
-     *
-     * @return int[]
+     * @return array
      */
     protected function getCartProducts()
     {
-        return $this->cart->getProductIds();
+        $products = array_values($this->cart->getProductIds());
+
+        return $products;
+
     }
 
     /**
