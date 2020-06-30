@@ -8,6 +8,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\View\Layout;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Store\Model\ScopeInterface;
 
 class ControllerActionLayoutRenderBeforeObserver implements ObserverInterface
 {
