@@ -10,7 +10,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
 use Magento\Framework\Module\ModuleList;
-use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
@@ -71,7 +70,6 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         PageCollectionFactory $pageCollectionFactory,
         Page $pageHelper,
-        StoreManagerInterface $storeManager,
         ClerkLogger $ClerkLogger,
         ModuleList $moduleList
     )
