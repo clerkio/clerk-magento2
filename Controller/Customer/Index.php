@@ -27,14 +27,26 @@ class Index extends AbstractAction
     protected $eventPrefix = 'clerk_customer';
 
     /**
-     * Customer controller constructor.
-     *
+     * Index constructor.
      * @param Context $context
+     * @param StoreManagerInterface $storeManager
      * @param ScopeConfigInterface $scopeConfig
+     * @param LoggerInterface $logger
+     * @param ModuleList $moduleList
+     * @param ClerkLogger $ClerkLogger
      * @param CollectionFactory $customerCollectionFactory
+     * @param CustomerMetadataInterface $customerMetadata
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $customerCollectionFactory, LoggerInterface $logger,  ModuleList $moduleList, ClerkLogger $ClerkLogger)
-    {
+    public function __construct(
+        Context $context,
+        StoreManagerInterface $storeManager,
+        ScopeConfigInterface $scopeConfig,
+        LoggerInterface $logger,
+        ModuleList $moduleList,
+        ClerkLogger $ClerkLogger,
+        CollectionFactory $customerCollectionFactory,
+        CustomerMetadataInterface $customerMetadata
+    ) {
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
         $this->_customerMetadata = $customerMetadata;
