@@ -21,11 +21,11 @@
                 <load_more_text>Load More Results</load_more_text>
                 <no_results_text>No products found</no_results_text>
             </search>
-            <live_search>
+            <livesearch>
                 <enabled>0</enabled>
                 <include_categories>1</include_categories>
                 <template>live-search</template>
-            </live_search>
+            </livesearch>
             <powerstep>
                 <enabled>0</enabled>
                 <type>1</type>
