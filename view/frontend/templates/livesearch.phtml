@@ -2,44 +2,35 @@
 /** @var \Clerk\Clerk\Block\LiveSearch $block */
 ?>
 <span
-    class="clerk"
-    data-template="@<?php echo $block->getLiveSearchTemplate(); ?>"
-    data-instant-search-suggestions="<?php echo $block->getSuggestions(); ?>"
-    data-instant-search-categories="<?php echo $block->getCategories(); ?>"
-    data-instant-search-pages="<?php echo $block->getPages(); ?>"
-    data-instant-search-pages-type="<?php echo $block->getPagesType(); ?>"
-    data-instant-search-positioning="<?php echo $block->getDropdownPosition(); ?>"
-    <?php if (empty($block->getInputSelector())) {
-        echo "data-instant-search=\"#search\">";
-    } else {
-        echo "data-instant-search=\"".$block->getInputSelector()."\">";
-    }?>
+        class="clerk"
+        data-template="@<?php echo $block->getLiveSearchTemplate(); ?>"
+        data-instant-search-suggestions="<?php echo $block->getSuggestions(); ?>"
+        data-instant-search-categories="<?php echo $block->getCategories(); ?>"
+        data-instant-search-pages="<?php echo $block->getPages(); ?>"
+        data-instant-search-pages-type="<?php echo $block->getPagesType(); ?>"
+        data-instant-search-positioning="<?php echo $block->getDropdownPosition(); ?>"
+<?php if (empty($block->getInputSelector())) {
+    echo "data-instant-search=\"#search\">";
+} else {
+    echo "data-instant-search=\"".$block->getInputSelector()."\">";
+}?>
 
 </span>
 <?php
 
 if (!empty($block->getFormSelector())) {?>
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', (event) => {
-        ClerkSearchPage = function(){
+    <script>
+        require([
+            'jquery',
+            'jquery/ui',
+            'domReady!'
+        ], function($){
             $("<?php echo $block->getFormSelector(); ?>").each(function (){
-                $(this).attr('action', '/catalogsearch/result/');
+                $(this).attr('action', '<?php echo $block->getUrl('catalogsearch/result');?>');
             });
-        };
-
-        if(window.jQuery) $( document ).ready(function() { ClerkSearchPage()  });
-        else{
-            var script = document.createElement('script');
-            document.head.appendChild(script);
-            script.type = 'text/javascript';
-            script.src = "https://code.jquery.com/jquery-3.4.1.min.js";
-            script.integrity = "sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=";
-            script.crossorigin = "anonymous";
-            script.onload = ClerkSearchPage;
-        }
-    });
-</script>
+        });
+    </script>
 <?php } ?>
 <style type="text/css">
-#search_autocomplete { display: none !important; }
+    #search_autocomplete { display: none !important; }
 </style>
