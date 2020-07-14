@@ -33,7 +33,7 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $customerCollectionFactory
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $customerCollectionFactory, LoggerInterface $logger,  ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $customerCollectionFactory, LoggerInterface $logger,  ModuleList $moduleList, ClerkLogger $ClerkLogger, CustomerMetadataInterface $customerMetadata)
     {
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
