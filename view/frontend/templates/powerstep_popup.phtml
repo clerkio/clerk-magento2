@@ -1,8 +1,8 @@
 <?php
 /** @var \Clerk\Clerk\Block\PowerstepPopup $block */
-$categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [];
 ?>
-<?php if ($block->shouldShow()) : ?>
+<?php if ($block->shouldShow() && $block->getProduct()) : ?>
+$categoryIds = $block->getProduct()->getCategoryIds();
 <div id="clerk_powerstep" class="clerk-popup">
     <div class="clerk_powerstep_header">
         <h2><?php echo $block->getHeaderText(); ?></h2>
