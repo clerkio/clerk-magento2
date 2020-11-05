@@ -124,6 +124,7 @@ class Index extends AbstractAction
 
                 $response[$key]['stock'] = $stockItem->getQty();
                 $response[$key]['product_type'] = $productType;
+                $response[$key]['created_at'] = strtotime($product->getCreatedAt());
 
             }
 
