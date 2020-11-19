@@ -171,6 +171,30 @@ class Product extends AbstractAdapter
 
         try {
 
+        	//Add id fieldhandler
+            $this->addFieldHandler('id', function ($item) {
+                try {
+                    /**
+                     * @var \Magento\Catalog\Model\Product $item
+                     */
+                    return intval($item->getId());
+                } catch (\Exception $e) {
+                    return 0;
+                }
+            });
+
+            //Add description fieldhandler
+            $this->addFieldHandler('description', function ($item) {
+                try {
+                    /**
+                     * @var \Magento\Catalog\Model\Product $item
+                     */
+                    return strip_tags($item->getDescription());
+                } catch (\Exception $e) {
+                    return '';
+                }
+            });
+
             //Add price fieldhandler
             $this->addFieldHandler('price', function ($item) {
                 try {
@@ -229,7 +253,7 @@ class Product extends AbstractAdapter
 
             //Add categories fieldhandler
             $this->addFieldHandler('categories', function ($item) {
-                return $item->getCategoryIds();
+                return array_map('intval', $item->getCategoryIds());
             });
 
             //Add age fieldhandler
