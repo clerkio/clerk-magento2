@@ -6,6 +6,7 @@ use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 abstract class AbstractAdapter
 {
@@ -61,7 +62,7 @@ abstract class AbstractAdapter
         ScopeConfigInterface $scopeConfig,
         ManagerInterface $eventManager,
         StoreManagerInterface $storeManager,
-        $collectionFactory,
+        CollectionFactory $collectionFactory,
         ClerkLogger $clerkLogger
     )
     {
@@ -133,13 +134,24 @@ abstract class AbstractAdapter
             
             $info = [];
 
+            $this->setFields([]);
+
             foreach ($this->getFields() as $field) {
                 if (isset($resourceItem[$field])) {
                     $info[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
                 }
 
                 if (isset($this->fieldHandlers[$field])) {
-                    $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
+                    if (in_array($this->getFieldName($field), ['price','list_price'])) {
+                        $info[$this->getFieldName($field)] = (float)$this->fieldHandlers[$field]($resourceItem);
+                    }
+                    else {
+                        $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
+                    }
+                }
+
+                if (array_key_exists($this->getFieldName($field),$info) != true) {
+                    $info[$this->getFieldName($field)] = "";
                 }
             }
             
