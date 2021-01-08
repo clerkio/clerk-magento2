@@ -45,6 +45,10 @@
                     <label>Collect Emails</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="collect_baskets" translate="label" type="select" sortOrder="25" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Collect Baskets</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="additional_fields" translate="label comment" type="text" sortOrder="30" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Additional Fields</label>
                     <comment>A comma separated list of additional fields to sync to Clerk.io</comment>
