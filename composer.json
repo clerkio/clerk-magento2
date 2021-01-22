@@ -1,10 +1,11 @@
 {
-  "name": "clerk/magento2",
+  "name": "clerkio/magento2",
   "description": "",
+  "version": "4.3.1",
   "authors": [
     {
-      "name": "Rasmus Bech",
-      "email": "rbe@clerk.io"
+      "name": "Casper Kromann Nielsen",
+      "email": "ckn@clerk.io"
     }
   ],
   "type": "magento2-module",

@@ -143,7 +143,8 @@ abstract class AbstractAdapter
 
                 if (isset($this->fieldHandlers[$field])) {
                     if (in_array($this->getFieldName($field), ['price','list_price'])) {
-                        $info[$this->getFieldName($field)] = (float)$this->fieldHandlers[$field]($resourceItem);
+                        $price = str_replace(',','',$this->fieldHandlers[$field]($resourceItem));
+                        $info[$this->getFieldName($field)] = (float)$price;
                     }
                     else {
                         $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);

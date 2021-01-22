@@ -105,12 +105,13 @@ class Index extends AbstractAction
                             if (empty($price)) {
 
                                 $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
+                                $price = str_replace(',','', $price);
 
 
                             } elseif ($price > $associatedProduct->getPrice()) {
 
                                 $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
-                                
+                                $price = str_replace(',','', $price);
 
                             }
 
@@ -118,8 +119,8 @@ class Index extends AbstractAction
 
                     }
 
-                    $response[$key]['price'] = number_format((float) floatval($price)  ? (float) floatval($price) : 0, 2);
-                    $response[$key]['list_price'] = number_format((float) floatval($price) ? (float) floatval($price) : 0, 2);
+                    $response[$key]['price'] = (float) $price;
+                    $response[$key]['list_price'] =(float) $price;
                 }
 
                 $response[$key]['stock'] = $stockItem->getQty();
