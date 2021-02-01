@@ -15,7 +15,7 @@ class PagesType implements ArrayInterface
     public function toOptionArray()
     {
         $PagesType = [
-            ['value' => 'CMS Pages', 'label' => 'CMS Page']            
+            ['value' => 'cms page', 'label' => 'CMS Page']            
         ];
 
         return $PagesType;
