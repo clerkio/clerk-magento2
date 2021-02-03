@@ -56,7 +56,7 @@ class Add extends BaseAdd
                 $this->_checkoutSession->setContinueShoppingUrl($this->_redirect->getRefererUrl());
             }
 
-            return $this->_url->getUrl('checkout/cart/added/id/' . $productId);
+            return $this->_url->getUrl('checkout/cart/');
         }
 
         return $defaultUrl;
