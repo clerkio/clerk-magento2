@@ -62,7 +62,7 @@ class Index extends AbstractAction
 
                 }
 
-                $response = $this->getCustomerCollection();
+                $response = $this->getCustomerCollection($this->page, $this->limit);
 
                 foreach ($response->getData() as $customer) {
 
@@ -112,9 +112,13 @@ class Index extends AbstractAction
 
     }
 
-    public function getCustomerCollection()
+    public function getCustomerCollection($page, $limit)
     {
-        return $this->collectionFactory->create();
+        $customerCollection = $this->collectionFactory->create();
+        $customerCollection->setOrder('title','ASC');
+        $customerCollection->setPageSize($limit);
+        $customerCollection->setCurPage($page);
+        return $customerCollection;
     }
 
     public function getCustomerGender($GenderCode)
