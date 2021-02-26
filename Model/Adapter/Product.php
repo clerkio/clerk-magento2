@@ -41,6 +41,11 @@ class Product extends AbstractAdapter
     protected $_stockFilter;
 
     /**
+     * @var
+     */
+    protected $storeManager;
+
+    /**
      * @var array
      */
     protected $fieldMap = [
@@ -69,6 +74,7 @@ class Product extends AbstractAdapter
         $this->_stockFilter = $stockFilter;
         $this->clerk_logger = $Clerklogger;
         $this->imageHelper = $imageHelper;
+        $this->storeManager = $storeManager;
         parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger);
     }
 
@@ -224,7 +230,7 @@ class Product extends AbstractAdapter
 
             //Add url fieldhandler
             $this->addFieldHandler('url', function ($item) {
-                return $item->getUrlModel()->getUrl($item);
+                return $item->getUrlModel($this->storeManager->getStore()->getId())->getUrl($item);
             });
 
             //Add categories fieldhandler
