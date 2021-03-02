@@ -13,7 +13,7 @@
         Clerk('config', {
             key: '<?php echo $block->escapeJsQuote($block->getPublicKey()); ?>',
             collect_email: <?php echo $block->getCollectionEmails(); ?>,
-            <?php if (strpos($block->getLanguage(), 'auto_') === false) {
+            <?php if (strpos($block->getLanguage(), 'auto_') === false && $block->getLanguage() != "") {
                 echo "language: '".$block->escapeJsQuote($block->getLanguage())."',";
             }?>
             globals: {
