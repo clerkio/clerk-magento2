@@ -238,6 +238,13 @@ class Product extends AbstractAdapter
                 return $item->getCategoryIds();
             });
 
+            //Add stock fieldhandler
+            $this->addFieldHandler('stock', function ($item) {
+                $productType = $item->getTypeID();
+                $stockItem = $item->getExtensionAttributes()->getStockItem();
+                return $stockItem->getQty();
+            });
+
             //Add age fieldhandler
             $this->addFieldHandler('age', function ($item) {
                 $createdAt = strtotime($item->getCreatedAt());
@@ -305,7 +312,8 @@ class Product extends AbstractAdapter
                 'brand',
                 'sku',
                 'age',
-                'on_sale'
+                'on_sale',
+                'stock'
             ];
 
             $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, ScopeInterface::SCOPE_STORE);
