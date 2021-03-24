@@ -230,7 +230,7 @@ class Product extends AbstractAdapter
 
             //Add url fieldhandler
             $this->addFieldHandler('url', function ($item) {
-                return $item->getUrlModel($this->storeManager->getStore()->getId())->getUrl($item);
+                return $item->setStoreId($this->storeManager->getStore()->getId())->getUrlInStore();
             });
 
             //Add categories fieldhandler
