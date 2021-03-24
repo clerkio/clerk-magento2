@@ -91,7 +91,6 @@ class Index extends AbstractAction
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product['id']);
                 $productType = $product->getTypeID();
-                $stockItem = $product->getExtensionAttributes()->getStockItem();
                 
                 if ($productType == "grouped") {
 
@@ -123,7 +122,6 @@ class Index extends AbstractAction
                     $response[$key]['list_price'] =(float) $price;
                 }
 
-                $response[$key]['stock'] = $stockItem->getQty();
                 $response[$key]['product_type'] = $productType;
                 $response[$key]['created_at'] = strtotime($product->getCreatedAt());
 

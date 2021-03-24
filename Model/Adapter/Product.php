@@ -241,8 +241,25 @@ class Product extends AbstractAdapter
             //Add stock fieldhandler
             $this->addFieldHandler('stock', function ($item) {
                 $productType = $item->getTypeID();
-                $stockItem = $item->getExtensionAttributes()->getStockItem();
-                return $stockItem->getQty();
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                $StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
+                $total_stock = 0;
+
+                if($productType == 'configurable'){
+
+                    $productTypeInstance = $item->getTypeInstance();
+                    $usedProducts = $productTypeInstance->getUsedProducts($item);
+                    foreach ($usedProducts as $simple) {
+                        $total_stock += $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+                    }
+
+                } else {
+                
+                    $total_stock = $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+
+                }
+
+                return $total_stock;
             });
 
             //Add age fieldhandler
