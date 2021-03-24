@@ -255,7 +255,7 @@ class Product extends AbstractAdapter
 
                 } else {
                 
-                    $total_stock = $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+                    $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
 
                 }
 
