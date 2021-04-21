@@ -53,11 +53,11 @@ class Image
 
         //Get image thumbnail from settings
         $imageType = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_IMAGE_TYPE, ScopeInterface::SCOPE_STORE);
-        $helper = $this->helperFactory->create();
+        /** @var \Magento\Catalog\Helper\Image $helper */
+        $helper = $this->helperFactory->create()->init($item, $imageType);
 
         if ($imageType) {
-            /** @var \Magento\Catalog\Helper\Image $helper */
-            $imageUrl = $helper->init($item, $imageType)->getUrl();;
+            $imageUrl = $helper->getUrl();
             if ($imageUrl == $helper->getDefaultPlaceholderUrl()) {
                 // allow to try other types
                 $imageUrl = null;
@@ -68,7 +68,7 @@ class Image
             $store = $this->storeManager->getStore();
             $itemImage = $item->getImage() ?? $item->getSmallImage() ?? $item->getThumbnail();
 
-            if ($itemImage === 'no_selection') {
+            if ($itemImage === 'no_selection' || !$itemImage) {
                 $imageUrl = $helper->getDefaultPlaceholderUrl('small_image');
             } else {
                 $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
