@@ -10,12 +10,14 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
 use Clerk\Clerk\Model\Adapter\Product as ProductAdapter;
 use Psr\Log\LoggerInterface;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 
 class ProductSaveAfterObserver implements ObserverInterface
 {
@@ -60,6 +62,16 @@ class ProductSaveAfterObserver implements ObserverInterface
     protected $productAdapter;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * ProductSaveAfterObserver constructor.
      * @param ObjectManagerInterface $objectManager
      * @param ScopeConfigInterface $scopeConfig
@@ -69,6 +81,8 @@ class ProductSaveAfterObserver implements ObserverInterface
      * @param StoreManagerInterface $storeManager
      * @param Api $api
      * @param ProductAdapter $productAdapter
+     * @param ProductRepositoryInterface $productRepository
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
@@ -78,7 +92,9 @@ class ProductSaveAfterObserver implements ObserverInterface
         Emulation $emulation,
         StoreManagerInterface $storeManager,
         Api $api,
-        ProductAdapter $productAdapter
+        ProductAdapter $productAdapter,
+        ProductRepositoryInterface $productRepository,
+        LoggerInterface $logger
     )
     {
         $this->objectManager = $objectManager;
@@ -89,6 +105,8 @@ class ProductSaveAfterObserver implements ObserverInterface
         $this->storeManager = $storeManager;
         $this->api = $api;
         $this->productAdapter = $productAdapter;
+        $this->productRepository = $productRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -104,7 +122,16 @@ class ProductSaveAfterObserver implements ObserverInterface
         if ($storeId == 0) {
             //Update all stores
             foreach ($this->storeManager->getStores() as $store) {
-                $this->updateStore($product, $store->getId());
+                try {
+                    /**
+                     * fetch correct product model for the store
+                     * @var Product $product
+                     */
+                    $product = $this->productRepository->getById($product->getId(), false, $store->getId());
+                    $this->updateStore($product, $store->getId());
+                } catch (NoSuchEntityException $e) {
+                    $this->logger->error($e->getMessage());
+                }
             }
         } else {
             //Update single store
