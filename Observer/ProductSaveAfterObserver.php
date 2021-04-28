@@ -102,9 +102,10 @@ class ProductSaveAfterObserver implements ObserverInterface
         $storeId = $this->request->getParam('store', 0);
         $product = $observer->getEvent()->getProduct();
         if ($storeId == 0) {
-            //Update all stores
-            foreach ($this->storeManager->getStores() as $store) {
-                $this->updateStore($product, $store->getId());
+            //Update all stores the product is connected to
+            $storeIds = $product->getStoreIds();
+            foreach ($storeIds as $storeId) {
+                $this->updateStore($product, $storeId);
             }
         } else {
             //Update single store

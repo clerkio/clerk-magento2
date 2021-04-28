@@ -10,6 +10,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Catalog\Helper\Data;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Bundle\Model\Product\Type as Bundle;
@@ -44,6 +45,11 @@ class Product extends AbstractAdapter
      * @var
      */
     protected $storeManager;
+    
+    /**
+     * @var
+     */
+    protected $taxHelper;
 
     /**
      * @var array
@@ -67,10 +73,12 @@ class Product extends AbstractAdapter
         StoreManagerInterface $storeManager,
         Image $imageHelper,
         ClerkLogger $Clerklogger,
-        \Magento\CatalogInventory\Helper\Stock $stockFilter
+        \Magento\CatalogInventory\Helper\Stock $stockFilter,
+        Data $taxHelper
 
     )
     {
+        $this->taxHelper = $taxHelper;
         $this->_stockFilter = $stockFilter;
         $this->clerk_logger = $Clerklogger;
         $this->imageHelper = $imageHelper;
@@ -180,6 +188,36 @@ class Product extends AbstractAdapter
             //Add price fieldhandler
             $this->addFieldHandler('price', function ($item) {
                 try {
+
+                    //Fix for configurable products
+                    if ($item->getTypeId() === Configurable::TYPE_CODE) {
+                        $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
+                    }
+
+                    //Fix for Grouped products
+                    if ($item->getTypeId() === "grouped") {
+                        $associatedProducts = $item->getTypeInstance()->getAssociatedProducts($item);
+
+                        if (!empty($associatedProducts)) {
+
+                            foreach ($associatedProducts as $associatedProduct) {
+
+                                if (empty($price)) {
+
+                                    $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
+                                    $price = str_replace(',','', $price);
+
+
+                                } elseif ($price > $associatedProduct->getPrice()) {
+
+                                    $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
+                                    $price = str_replace(',','', $price);
+
+                                }
+                            }
+                        }
+                    }
+
                     if ($item->getTypeId() === Bundle::TYPE_CODE) {
                         //Get minimum price for bundle products
                         $price = $item
@@ -187,8 +225,11 @@ class Product extends AbstractAdapter
                             ->getPrice('final_price')
                             ->getMinimalPrice()
                             ->getValue();
-                    } else {
-                        $price = $item->getFinalPrice();
+
+                    }
+
+                    if ($item->getTypeId() === 'simple') {
+                        $price = $this->taxHelper->getTaxPrice($item, $item->getFinalPrice(), true);
                     }
 
                     return number_format( (float)$price, 2 );
@@ -200,11 +241,36 @@ class Product extends AbstractAdapter
             //Add list_price fieldhandler
             $this->addFieldHandler('list_price', function ($item) {
                 try {
+
                     $price = $item->getPrice();
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
                         $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
+                    }
+
+                    //Fix for Grouped products
+                    if ($item->getTypeId() === "grouped") {
+                        $associatedProducts = $item->getTypeInstance()->getAssociatedProducts($item);
+
+                        if (!empty($associatedProducts)) {
+
+                            foreach ($associatedProducts as $associatedProduct) {
+
+                                if (empty($price)) {
+
+                                    $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
+                                    $price = str_replace(',','', $price);
+
+
+                                } elseif ($price > $associatedProduct->getPrice()) {
+
+                                    $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
+                                    $price = str_replace(',','', $price);
+
+                                }
+                            }
+                        }
                     }
 
                     if ($item->getTypeId() === Bundle::TYPE_CODE) {
@@ -213,6 +279,10 @@ class Product extends AbstractAdapter
                             ->getPrice('regular_price')
                             ->getMinimalPrice()
                             ->getValue();
+                    }
+
+                    if ($item->getTypeId() === 'simple') {
+                        $price = $this->taxHelper->getTaxPrice($item, $item->getFinalPrice(), true);
                     }
 
                     return number_format( (float)$price, 2);
