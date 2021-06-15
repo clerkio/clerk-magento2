@@ -52,6 +52,10 @@ class Store extends \Magento\Backend\Block\Widget
         $select = $this->_objectManager->create('Magento\Framework\Data\Form\Element\Select');
         $select->setHtmlId($element->getHtmlId());
         $select->setName($element->getName());
+        $configuredValue = $element->getData();
+        if ($configuredValue !== null) {
+            $select->setValue($element->getData());
+        }
         $select->setValues($this->_sourceModelPool->get('Magento\Config\Model\Config\Source\Store')->toOptionArray());
         $select->setForm($element->getForm());
 
