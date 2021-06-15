@@ -45,7 +45,7 @@ class Product extends AbstractAdapter
      * @var
      */
     protected $storeManager;
-    
+
     /**
      * @var
      */
@@ -189,9 +189,11 @@ class Product extends AbstractAdapter
             $this->addFieldHandler('price', function ($item) {
                 try {
 
+                    $price = $this->taxHelper->getTaxPrice($item, $item->getFinalPrice(), true);
+
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+                        $price = $this->taxHelper->getTaxPrice($item, $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue(), true);
                     }
 
                     //Fix for Grouped products
@@ -242,11 +244,11 @@ class Product extends AbstractAdapter
             $this->addFieldHandler('list_price', function ($item) {
                 try {
 
-                    $price = $item->getPrice();
+                    $price = $this->taxHelper->getTaxPrice($item, $item->getPrice(), true);
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
+                        $price = $this->taxHelper->getTaxPrice($item, $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue(), true);
                     }
 
                     //Fix for Grouped products
@@ -259,13 +261,13 @@ class Product extends AbstractAdapter
 
                                 if (empty($price)) {
 
-                                    $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
+                                    $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getPrice(), true);
                                     $price = str_replace(',','', $price);
 
 
                                 } elseif ($price > $associatedProduct->getPrice()) {
 
-                                    $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
+                                    $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getPrice(), true);
                                     $price = str_replace(',','', $price);
 
                                 }
@@ -282,7 +284,7 @@ class Product extends AbstractAdapter
                     }
 
                     if ($item->getTypeId() === 'simple') {
-                        $price = $this->taxHelper->getTaxPrice($item, $item->getFinalPrice(), true);
+                        $price = $this->taxHelper->getTaxPrice($item, $item->getPrice(), true);
                     }
 
                     return number_format( (float)$price, 2);
@@ -324,7 +326,7 @@ class Product extends AbstractAdapter
                     }
 
                 } else {
-                
+
                     $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
 
                 }
