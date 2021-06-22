@@ -67,6 +67,6 @@ class ControllerActionLayoutRenderBeforeObserver implements ObserverInterface
      */
     private function isFacetedSearchEnabled()
     {
-        return $this->scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED);
+        return $this->scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED, ScopeInterface::SCOPE_STORE);
     }
 }
