@@ -326,7 +326,7 @@ class Product extends AbstractAdapter
                 'image',
                 'url',
                 'categories',
-                'brand',
+                'manufacturer',
                 'sku',
                 'age',
                 'on_sale',
