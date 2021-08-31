@@ -22,5 +22,52 @@
             }
         });
 
+          var collectbaskets = <?php echo $block->getCollectionBaskets(); ?>;
+          
+          if(collectbaskets){
+
+            let open = XMLHttpRequest.prototype.open; 
+            XMLHttpRequest.prototype.open = function() {
+                this.addEventListener("load", function(){
+
+                    if( this.responseURL.includes("=cart")){
+                        
+                        if (this.readyState === 4 && this.status === 200) {
+                            var response = JSON.parse(this.responseText);
+
+                            var clerk_productids = [];
+                            if(response && response.hasOwnProperty('cart') && response.cart.hasOwnProperty('items') ){
+
+                                for (var i = 0, len = response.cart.items.length; i < len; i++) {
+                                    clerk_productids.push(response.cart.items[i].item_id);
+                                }
+                            }
+
+                            clerk_productids = clerk_productids.map(Number);
+                            var clerk_last_productids = [];
+                            if( localStorage.getItem('clerk_productids') !== null ){
+                                clerk_last_productids = localStorage.getItem('clerk_productids').split(",");
+                                clerk_last_productids = clerk_last_productids.map(Number);  
+                            }
+                            clerk_productids = clerk_productids.sort((a, b) => a - b);
+                            clerk_last_productids = clerk_last_productids.sort((a, b) => a - b);
+                            if(JSON.stringify(clerk_productids) == JSON.stringify(clerk_last_productids)){
+                                // if equal - do nothing
+                            }else{
+                                if(JSON.stringify(clerk_productids) === "[0]" ){
+                                    Clerk('cart', 'set', []);
+                                }else{
+                                    Clerk('cart', 'set', clerk_productids);
+                                }
+                            }
+                            localStorage.setItem("clerk_productids", clerk_productids);
+                        }                         
+                    }
+                }, false);
+                open.apply(this, arguments);
+            };
+
+        } 
+
 </script>
 <!-- End of Clerk.io E-commerce Personalisation tool - www.clerk.io -->

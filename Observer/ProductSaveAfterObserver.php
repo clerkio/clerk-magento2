@@ -102,15 +102,19 @@ class ProductSaveAfterObserver implements ObserverInterface
         $storeId = $this->request->getParam('store', 0);
         $product = $observer->getEvent()->getProduct();
         if ($storeId == 0) {
-            //Update all stores the product is connected to
+            //Update all stores
             $storeIds = $product->getStoreIds();
             foreach ($storeIds as $storeId) {
-                $this->updateStore($product, $storeId);
+                if ($this->storeManager->getStore($storeId)->isActive() == True) {
+                    $this->updateStore($product, $storeId);
+                }
             }
         } else {
             //Update single store
             $this->updateStore($product, $storeId);
         }
+
+        $this->emulation->stopEnvironmentEmulation();
     }
 
     /**
@@ -121,27 +125,21 @@ class ProductSaveAfterObserver implements ObserverInterface
         $this->emulation->startEnvironmentEmulation($storeId);
         if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, ScopeInterface::SCOPE_STORE)) {
             if ($product->getId()) {
-
                 //Cancel if product visibility is not as defined
                 if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE)) {
-                    $this->emulation->stopEnvironmentEmulation();
                     return;
                 }
 
                 //Cancel if product is not saleable
                 if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE)) {
                     if (!$product->isSalable()) {
-                        $this->emulation->stopEnvironmentEmulation();
                         return;
                     }
                 }
-
                 $productInfo = $this->productAdapter->getInfoForItem($product);
 
                 $this->api->addProduct($productInfo);
             }
         }
-
-        $this->emulation->stopEnvironmentEmulation();
     }
 }

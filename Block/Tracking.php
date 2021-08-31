@@ -52,6 +52,20 @@ class Tracking extends Template
         ) ? 'true' : 'false');
     }
 
+    /**
+     * Get collect carts
+     *
+     * @return string
+     */
+    public function getCollectionBaskets()
+    {
+        $collectBaskets = "false";
+        if($this->_scopeConfig->getValue('clerk/product_synchronization/collect_baskets', ScopeInterface::SCOPE_STORE) == '1'){
+            $collectBaskets = "true";
+        }
+        return $collectBaskets;
+    }
+
     public function getFormKey() {
 
         return $this->formKey->getFormKey();
