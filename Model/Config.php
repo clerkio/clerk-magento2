@@ -35,6 +35,11 @@ class Config
      * Search configuration
      */
     const XML_PATH_SEARCH_ENABLED = 'clerk/search/enabled';
+    const XML_PATH_SEARCH_INCLUDE_CATEGORIES = 'clerk/search/include_categories';
+    const XML_PATH_SEARCH_CATEGORIES = 'clerk/search/categories';
+    const XML_PATH_SEARCH_SUGGESTIONS = 'clerk/search/suggestions';
+    const XML_PATH_SEARCH_PAGES = 'clerk/search/pages';
+    const XML_PATH_SEARCH_PAGES_TYPE = 'clerk/search/pages_type';
     const XML_PATH_SEARCH_TEMPLATE = 'clerk/search/template';
     const XML_PATH_SEARCH_NO_RESULTS_TEXT = 'clerk/search/no_results_text';
     const XML_PATH_SEARCH_LOAD_MORE_TEXT = 'clerk/search/load_more_text';
@@ -43,6 +48,7 @@ class Config
      * Faceted Search configuration
      */
     const XML_PATH_FACETED_SEARCH_ENABLED = 'clerk/faceted_search/enabled';
+    const XML_PATH_FACETED_SEARCH_DESIGN = 'clerk/faceted_search/design';
     const XML_PATH_FACETED_SEARCH_ATTRIBUTES = 'clerk/faceted_search/attributes';
     const XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES = 'clerk/faceted_search/multiselect_attributes';
     const XML_PATH_FACETED_SEARCH_TITLES = 'clerk/faceted_search/titles';

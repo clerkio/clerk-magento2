@@ -102,19 +102,15 @@ class ProductSaveAfterObserver implements ObserverInterface
         $storeId = $this->request->getParam('store', 0);
         $product = $observer->getEvent()->getProduct();
         if ($storeId == 0) {
-            //Update all stores
+            //Update all stores the product is connected to
             $storeIds = $product->getStoreIds();
             foreach ($storeIds as $storeId) {
-                if ($this->storeManager->getStore($storeId)->isActive() == True) {
-                    $this->updateStore($product, $storeId);
-                }
+                $this->updateStore($product, $storeId);
             }
         } else {
             //Update single store
             $this->updateStore($product, $storeId);
         }
-
-        $this->emulation->stopEnvironmentEmulation();
     }
 
     /**
@@ -125,21 +121,54 @@ class ProductSaveAfterObserver implements ObserverInterface
         $this->emulation->startEnvironmentEmulation($storeId);
         if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, ScopeInterface::SCOPE_STORE)) {
             if ($product->getId()) {
+
+                 // 21-10-2021 KKY update parent products if in Grouped or child to Configurable before we check visibility and saleable - start
+                    
+                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+                 $confParentProductIds = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')->getParentIdsByChild($product->getId());
+                 if(isset($confParentProductIds[0])){
+                     $confparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($confParentProductIds[0]);
+ 
+                     $productInfo = $this->productAdapter->getInfoForItem($confparentproduct);
+                     $this->api->addProduct($productInfo);
+    
+                 }
+                 $groupParentProductIds = $objectManager->create('Magento\GroupedProduct\Model\Product\Type\Grouped')->getParentIdsByChild($product->getId());
+                 if(isset($groupParentProductIds[0])){
+                     foreach ($groupParentProductIds as $groupParentProductId) {
+                         $groupparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($groupParentProductId);
+ 
+                         $productInfo = $this->productAdapter->getInfoForItem($groupparentproduct);
+                         $this->api->addProduct($productInfo);
+ 
+                     }
+    
+                 }
+ 
+                 // 21-10-2021 KKY update parent products if in Grouped or child to Configurable - end
+
                 //Cancel if product visibility is not as defined
                 if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE)) {
+                    $this->emulation->stopEnvironmentEmulation();
                     return;
                 }
 
                 //Cancel if product is not saleable
                 if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE)) {
                     if (!$product->isSalable()) {
+                        $this->emulation->stopEnvironmentEmulation();
                         return;
                     }
                 }
+
                 $productInfo = $this->productAdapter->getInfoForItem($product);
 
                 $this->api->addProduct($productInfo);
+
             }
         }
+
+        $this->emulation->stopEnvironmentEmulation();
     }
 }

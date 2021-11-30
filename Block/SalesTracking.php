@@ -56,12 +56,27 @@ class SalesTracking extends Template
         $order = $this->getOrder();
         $products = [];
 
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
         foreach ($order->getAllVisibleItems() as $item) {
-            $product = [
-                'id'       => $item->getProductId(),
-                'quantity' => (int) $item->getQtyOrdered(),
-                'price'    => (float) $item->getBasePrice(),
-            ];
+            $groupParentId = $objectManager->create('Magento\GroupedProduct\Model\Product\Type\Grouped')->getParentIdsByChild($item->getProductId());
+
+            if (isset($groupParentId[0])) {
+
+                $product = [
+                    'id' => $groupParentId[0],
+                    'quantity' => (int)$item->getQtyOrdered(),
+                    'price' => (float)$item->getBasePrice(),
+                ];
+
+            } else {
+
+                $product = [
+                    'id'       => $item->getProductId(),
+                    'quantity' => (int) $item->getQtyOrdered(),
+                    'price'    => (float) $item->getBasePrice(),
+                ];
+            }
 
             $products[] = $product;
         }
