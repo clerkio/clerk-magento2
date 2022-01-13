@@ -193,7 +193,7 @@ class Product extends AbstractAdapter
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $this->taxHelper->getTaxPrice($item, $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue(), true);
+                        $price = $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
                     }
 
                     //Fix for Grouped products
@@ -248,7 +248,7 @@ class Product extends AbstractAdapter
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $this->taxHelper->getTaxPrice($item, $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue(), true);
+                        $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue());
                     }
 
                     //Fix for Grouped products
