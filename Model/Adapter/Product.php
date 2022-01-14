@@ -248,7 +248,7 @@ class Product extends AbstractAdapter
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue());
+                        $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
                     }
 
                     //Fix for Grouped products
