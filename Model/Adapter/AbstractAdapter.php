@@ -204,6 +204,7 @@ abstract class AbstractAdapter
                         $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
                     }
                 }
+                // change end
 
                 if (array_key_exists($this->getFieldName($field),$info) != true) {
                     $info[$this->getFieldName($field)] = "";
