@@ -91,13 +91,14 @@ class Product extends AbstractAdapter
      *
      * @return mixed
      */
-    protected function prepareCollection($page, $limit, $orderBy, $order)
+    protected function prepareCollection($page, $limit, $orderBy, $order, $scope, $scopeid)
     {
         try {
 
             $collection = $this->collectionFactory->create();
 
             $collection->addFieldToSelect('*');
+            $collection->addStoreFilter($scopeid);
 
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
@@ -106,20 +107,20 @@ class Product extends AbstractAdapter
             if (!$version >= '2.3.3') {
 
                 //Filter on is_saleable if defined
-                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE)) {
+                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, $scope, $scopeid)) {
                     $this->_stockFilter->addInStockFilterToCollection($collection);
                 }
 
 
             } else {
 
-                if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE)) {
+                if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, $scope, $scopeid)) {
                     $collection->setFlag('has_stock_status_filter', true);
                 }
 
             }
 
-            $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE);
+            $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, $scope, $scopeid);
 
             switch ($visibility) {
                 case Visibility::VISIBILITY_IN_CATALOG:
@@ -193,7 +194,7 @@ class Product extends AbstractAdapter
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+                        $price = $this->taxHelper->getTaxPrice($item, $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue(), true);
                     }
 
                     //Fix for Grouped products
@@ -248,7 +249,7 @@ class Product extends AbstractAdapter
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
+                        $price = $this->taxHelper->getTaxPrice($item, $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue(), true);
                     }
 
                     //Fix for Grouped products
@@ -385,7 +386,7 @@ class Product extends AbstractAdapter
      *
      * @return array
      */
-    protected function getDefaultFields()
+    protected function getDefaultFields($scope, $scopeid)
     {
 
         try {
@@ -405,7 +406,7 @@ class Product extends AbstractAdapter
                 'stock'
             ];
 
-            $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, ScopeInterface::SCOPE_STORE);
+            $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);
 
             if ($additionalFields) {
                 $fields = array_merge($fields, str_replace(' ','' ,explode(',', $additionalFields)));

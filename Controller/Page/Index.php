@@ -17,8 +17,11 @@ use Psr\Log\LoggerInterface;
 use Magento\Store\Model\ScopeInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
+
 class Index extends AbstractAction
 {
+
+    
     /**
      * @var ClerkLogger
      */
@@ -47,6 +50,7 @@ class Index extends AbstractAction
     protected $_scopeConfig;
 
     protected $moduleList;
+
 
     /**
      * Index constructor.
@@ -77,6 +81,7 @@ class Index extends AbstractAction
         $this->clerk_logger = $ClerkLogger;
         $this->_scopeConfig = $scopeConfig;
         $this->moduleList = $moduleList;
+        $this->storeManager = $storeManager;
         parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
@@ -89,8 +94,8 @@ class Index extends AbstractAction
 
         try {
 
-            $Include_pages = $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES, ScopeInterface::SCOPE_STORE);
-            $Pages_Additional_Fields = explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, ScopeInterface::SCOPE_STORE));
+            $Include_pages = $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES, $this->scope, $this->scopeid);
+            $Pages_Additional_Fields = explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $this->scope, $this->scopeid));
 
             $pages = [];
 
@@ -100,23 +105,67 @@ class Index extends AbstractAction
                     ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true);
 
-                $searchCriteriaBuilder = $this->_searchCriteriaBuilderFactory->create();
-                $searchCriteriaBuilder->addFilter('is_active', 1, 'eq');
-                $searchCriteria = $searchCriteriaBuilder->create();
-                $pages_raw = $this->_PageRepositoryInterface->getList($searchCriteria)->getItems();
+                // collection of pages visible on all views
+                $pages_default = $this->getPageCollection($this->page, $this->limit, 0);
 
-                foreach ($pages_raw as $page_raw) {
+                foreach ($pages_default->getData() as $page_default) {
 
                     try {
-
-                        $url = $this->_objectManager->create('Magento\Cms\Helper\Page')
-                            ->getPageUrl($page_raw['page_id']);
-                        $page['id'] = $page_raw['page_id'];
+                        $url = "not found";
+                        $geturl = $this->_objectManager->create('Magento\Cms\Helper\Page')->getPageUrl($page_default['page_id']);
+                        if($geturl){
+                            $url = $geturl;
+                        }
+                        $page['id'] = $page_default['page_id'];
                         $page['type'] = 'cms page';
                         $page['url'] = $url;
-                        $page['title'] = $page_raw['title'];
-                        $page['text'] = $page_raw['content'];
+                        $page['title'] = $page_default['title'];
+                        $page['text'] = $page_default['content'];
+                        
+                        if (!$this->ValidatePage($page)) {
 
+                            continue;
+
+                        }
+
+                        foreach ($Pages_Additional_Fields as $Pages_Additional_Field) {
+
+                            $Pages_Additional_Field = str_replace(' ','',$Pages_Additional_Field);
+
+                            if (!empty($page_raw[$Pages_Additional_Field])) {
+
+                                $page[$Pages_Additional_Field] = $page_raw[$Pages_Additional_Field];
+
+                            }
+
+                        }
+
+                        $pages[] = $page;
+
+                    } catch (\Exception $e) {
+
+                        continue;
+
+                    }
+
+                }
+
+                // collection of pages visible only on this view
+                $pages_store = $this->getPageCollection($this->page, $this->limit, $this->scopeid);
+                foreach ($pages_store->getData() as $page_store) {
+
+                    try {
+                        $url = "not found";
+                        $geturl = $this->_objectManager->create('Magento\Cms\Helper\Page')->getPageUrl($page_store['page_id']);
+                        if($geturl){
+                            $url = $geturl;
+                        }
+                        $page['id'] = $page_store['page_id'];
+                        $page['type'] = 'cms page';
+                        $page['url'] = $url;
+                        $page['title'] = $page_store['title'];
+                        $page['text'] = $page_store['content'];
+                       
                         if (!$this->ValidatePage($page)) {
 
                             continue;
@@ -172,5 +221,21 @@ class Index extends AbstractAction
         return true;
 
     }
+
+    public function getPageCollection($page, $limit, $storeid)
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $pageCollectionFactory = $objectManager->get('Magento\Cms\Model\ResourceModel\Page\CollectionFactory');
+
+        $store = $this->storeManager->getStore($storeid);
+        $collection = $pageCollectionFactory->create();
+        $collection->addFilter('is_active', 1);
+        $collection->addFilter('store_id', $store->getId());
+        $collection->addStoreFilter($store);
+        $collection->setPageSize($limit);
+        $collection->setCurPage($page);
+        return $collection;
+    }
+
 
 }

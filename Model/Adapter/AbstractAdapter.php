@@ -89,22 +89,24 @@ abstract class AbstractAdapter
      * @param $limit
      * @param $orderBy
      * @param $order
+     * @param $scope
+     * @param $scopeid
      * @return array
      */
-    public function getResponse($fields, $page, $limit, $orderBy, $order)
+    public function getResponse($fields, $page, $limit, $orderBy, $order, $scope, $scopeid)
     {
         try {
             
-            $this->setFields($fields);
+            $this->setFields($fields, $scope, $scopeid);
 
-            $collection = $this->prepareCollection($page, $limit, $orderBy, $order);
+            $collection = $this->prepareCollection($page, $limit, $orderBy, $order, $scope, $scopeid);
 
             $response = [];
 
             if ($page <= $collection->getLastPageNumber()) {
                 //Build response
                 foreach ($collection as $resourceItem) {
-                    $item = $this->getInfoForItem($resourceItem);
+                    $item = $this->getInfoForItem($resourceItem, $scope, $scopeid);
 
                     $response[] = $item;
                 }
@@ -122,7 +124,7 @@ abstract class AbstractAdapter
     /**
      * @return mixed
      */
-    abstract protected function prepareCollection($page, $limit, $orderBy, $order);
+    abstract protected function prepareCollection($page, $limit, $orderBy, $order, $scope, $scopeid);
 
     /**
      * Get information for single resource item
@@ -131,13 +133,13 @@ abstract class AbstractAdapter
      * @param $resourceItem
      * @return array
      */
-    public function getInfoForItem($resourceItem)
+    public function getInfoForItem($resourceItem,$scope, $scopeid)
     {
         try {
             
             $info = [];
 
-            $this->setFields([]);
+            $this->setFields([], $scope, $scopeid);
 
             foreach ($this->getFields() as $field) {
                 if (isset($resourceItem[$field])) {
@@ -145,7 +147,7 @@ abstract class AbstractAdapter
                 }
 
                 //21-10-2021 KKY Additional Fields for Configurable and grouped Products - start
-                $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, ScopeInterface::SCOPE_STORE);
+                $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);
                 $customFields = str_replace(' ','' ,explode(',', $additionalFields));
 
                 if(in_array($field, $customFields)){
@@ -204,7 +206,6 @@ abstract class AbstractAdapter
                         $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
                     }
                 }
-                // change end
 
                 if (array_key_exists($this->getFieldName($field),$info) != true) {
                     $info[$this->getFieldName($field)] = "";
@@ -234,9 +235,9 @@ abstract class AbstractAdapter
      *
      * @param $fields
      */
-    public function setFields($fields)
+    public function setFields($fields, $scope, $scopeid)
     {
-        $this->fields = array_merge(['entity_id'], $this->getDefaultFields(), (array)$fields);
+        $this->fields = array_merge(['entity_id'], $this->getDefaultFields($scope, $scopeid), (array)$fields);
     }
 
     /**
@@ -291,5 +292,5 @@ abstract class AbstractAdapter
      * Get default fields 
      * @return array
      */
-    abstract protected function getDefaultFields();
+    abstract protected function getDefaultFields($scope, $scopeid);
 }

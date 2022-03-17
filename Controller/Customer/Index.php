@@ -10,7 +10,6 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
 use Magento\Framework\Module\ModuleList;
-use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\CustomerMetadataInterface;
 
@@ -38,7 +37,8 @@ class Index extends AbstractAction
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
         $this->_customerMetadata = $customerMetadata;
-
+        $this->_storeManager = $storeManager;
+    
         parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
@@ -46,15 +46,15 @@ class Index extends AbstractAction
     {
         try {
 
-            if ($this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_ENABLED, ScopeInterface::SCOPE_STORE)) {
+            if ($this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
 
                 $Customers = [];
                 $this->getResponse()
                     ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true);
-                if (!empty($this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, ScopeInterface::SCOPE_STORE))) {
+                if (!empty($this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid))) {
 
-                    $Fields = explode(',',str_replace(' ','', $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, ScopeInterface::SCOPE_STORE)));
+                    $Fields = explode(',',str_replace(' ','', $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid)));
 
                 } else {
 
@@ -62,32 +62,33 @@ class Index extends AbstractAction
 
                 }
 
-                $response = $this->getCustomerCollection($this->page, $this->limit);
+                    $response = $this->getCustomerCollection($this->page, $this->limit, $this->scopeid);
 
-                foreach ($response->getData() as $customer) {
+                    foreach ($response->getData() as $customer) {
 
-                    $_customer = [];
-                    $_customer['id'] = $customer['entity_id'];
-                    $_customer['name'] = $customer['firstname'] . " " . ($customer['middlename'] ? $customer['middlename'] . " " : "") . $customer['lastname'];
-                    $_customer['email'] = $customer['email'];
-
-                    foreach ($Fields as $Field) {
-                        if (isset($customer[$Field])) {
-                            if ($Field == "gender") {
-
-                                $_customer[$Field] = $this->getCustomerGender($customer[$Field]);
-
-                            } else {
-
-                                $_customer[$Field] = $customer[$Field];
-
+                        $_customer = [];
+                        $_customer['id'] = $customer['entity_id'];
+                        $_customer['name'] = $customer['firstname'] . " " . ($customer['middlename'] ? $customer['middlename'] . " " : "") . $customer['lastname'];
+                        $_customer['email'] = $customer['email'];
+    
+                        foreach ($Fields as $Field) {
+                            if (isset($customer[$Field])) {
+                                if ($Field == "gender") {
+    
+                                    $_customer[$Field] = $this->getCustomerGender($customer[$Field]);
+    
+                                } else {
+    
+                                    $_customer[$Field] = $customer[$Field];
+    
+                                }
+    
                             }
-
                         }
+    
+                        $Customers[] = $customer;
                     }
-
-                    $Customers[] = $_customer;
-                }
+                
 
                 if ($this->debug) {
                     $this->getResponse()->setBody(json_encode($Customers, JSON_PRETTY_PRINT));
@@ -111,11 +112,13 @@ class Index extends AbstractAction
         }
 
     }
-
-    public function getCustomerCollection($page, $limit)
+    
+    public function getCustomerCollection($page, $limit, $storeid)
     {
+        $store = $this->_storeManager->getStore($storeid);
         $customerCollection = $this->collectionFactory->create();
         $customerCollection->setOrder('title','ASC');
+        $customerCollection->addFilter('store_id', $store->getId());
         $customerCollection->setPageSize($limit);
         $customerCollection->setCurPage($page);
         return $customerCollection;

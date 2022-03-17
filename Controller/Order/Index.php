@@ -75,7 +75,7 @@ class Index extends AbstractAction
 
             //Add email fieldhandler
             $this->addFieldHandler('email', function ($item) {
-                if ($this->scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS, ScopeInterface::SCOPE_STORE)) {
+                if ($this->scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS, $this->scope, $this->scopeid)) {
                     return $item->getCustomerEmail();
                 }
 
@@ -116,7 +116,8 @@ class Index extends AbstractAction
 
             $disabled = $this->scopeConfig->isSetFlag(
                 Config::XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION,
-                ScopeInterface::SCOPE_STORE
+                $this->scope,
+                $this->scopeid
             );
 
             if ($disabled) {

@@ -83,7 +83,7 @@ class Index extends AbstractAction
 
             }
 
-            $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order);
+            $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order, $this->scope, $this->scopeid);
 
             foreach ($response as $key => $product) {
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -117,6 +117,8 @@ class Index extends AbstractAction
             $this->limit = (int)$request->getParam('limit', 0);
             $this->page = (int)$request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
+            $this->scopeid = $request->getParam('scope_id');
+            $this->scope = $request->getParam('scope');
 
             if ($request->getParam('order') === 'desc') {
                 $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_DESC;
