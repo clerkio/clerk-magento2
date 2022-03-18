@@ -103,9 +103,9 @@ class ProductSaveAfterObserver implements ObserverInterface
         $product = $observer->getEvent()->getProduct();
         if ($storeId == 0) {
             //Update all stores the product is connected to
-            $storeIds = $product->getStoreIds();
-            foreach ($storeIds as $storeId) {
-                $this->updateStore($product, $storeId);
+            $productstoreIds = $product->getStoreIds();
+            foreach ($productstoreIds as $productstoreId) {
+                $this->updateStore($product, $productstoreId);
             }
         } else {
             //Update single store
@@ -119,7 +119,7 @@ class ProductSaveAfterObserver implements ObserverInterface
     protected function updateStore(Product $product, $storeId)
     {
         $this->emulation->startEnvironmentEmulation($storeId);
-        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, ScopeInterface::SCOPE_STORE)) {
+        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, ScopeInterface::SCOPE_STORE, $storeId)) {
             if ($product->getId()) {
 
                  // 21-10-2021 KKY update parent products if in Grouped or child to Configurable before we check visibility and saleable - start
@@ -149,13 +149,13 @@ class ProductSaveAfterObserver implements ObserverInterface
                  // 21-10-2021 KKY update parent products if in Grouped or child to Configurable - end
 
                 //Cancel if product visibility is not as defined
-                if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE)) {
+                if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
                     $this->emulation->stopEnvironmentEmulation();
                     return;
                 }
 
                 //Cancel if product is not saleable
-                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE)) {
+                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE, $storeId)) {
                     if (!$product->isSalable()) {
                         $this->emulation->stopEnvironmentEmulation();
                         return;
