@@ -105,11 +105,22 @@ class ProductSaveAfterObserver implements ObserverInterface
             //Update all stores the product is connected to
             $productstoreIds = $product->getStoreIds();
             foreach ($productstoreIds as $productstoreId) {
-                $this->updateStore($product, $productstoreId);
+
+                if ($this->storeManager->getStore($productstoreId)->isActive() == True) {
+                    try {
+                        $this->updateStore($product, $productstoreId);
+                    } finally {
+                        $this->emulation->stopEnvironmentEmulation();
+                    }
+                }
             }
         } else {
             //Update single store
-            $this->updateStore($product, $storeId);
+            try {
+                $this->updateStore($product, $storeId);
+            } finally {
+                $this->emulation->stopEnvironmentEmulation();
+            }
         }
     }
 
