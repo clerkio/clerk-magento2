@@ -161,14 +161,12 @@ class ProductSaveAfterObserver implements ObserverInterface
 
                 //Cancel if product visibility is not as defined
                 if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
-                    $this->emulation->stopEnvironmentEmulation();
                     return;
                 }
 
                 //Cancel if product is not saleable
                 if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE, $storeId)) {
                     if (!$product->isSalable()) {
-                        $this->emulation->stopEnvironmentEmulation();
                         return;
                     }
                 }
@@ -180,6 +178,5 @@ class ProductSaveAfterObserver implements ObserverInterface
             }
         }
 
-        $this->emulation->stopEnvironmentEmulation();
     }
 }
