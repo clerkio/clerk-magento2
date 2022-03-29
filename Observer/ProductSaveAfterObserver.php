@@ -141,7 +141,7 @@ class ProductSaveAfterObserver implements ObserverInterface
                  if(isset($confParentProductIds[0])){
                      $confparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($confParentProductIds[0]);
  
-                     $productInfo = $this->productAdapter->getInfoForItem($confparentproduct);
+                     $productInfo = $this->productAdapter->getInfoForItem($confparentproduct, 'store', $storeId);
                      $this->api->addProduct($productInfo);
     
                  }
@@ -150,7 +150,7 @@ class ProductSaveAfterObserver implements ObserverInterface
                      foreach ($groupParentProductIds as $groupParentProductId) {
                          $groupparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($groupParentProductId);
  
-                         $productInfo = $this->productAdapter->getInfoForItem($groupparentproduct);
+                         $productInfo = $this->productAdapter->getInfoForItem($groupparentproduct, 'store', $storeId);
                          $this->api->addProduct($productInfo);
  
                      }
@@ -171,7 +171,7 @@ class ProductSaveAfterObserver implements ObserverInterface
                     }
                 }
 
-                $productInfo = $this->productAdapter->getInfoForItem($product);
+                $productInfo = $this->productAdapter->getInfoForItem($product, 'store', $storeId);
 
                 $this->api->addProduct($productInfo);
 
