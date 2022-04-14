@@ -19,7 +19,7 @@
 <?php
 
 if (!empty($block->getFormSelector())) {?>
-<script type="text/javascript">
+<script>
     document.addEventListener('DOMContentLoaded', (event) => {
         ClerkSearchPage = function(){
             var elems = document.querySelectorAll('<?php echo $block->getFormSelector(); ?>');
