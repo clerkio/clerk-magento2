@@ -194,7 +194,7 @@ class Product extends AbstractAdapter
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $this->taxHelper->getTaxPrice($item, $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue(), true);
+                        $price = $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
                     }
 
                     //Fix for Grouped products
@@ -249,7 +249,7 @@ class Product extends AbstractAdapter
 
                     //Fix for configurable products
                     if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                        $price = $this->taxHelper->getTaxPrice($item, $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue(), true);
+                        $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
                     }
 
                     //Fix for Grouped products
@@ -399,11 +399,10 @@ class Product extends AbstractAdapter
                 'image',
                 'url',
                 'categories',
-                'brand',
                 'sku',
                 'age',
                 'on_sale',
-                'stock'
+                'stock',
             ];
 
             $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);
