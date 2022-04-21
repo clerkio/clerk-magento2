@@ -57,7 +57,7 @@ class Image
         $helper = $this->helperFactory->create()->init($item, $imageType);
 
         if ($imageType) {
-            $imageUrl = $helper->getUrl();;
+            $imageUrl = $helper->getUrl();
             if ($imageUrl == $helper->getDefaultPlaceholderUrl()) {
                 // allow to try other types
                 $imageUrl = null;
