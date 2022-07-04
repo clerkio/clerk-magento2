@@ -318,18 +318,31 @@ class Product extends AbstractAdapter
                 $StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
                 $total_stock = 0;
 
-                if($productType == 'configurable'){
-
-                    $productTypeInstance = $item->getTypeInstance();
-                    $usedProducts = $productTypeInstance->getUsedProducts($item);
-                    foreach ($usedProducts as $simple) {
-                        $total_stock += $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
-                    }
-
-                } else {
-
-                    $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
-
+                switch($productType){
+                    case 'configurable':
+                        $productTypeInstance = $item->getTypeInstance();
+                        $usedProducts = $productTypeInstance->getUsedProducts($item);
+                        foreach ($usedProducts as $simple) {
+                            $total_stock += $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+                        }
+                        break;
+                    case 'simple':
+                        $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
+                        break;
+                    case 'bundle':
+                        // Get the inventory qty of each child item
+                        $childProducts = $this->getChildrenItems($item);
+                        foreach ($childProducts as $child) {
+                            $total_stock += $child->getQty();
+                        }
+                        break;
+                    case 'grouped':
+                        $productTypeInstance = $item->getTypeInstance();
+                        $usedProducts = $productTypeInstance->getAssociatedProducts($item);
+                        foreach ($usedProducts as $simple) {
+                            $total_stock += $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+                        }
+                        break;
                 }
 
                 return $total_stock;
