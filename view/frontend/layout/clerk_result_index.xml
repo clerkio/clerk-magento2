@@ -5,14 +5,13 @@
             <!-- Remove default results -->
             <referenceBlock name="search.result" remove="true"/>
             <!-- Insert Clerk results -->
+            <block class="Magento\Framework\View\Element\Template" name="clerk.faceted_search.facets" template="Clerk_Clerk::facets.phtml" ifconfig="clerk/faceted_search/enabled"/>
             <block class="Clerk\Clerk\Block\Result" name="clerk.search.result" template="Clerk_Clerk::result.phtml" ifconfig="clerk/search/enabled"/>
         </referenceContainer>
         <referenceContainer name="sidebar.main">
             <!-- Remove default sidebar blocks -->
             <referenceBlock name="catalogsearch.leftnav" remove="true"/>
             <referenceBlock name="sidebar.additional" remove="true"/>
-
-            <block class="Magento\Framework\View\Element\Template" name="clerk.faceted_search.facets" template="Clerk_Clerk::facets.phtml" ifconfig="clerk/faceted_search/enabled"/>
         </referenceContainer>
     </body>
 </page>
