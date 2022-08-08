@@ -21,7 +21,6 @@ use Clerk\Clerk\Controller\Logger\ClerkLogger;
 class Index extends AbstractAction
 {
 
-    
     /**
      * @var ClerkLogger
      */
@@ -95,7 +94,8 @@ class Index extends AbstractAction
         try {
 
             $Include_pages = $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES, $this->scope, $this->scopeid);
-            $Pages_Additional_Fields = explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $this->scope, $this->scopeid));
+
+            $Pages_Additional_Fields = is_string($this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $this->scope, $this->scopeid)) ? explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $this->scope, $this->scopeid)) : array();
 
             $pages = [];
 
@@ -121,7 +121,7 @@ class Index extends AbstractAction
                         $page['url'] = $url;
                         $page['title'] = $page_default['title'];
                         $page['text'] = $page_default['content'];
-                        
+
                         if (!$this->ValidatePage($page)) {
 
                             continue;
@@ -165,7 +165,7 @@ class Index extends AbstractAction
                         $page['url'] = $url;
                         $page['title'] = $page_store['title'];
                         $page['text'] = $page_store['content'];
-                       
+
                         if (!$this->ValidatePage($page)) {
 
                             continue;

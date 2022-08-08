@@ -14,6 +14,8 @@ use Magento\Catalog\Helper\Data;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Bundle\Model\Product\Type as Bundle;
+use Magento\CatalogInventory\Api\StockStateInterface;
+use Magento\Framework\App\ProductMetadataInterface;
 
 class Product extends AbstractAdapter
 {
@@ -59,12 +61,23 @@ class Product extends AbstractAdapter
     ];
 
     /**
+     * @var StockStateInterface
+     */
+    protected $StockStateInterface;
+
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $ProductMetadataInterface;
+    /**
      * Product constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
      * @param ManagerInterface $eventManager
      * @param CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManager
+     * @param StockStateInterface $StockStateInterface
+     * @param ProductMetadataInterface $ProductMetadataInterface
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -74,7 +87,9 @@ class Product extends AbstractAdapter
         Image $imageHelper,
         ClerkLogger $Clerklogger,
         \Magento\CatalogInventory\Helper\Stock $stockFilter,
-        Data $taxHelper
+        Data $taxHelper,
+        StockStateInterface $StockStateInterface,
+        ProductMetadataInterface $ProductMetadataInterface
 
     )
     {
@@ -83,7 +98,9 @@ class Product extends AbstractAdapter
         $this->clerk_logger = $Clerklogger;
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;
-        parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger);
+        $this->StockStateInterface = $StockStateInterface;
+        $this->ProductMetadataInterface = $ProductMetadataInterface;
+        parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger, $StockStateInterface, $ProductMetadataInterface);
     }
 
     /**
@@ -99,9 +116,7 @@ class Product extends AbstractAdapter
 
             $collection->addFieldToSelect('*');
             $collection->addStoreFilter($scopeid);
-
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+            $productMetadata = $this->ProductMetadataInterface;
             $version = $productMetadata->getVersion();
 
             if (!$version >= '2.3.3') {
@@ -294,6 +309,34 @@ class Product extends AbstractAdapter
                 }
             });
 
+            $this->addFieldHandler('tier_price_values', function ($item) {
+                $holderArray = [];
+                $tierPriceObj = $item->getTierPrice();
+                if(count($tierPriceObj) > 0){
+                    foreach($tierPriceObj as $price){
+                        if(isset($price['price'])){
+                            array_push($holderArray, floatval($price['price']));
+                        }
+                    }
+                }
+                return $holderArray;
+            });
+
+            $this->addFieldHandler('tier_price_quantities', function ($item) {
+                $holderArray = [];
+                $tierPriceObj = $item->getTierPrice();
+                if(count($tierPriceObj) > 0){
+                    foreach($tierPriceObj as $price){
+                        //$value = $price->getQty();
+                        //array_push($holderArray, $value);
+                        if(isset($price['price_qty'])){
+                            array_push($holderArray, floatval($price['price_qty']));
+                        }
+                    }
+                }
+                return $holderArray;
+            });
+
             //Add image fieldhandler
             $this->addFieldHandler('image', function ($item) {
                 $imageUrl = $this->imageHelper->getUrl($item);
@@ -314,8 +357,7 @@ class Product extends AbstractAdapter
             //Add stock fieldhandler
             $this->addFieldHandler('stock', function ($item) {
                 $productType = $item->getTypeID();
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                $StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
+                $StockState = $this->StockStateInterface;
                 $total_stock = 0;
 
                 switch($productType){
@@ -331,10 +373,34 @@ class Product extends AbstractAdapter
                         break;
                     case 'bundle':
                         // Get the inventory qty of each child item
-                        $childProducts = $this->getChildrenItems($item);
-                        foreach ($childProducts as $child) {
-                            $total_stock += $child->getQty();
+                        $productsArray = array();
+                        $selectionCollection = $item->getTypeInstance(true)
+                        ->getSelectionsCollection(
+                            $item->getTypeInstance(true)->getOptionsIds($item),
+                            $item
+                        );
+
+                        foreach ($selectionCollection as $proselection) {
+                            $selectionArray = [];
+                            $selectionArray['min_qty'] = $proselection->getSelectionQty();
+                            $selectionArray['stock'] = $StockState->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
+                            $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
                         }
+
+                        $bundle_stock = 0;
+                        foreach($productsArray as $_ => $bundle_item){
+                            $bundle_option_min_stock = 0;
+                            foreach($bundle_item as $__ => $bundle_option){
+                                if((integer)$bundle_option['min_qty'] <= $bundle_option['stock']){
+                                    $bundle_option_min_stock = ($bundle_option_min_stock == 0) ? $bundle_option['stock'] : $bundle_option_min_stock;
+                                    $bundle_option_min_stock = ($bundle_option_min_stock < $bundle_option['stock']) ? $bundle_option['stock'] : $bundle_option_min_stock;
+                                }
+                            }
+                            $bundle_stock = ($bundle_stock == 0) ? $bundle_option_min_stock : $bundle_stock;
+                            $bundle_stock = ($bundle_stock < $bundle_option_min_stock) ? $bundle_option_min_stock : $bundle_stock;
+                        }
+
+                        $total_stock = $bundle_stock;
                         break;
                     case 'grouped':
                         $productTypeInstance = $item->getTypeInstance();
@@ -416,6 +482,8 @@ class Product extends AbstractAdapter
                 'age',
                 'on_sale',
                 'stock',
+                'tier_price_values',
+                'tier_price_quantities'
             ];
 
             $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);

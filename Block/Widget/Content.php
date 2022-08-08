@@ -98,6 +98,15 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     public function getSpanAttributes()
     {
+
+        $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+        $filter_product = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+        $filter_cart = $this->_scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+
+        static $product_contents = 0;
+        static $cart_contents = 0;
+        static $category_contents = 0;
+
         $output = '<span ';
         $spanAttributes = [
             'class' => 'clerk',
@@ -115,6 +124,20 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             if ($productId) {
                 $spanAttributes['data-products'] = json_encode([$productId]);
             }
+            if($filter_product){
+                $unique_class = "clerk_" . (string)$product_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($product_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $product_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         if ($this->getCategoryId()) {
@@ -128,21 +151,77 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             if ($categoryId) {
                 $spanAttributes['data-category'] = $categoryId;
             }
+            if($filter_category){
+                $unique_class = "clerk_" . (string)$category_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($category_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $category_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         if ($this->getType() === 'cart') {
             $spanAttributes['data-products'] = json_encode($this->getCartProducts());
             $spanAttributes['data-template'] = '@' . $this->getCartContents();
+            if($filter_cart){
+                $unique_class = "clerk_" . (string)$cart_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($cart_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $cart_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         if ($this->getType() === 'category') {
             $spanAttributes['data-category'] = $this->getCurrentCategory();
             $spanAttributes['data-template'] = '@' . $this->getCategoryContents();
+            if($filter_category){
+                $unique_class = "clerk_" . (string)$category_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($category_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $category_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         if ($this->getType() === 'product') {
             $spanAttributes['data-products'] = json_encode([$this->getCurrentProduct()]);
             $spanAttributes['data-template'] = '@' . $this->getProductContents();
+            if($filter_product){
+                $unique_class = "clerk_" . (string)$product_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($product_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $product_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         foreach ($spanAttributes as $attribute => $value) {
@@ -150,6 +229,10 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
         }
 
         $output .= '></span>';
+
+        $product_contents++;
+        $cart_contents++;
+        $category_contents++;
 
         return $output;
     }
@@ -225,6 +308,15 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
 
     private function getHtmlForContent($content)
     {
+
+        $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+        $filter_product = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+        $filter_cart = $this->_scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+
+        static $product_contents = 0;
+        static $cart_contents = 0;
+        static $category_contents = 0;
+
         $output = '<span ';
         $spanAttributes = [
             'class' => 'clerk',
@@ -242,6 +334,20 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             if ($productId) {
                 $spanAttributes['data-products'] = json_encode([$productId]);
             }
+            if($filter_product){
+                $unique_class = "clerk_" . (string)$product_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($product_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $product_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         if ($this->getCategoryId()) {
@@ -255,18 +361,74 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             if ($categoryId) {
                 $spanAttributes['data-category'] = $categoryId;
             }
+            if($filter_category){
+                $unique_class = "clerk_" . (string)$category_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($category_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $category_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         if ($this->getType() === 'cart') {
             $spanAttributes['data-products'] = json_encode($this->getCartProducts());
+            if($filter_cart){
+                $unique_class = "clerk_" . (string)$cart_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($cart_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $cart_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         if ($this->getType() === 'category') {
             $spanAttributes['data-category'] = $this->getCurrentCategory();
+            if($filter_category){
+                $unique_class = "clerk_" . (string)$category_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($category_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $category_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         if ($this->getType() === 'product') {
             $spanAttributes['data-products'] = json_encode([$this->getCurrentProduct()]);
+            if($filter_product){
+                $unique_class = "clerk_" . (string)$product_contents;
+                $spanAttributes['class'] = 'clerk ' . $unique_class;
+                if($product_contents > 0){
+                    $filter_string = '';
+                    for($i = 0; $i < $product_contents; $i++){
+                        if($i > 0){
+                            $filter_string .= ', ';
+                        }
+                        $filter_string .= '.clerk_'.strval($i);
+                    }
+                $spanAttributes['data-exclude-from'] = $filter_string;
+                }
+            }
         }
 
         foreach ($spanAttributes as $attribute => $value) {
@@ -274,6 +436,10 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
         }
 
         $output .= "></span>\n";
+
+        $product_contents++;
+        $cart_contents++;
+        $category_contents++;
 
         return $output;
     }

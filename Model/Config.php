@@ -12,7 +12,7 @@ class Config
     const XML_PATH_LANGUAGE = 'clerk/general/language';
     const XML_PATH_INCLUDE_PAGES = 'clerk/general/include_pages';
     const XML_PATH_PAGES_ADDITIONAL_FIELDS = 'clerk/general/pages_additional_fields';
-    
+
 
     /**
      * Product Synchronization configuration
@@ -73,6 +73,7 @@ class Config
     const XML_PATH_POWERSTEP_ENABLED = 'clerk/powerstep/enabled';
     const XML_PATH_POWERSTEP_TYPE = 'clerk/powerstep/type';
     const XML_PATH_POWERSTEP_TEMPLATES = 'clerk/powerstep/templates';
+    const XML_PATH_POWERSTEP_FILTER_DUPLICATES = 'clerk/powerstep/powerstep_filter';
 
     /**
      * Exit intent configuration
@@ -85,18 +86,21 @@ class Config
      */
     const XML_PATH_CATEGORY_ENABLED = 'clerk/category/enabled';
     const XML_PATH_CATEGORY_CONTENT = 'clerk/category/content';
+    const XML_PATH_CATEGORY_FILTER_DUPLICATES = 'clerk/category/category_filter';
 
     /**
      * Product configuration
      */
     const XML_PATH_PRODUCT_ENABLED = 'clerk/product/enabled';
     const XML_PATH_PRODUCT_CONTENT = 'clerk/product/content';
+    const XML_PATH_PRODUCT_FILTER_DUPLICATES = 'clerk/product/product_filter';
 
     /**
      * Cart configuration
      */
     const XML_PATH_CART_ENABLED = 'clerk/cart/enabled';
     const XML_PATH_CART_CONTENT = 'clerk/cart/content';
+    const XML_PATH_CART_FILTER_DUPLICATES = 'clerk/cart/cart_filter';
 
     /**
      * Logger configuration

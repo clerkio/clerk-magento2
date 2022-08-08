@@ -38,7 +38,7 @@ class Index extends AbstractAction
         $this->clerk_logger = $ClerkLogger;
         $this->_customerMetadata = $customerMetadata;
         $this->_storeManager = $storeManager;
-    
+
         parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
@@ -52,6 +52,7 @@ class Index extends AbstractAction
                 $this->getResponse()
                     ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true);
+
                 if (!empty($this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid))) {
 
                     $Fields = explode(',',str_replace(' ','', $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid)));
@@ -68,27 +69,26 @@ class Index extends AbstractAction
 
                         $_customer = [];
                         $_customer['id'] = $customer['entity_id'];
-                        $_customer['name'] = $customer['firstname'] . " " . ($customer['middlename'] ? $customer['middlename'] . " " : "") . $customer['lastname'];
+                        $_customer['name'] = $customer['firstname'] . " " . (!is_null($customer['middlename']) ? $customer['middlename'] . " " : "") . $customer['lastname'];
                         $_customer['email'] = $customer['email'];
-    
+
                         foreach ($Fields as $Field) {
                             if (isset($customer[$Field])) {
                                 if ($Field == "gender") {
-    
+
                                     $_customer[$Field] = $this->getCustomerGender($customer[$Field]);
-    
+
                                 } else {
-    
+
                                     $_customer[$Field] = $customer[$Field];
-    
+
                                 }
-    
+
                             }
                         }
-    
-                        $Customers[] = $customer;
+
+                        $Customers[] = $_customer;
                     }
-                
 
                 if ($this->debug) {
                     $this->getResponse()->setBody(json_encode($Customers, JSON_PRETTY_PRINT));
@@ -112,7 +112,7 @@ class Index extends AbstractAction
         }
 
     }
-    
+
     public function getCustomerCollection($page, $limit, $storeid)
     {
         $store = $this->_storeManager->getStore($storeid);
