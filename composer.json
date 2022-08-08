@@ -1,11 +1,19 @@
 {
   "name": "clerkio/magento2",
   "description": "",
-  "version": "4.5.3",
+  "version": "4.6.0",
   "authors": [
+    {
+      "name": "Alexander Bugge Stage",
+      "email": "abs@clerk.io"
+    },
     {
       "name": "Casper Kromann Nielsen",
       "email": "ckn@clerk.io"
+    },
+    {
+      "name": "Kim Kyhlensø",
+      "email": "kky@clerk.io"
     }
   ],
   "type": "magento2-module",
