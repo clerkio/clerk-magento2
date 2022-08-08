@@ -57,6 +57,11 @@ class Powerstep extends AbstractProduct
             ->getUrl();
     }
 
+    public function getExcludeState()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+    }
+
     public function getTemplates()
     {
         $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, ScopeInterface::SCOPE_STORE);

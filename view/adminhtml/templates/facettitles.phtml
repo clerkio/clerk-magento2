@@ -2,7 +2,7 @@
 /** @var \Clerk\Clerk\Block\Adminhtml\System\Config\Field\FacetTitles $block */
 $element = $block->getElement();
 $values = [];
-$values = json_decode($element->getValue(), true);
+$values = is_null($element->getValue()) ? array() : json_decode($element->getValue(), true);
 ?>
 <div class="admin__control-table-wrapper">
     <table class="admin__control-table" id="attribute-labels-table">

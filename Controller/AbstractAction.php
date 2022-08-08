@@ -169,7 +169,7 @@ abstract class AbstractAction extends Action
             $scopeID = $this->verifyKeys($request);
             $request->setParams(['scope_id' => $scopeID]);
             $request->setParams(['scope' => 'store']);
-            
+
             if($this->verifyWebsiteKeys($request) !==0){
                 $scopeID = $this->verifyWebsiteKeys($request);
                 $request->setParams(['scope_id' => $scopeID]);
@@ -200,14 +200,14 @@ abstract class AbstractAction extends Action
 
             $privateKey = $request->getParam('private_key');
             $publicKey = $request->getParam('key');
-           
+
             $storeids = $this->getStores();
             foreach($storeids as $scopeID){
                 if ($privateKey == $this->getPrivateKey($scopeID) && $publicKey == $this->getPublicKey($scopeID)) {
                     return $scopeID;
                 }
             }
-           
+
             return 0;
 
         } catch (\Exception $e) {
@@ -230,14 +230,14 @@ abstract class AbstractAction extends Action
 
             $privateKey = $request->getParam('private_key');
             $publicKey = $request->getParam('key');
-            
+
             $websiteids = $this->getWebsites();
             foreach($websiteids as $scopeID){
                 if ($privateKey == $this->getPrivateWebsiteKey($scopeID) && $publicKey == $this->getPublicWebsiteKey($scopeID)) {
                     return $scopeID;
                 }
             }
-            
+
             return 0;
 
         } catch (\Exception $e) {

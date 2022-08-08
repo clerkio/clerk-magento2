@@ -80,7 +80,10 @@ class Index extends AbstractAction
         $this->pageHelper = $pageHelper;
         $this->storeManager = $storeManager;
         $this->clerk_logger = $ClerkLogger;
-
+        $this->fields = array(
+            "entity_id",
+            "parent_id"
+        );
         $this->addFieldHandlers();
 
         parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
@@ -137,6 +140,13 @@ class Index extends AbstractAction
                 foreach ($collection as $resourceItem) {
 
                     $item = [];
+
+                    $item['parent'] = $resourceItem->getParentId();
+                    $item['url'] = $resourceItem->getUrl();
+
+                    $children = $resourceItem->getAllChildren(true);
+                    $subcategories = array_values(array_diff($children, [$resourceItem->getId()]));
+                    $item['subcategories'] = $subcategories;
 
                     foreach ($this->fields as $field) {
 
@@ -202,9 +212,8 @@ class Index extends AbstractAction
             $collection->addPathsFilter('1/' . $rootCategory . '/%');
             $collection->addFieldToFilter('is_active',array("in"=>array('1')));
 
-            $collection->setPageSize($this->limit)
-                ->setCurPage($this->page)
-                ->addOrder($this->orderBy, $this->order);
+            $offset = ($this->page == 0) ? 0 : ($this->page * $this->limit);
+            $collection->setPage($offset, $this->limit)->addOrder($this->orderBy, $this->order);
 
             return $collection;
 

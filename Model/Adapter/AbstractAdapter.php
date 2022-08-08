@@ -96,7 +96,7 @@ abstract class AbstractAdapter
     public function getResponse($fields, $page, $limit, $orderBy, $order, $scope, $scopeid)
     {
         try {
-            
+
             $this->setFields($fields, $scope, $scopeid);
 
             $collection = $this->prepareCollection($page, $limit, $orderBy, $order, $scope, $scopeid);
@@ -111,7 +111,7 @@ abstract class AbstractAdapter
                     $response[] = $item;
                 }
             }
-            
+
             return $response;
 
         } catch (\Exception $e) {
@@ -136,7 +136,7 @@ abstract class AbstractAdapter
     public function getInfoForItem($resourceItem,$scope, $scopeid)
     {
         try {
-            
+
             $info = [];
 
             $this->setFields([], $scope, $scopeid);
@@ -148,10 +148,10 @@ abstract class AbstractAdapter
 
                 //21-10-2021 KKY Additional Fields for Configurable and grouped Products - start
                 $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);
-                $customFields = str_replace(' ','' ,explode(',', $additionalFields));
+                $customFields = is_string($additionalFields) ? str_replace(' ','' ,explode(',', $additionalFields)) : array();
 
                 if(in_array($field, $customFields)){
-                    
+
                     if ($resourceItem->getTypeId() === Configurable::TYPE_CODE){
 
                         $configurablelist=[];
@@ -164,12 +164,12 @@ abstract class AbstractAdapter
                                 }elseif(isset($simple[$entityField])){
                                     $configurablelist[] = $this->getAttributeValue($simple, $entityField);
                                 }
-                            }   
+                            }
                         }
                         if(!empty($configurablelist)){
                             $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($configurablelist));
                         }
-                        
+
                     }
 
                     if ($resourceItem->getTypeId() === "grouped"){
@@ -180,7 +180,7 @@ abstract class AbstractAdapter
                         //find simple products
                         if (!empty($associatedProducts)) {
                             foreach ($associatedProducts as $associatedProduct) {
-                               
+
                                 if (isset($associatedProduct[$field])) {
                                     $groupedList[] = $this->getAttributeValue($associatedProduct, $field);
                                 }elseif(isset($associatedProduct[$entityField])){
@@ -188,7 +188,7 @@ abstract class AbstractAdapter
                                 }
                             }
                         }
-                        
+
                         if(!empty($groupedList)){
                             $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($groupedList));
                         }
@@ -196,11 +196,11 @@ abstract class AbstractAdapter
                     }
                 }
                 //21-10-2021 KKY Additional Fields for Configurable and grouped Products - end
-               
+
                 if (isset($this->fieldHandlers[$field])) {
                     if (in_array($this->getFieldName($field), ['price','list_price'])) {
                             $price = str_replace(',','',$this->fieldHandlers[$field]($resourceItem));
-                            $info[$this->getFieldName($field)] = (float)$price;           
+                            $info[$this->getFieldName($field)] = (float)$price;
                     }
                     else {
                         $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
@@ -211,7 +211,7 @@ abstract class AbstractAdapter
                     $info[$this->getFieldName($field)] = "";
                 }
             }
-            
+
             return $info;
         } catch (\Exception $e) {
 
@@ -289,7 +289,7 @@ abstract class AbstractAdapter
     }
 
     /**
-     * Get default fields 
+     * Get default fields
      * @return array
      */
     abstract protected function getDefaultFields($scope, $scopeid);

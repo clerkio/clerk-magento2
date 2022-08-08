@@ -126,7 +126,13 @@ class PowerstepPopup extends Template
      */
     public function shouldShow()
     {
-        return ($this->getRequest()->getParam('isAjax')) || ($this->checkoutSession->getClerkShowPowerstep(true));
+        $showPowerstep = ($this->getRequest()->getParam('isAjax')) || ($this->checkoutSession->getClerkShowPowerstep(true));
+
+        if($showPowerstep){
+            $this->checkoutSession->setClerkShowPowerstep(false);
+        }
+
+        return $showPowerstep;
     }
 
     /**
@@ -137,6 +143,11 @@ class PowerstepPopup extends Template
     public function isAjax()
     {
         return $this->getRequest()->getParam('isAjax');
+    }
+
+    public function getExcludeState()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
     }
 
     /**
