@@ -100,7 +100,7 @@ class Product extends AbstractAdapter
         $this->storeManager = $storeManager;
         $this->StockStateInterface = $StockStateInterface;
         $this->ProductMetadataInterface = $ProductMetadataInterface;
-        parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger, $StockStateInterface, $ProductMetadataInterface);
+        parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger);
     }
 
     /**
