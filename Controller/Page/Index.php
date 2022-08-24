@@ -111,10 +111,11 @@ class Index extends AbstractAction
                 foreach ($pages_default->getData() as $page_default) {
 
                     try {
-                        $url = "not found";
                         $geturl = $this->_objectManager->create('Magento\Cms\Helper\Page')->getPageUrl($page_default['page_id']);
                         if($geturl){
                             $url = $geturl;
+                        } else {
+                            continue;
                         }
                         $page['id'] = $page_default['page_id'];
                         $page['type'] = 'cms page';
