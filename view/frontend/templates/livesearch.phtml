@@ -23,7 +23,7 @@ if (!empty($block->getFormSelector())) {?>
     document.addEventListener('DOMContentLoaded', (event) => {
         ClerkSearchPage = function(){
             var elems = document.querySelectorAll('<?php echo $block->getFormSelector(); ?>');
-            elems.forEach(element => element.action = "catalogsearch/result/");
+            elems.forEach(element => element.action = "<?php echo $block->getShopBaseDomainUrl(); ?>catalogsearch/result/");
         };
         ClerkSearchPage();
     });
