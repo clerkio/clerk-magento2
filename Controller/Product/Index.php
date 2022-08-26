@@ -13,6 +13,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Module\ModuleList;
+use Magento\Catalog\Helper\Data;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
@@ -45,7 +46,7 @@ class Index extends AbstractAction
         ProductAdapter $productAdapter,
         ClerkLogger $ClerkLogger,
         LoggerInterface $logger,
-        \Magento\Catalog\Helper\Data $taxHelper,
+        Data $taxHelper,
         ModuleList $moduleList
     )
     {
@@ -82,50 +83,7 @@ class Index extends AbstractAction
 
             }
 
-            $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order);
-
-            foreach ($response as $key => $product) {
-
-                $price = '';
-                $list_price = '';
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product['id']);
-                $productType = $product->getTypeID();
-                
-                if ($productType == "grouped") {
-
-                    $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
-
-                    if (!empty($associatedProducts)) {
-
-
-                        foreach ($associatedProducts as $associatedProduct) {
-
-                            if (empty($price)) {
-
-                                $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
-                                $price = str_replace(',','', $price);
-
-
-                            } elseif ($price > $associatedProduct->getPrice()) {
-
-                                $price = $this->taxHelper->getTaxPrice($associatedProduct, $associatedProduct->getFinalPrice(), true);
-                                $price = str_replace(',','', $price);
-
-                            }
-
-                        }
-
-                    }
-
-                    $response[$key]['price'] = (float) $price;
-                    $response[$key]['list_price'] =(float) $price;
-                }
-
-                $response[$key]['product_type'] = $productType;
-                $response[$key]['created_at'] = strtotime($product->getCreatedAt());
-
-            }
+            $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order, $this->scope, $this->scopeid);
 
             $this->clerk_logger->log('Feched page ' . $this->page . ' with ' . count($response) . ' products', ['response' => $response]);
 
@@ -150,6 +108,8 @@ class Index extends AbstractAction
             $this->limit = (int)$request->getParam('limit', 0);
             $this->page = (int)$request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
+            $this->scopeid = $request->getParam('scope_id');
+            $this->scope = $request->getParam('scope');
 
             if ($request->getParam('order') === 'desc') {
                 $this->order = \Magento\Framework\Data\Collection::SORT_ORDER_DESC;

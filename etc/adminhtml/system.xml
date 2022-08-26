@@ -34,6 +34,10 @@
                     <label>Language</label>
                     <source_model>Clerk\Clerk\Model\Config\Source\Language</source_model>
                 </field>
+                <field id="store_id" translate="label" type="select" sortOrder="70" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Store ID</label>
+                    <source_model>Clerk\Clerk\Model\Config\Source\Language</source_model>
+                </field>
             </group>
             <group id="product_synchronization" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="1" showInStore="1">
                 <label>Synchronization</label>
@@ -88,19 +92,35 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="template" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="1" showInStore="1">
+                <field id="include_categories" translate="label" type="select" sortOrder="20" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Include Categories</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="categories" translate="label" type="select" sortOrder="40" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Number of Categories</label>
+                    <source_model>Clerk\Clerk\Model\Config\Source\Numbers</source_model>
+                </field>
+                <field id="pages" translate="label" type="select" sortOrder="50" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Number of Pages</label>
+                    <source_model>Clerk\Clerk\Model\Config\Source\Numbers</source_model>
+                </field>
+                <field id="pages_type" translate="label" type="select" sortOrder="60" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Pages Type</label>
+                    <source_model>Clerk\Clerk\Model\Config\Source\PagesType</source_model>
+                </field>
+                <field id="template" translate="label" type="text" sortOrder="70" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Content</label>
                     <depends>
                         <field id="*/*/enabled">1</field>
                     </depends>
                 </field>
-                <field id="load_more_text" translate="label" type="text" sortOrder="30" showInDefault="0" showInWebsite="1" showInStore="1">
+                <field id="load_more_text" translate="label" type="text" sortOrder="80" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Load more button text</label>
                     <depends>
                         <field id="*/*/enabled">1</field>
                     </depends>
                 </field>
-                <field id="no_results_text" translate="label" type="text" sortOrder="40" showInDefault="0" showInWebsite="1" showInStore="1">
+                <field id="no_results_text" translate="label" type="text" sortOrder="90" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>No results text</label>
                     <depends>
                         <field id="*/*/enabled">1</field>
@@ -113,6 +133,12 @@
                 <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="design" translate="label" type="text" sortOrder="60" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>design</label>
+                    <depends>
+                        <field id="*/*/enabled">1</field>
+                    </depends>
                 </field>
                 <field id="attributes" translate="label" type="multiselect" sortOrder="20" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Attributes</label>
@@ -208,6 +234,10 @@
                         <field id="*/*/enabled">1</field>
                     </depends>
                 </field>
+                <field id="powerstep_filter" translate="label" type="select" sortOrder="40" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Filter Duplicates</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <group id="exit_intent" translate="label" type="text" sortOrder="60" showInDefault="0" showInWebsite="1" showInStore="1">
                 <label>Exit Intent</label>
@@ -234,6 +264,10 @@
                         <field id="*/*/enabled">1</field>
                     </depends>
                 </field>
+                <field id="category_filter" translate="label" type="select" sortOrder="40" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Filter Duplicates</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <group id="product" translate="label" type="text" sortOrder="80" showInDefault="0" showInWebsite="1" showInStore="1">
                 <label>Product Settings</label>
@@ -247,6 +281,10 @@
                         <field id="*/*/enabled">1</field>
                     </depends>
                 </field>
+                <field id="product_filter" translate="label" type="select" sortOrder="30" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Filter Duplicates</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <group id="cart" translate="label" type="text" sortOrder="90" showInDefault="0" showInWebsite="1" showInStore="1">
                 <label>Cart Settings</label>
@@ -259,6 +297,10 @@
                     <depends>
                         <field id="*/*/enabled">1</field>
                     </depends>
+                </field>
+                <field id="cart_filter" translate="label" type="select" sortOrder="30" showInDefault="0" showInWebsite="1" showInStore="1">
+                    <label>Filter Duplicates</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
             <group id="log" translate="label" type="text" sortOrder="95" showInDefault="0" showInWebsite="1" showInStore="1">

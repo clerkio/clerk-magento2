@@ -18,6 +18,11 @@ class LiveSearch extends Template
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_TEMPLATE, ScopeInterface::SCOPE_STORE);
     }
 
+    public function getShopBaseDomainUrl()
+    {
+        return $this->_storeManager->getStore()->getBaseUrl();
+    }
+
     /**
      * Determine if we should include categories in live search results
      *

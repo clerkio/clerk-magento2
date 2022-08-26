@@ -31,6 +31,48 @@ class Result extends BaseResult
     }
 
     /**
+     * Get facets template
+     *
+     * @return mixed
+     */
+    public function getFacetsDesign()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_DESIGN, ScopeInterface::SCOPE_STORE);
+    }
+
+    /**
+     * Determine if we should include categories and pages in search results
+     * 
+     * @return bool
+     * 
+     */
+
+    public function shouldIncludeCategories()
+    {
+        return ($this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_INCLUDE_CATEGORIES, ScopeInterface::SCOPE_STORE)) ? 'true' : 'false';
+    }
+    public function getSuggestions()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_SUGGESTIONS, ScopeInterface::SCOPE_STORE);
+    }
+
+    public function getCategories()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_CATEGORIES, ScopeInterface::SCOPE_STORE);
+    }
+
+    public function getPages()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_PAGES, ScopeInterface::SCOPE_STORE);
+    }
+
+    public function getPagesType()
+    {
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_PAGES_TYPE, ScopeInterface::SCOPE_STORE);
+    }
+
+
+    /**
      * Get attributes for clerk span
      *
      * @return string
@@ -49,9 +91,17 @@ class Result extends BaseResult
             'data-after-render' => '_clerk_after_load_event',
         ];
 
+        if ($this->shouldIncludeCategories()) {
+            $spanAttributes['data-search-categories'] = $this->getCategories();
+            $spanAttributes['data-search-pages'] = $this->getPages();
+            $spanAttributes['data-search-pages-type'] = $this->getPagesType();
+        }
+
+
         if ($this->_scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED, ScopeInterface::SCOPE_STORE)) {
             try {
                 $spanAttributes['data-facets-target'] = "#clerk-search-filters";
+                $spanAttributes['data-facets-design'] =  $this->getFacetsDesign();
 
                 if ($titles = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES, ScopeInterface::SCOPE_STORE)) {
                     $titles = json_decode($titles, true);

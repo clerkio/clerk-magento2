@@ -12,7 +12,7 @@ class Config
     const XML_PATH_LANGUAGE = 'clerk/general/language';
     const XML_PATH_INCLUDE_PAGES = 'clerk/general/include_pages';
     const XML_PATH_PAGES_ADDITIONAL_FIELDS = 'clerk/general/pages_additional_fields';
-    
+
 
     /**
      * Product Synchronization configuration
@@ -35,6 +35,11 @@ class Config
      * Search configuration
      */
     const XML_PATH_SEARCH_ENABLED = 'clerk/search/enabled';
+    const XML_PATH_SEARCH_INCLUDE_CATEGORIES = 'clerk/search/include_categories';
+    const XML_PATH_SEARCH_CATEGORIES = 'clerk/search/categories';
+    const XML_PATH_SEARCH_SUGGESTIONS = 'clerk/search/suggestions';
+    const XML_PATH_SEARCH_PAGES = 'clerk/search/pages';
+    const XML_PATH_SEARCH_PAGES_TYPE = 'clerk/search/pages_type';
     const XML_PATH_SEARCH_TEMPLATE = 'clerk/search/template';
     const XML_PATH_SEARCH_NO_RESULTS_TEXT = 'clerk/search/no_results_text';
     const XML_PATH_SEARCH_LOAD_MORE_TEXT = 'clerk/search/load_more_text';
@@ -43,6 +48,7 @@ class Config
      * Faceted Search configuration
      */
     const XML_PATH_FACETED_SEARCH_ENABLED = 'clerk/faceted_search/enabled';
+    const XML_PATH_FACETED_SEARCH_DESIGN = 'clerk/faceted_search/design';
     const XML_PATH_FACETED_SEARCH_ATTRIBUTES = 'clerk/faceted_search/attributes';
     const XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES = 'clerk/faceted_search/multiselect_attributes';
     const XML_PATH_FACETED_SEARCH_TITLES = 'clerk/faceted_search/titles';
@@ -67,6 +73,7 @@ class Config
     const XML_PATH_POWERSTEP_ENABLED = 'clerk/powerstep/enabled';
     const XML_PATH_POWERSTEP_TYPE = 'clerk/powerstep/type';
     const XML_PATH_POWERSTEP_TEMPLATES = 'clerk/powerstep/templates';
+    const XML_PATH_POWERSTEP_FILTER_DUPLICATES = 'clerk/powerstep/powerstep_filter';
 
     /**
      * Exit intent configuration
@@ -79,18 +86,21 @@ class Config
      */
     const XML_PATH_CATEGORY_ENABLED = 'clerk/category/enabled';
     const XML_PATH_CATEGORY_CONTENT = 'clerk/category/content';
+    const XML_PATH_CATEGORY_FILTER_DUPLICATES = 'clerk/category/category_filter';
 
     /**
      * Product configuration
      */
     const XML_PATH_PRODUCT_ENABLED = 'clerk/product/enabled';
     const XML_PATH_PRODUCT_CONTENT = 'clerk/product/content';
+    const XML_PATH_PRODUCT_FILTER_DUPLICATES = 'clerk/product/product_filter';
 
     /**
      * Cart configuration
      */
     const XML_PATH_CART_ENABLED = 'clerk/cart/enabled';
     const XML_PATH_CART_CONTENT = 'clerk/cart/content';
+    const XML_PATH_CART_FILTER_DUPLICATES = 'clerk/cart/cart_filter';
 
     /**
      * Logger configuration

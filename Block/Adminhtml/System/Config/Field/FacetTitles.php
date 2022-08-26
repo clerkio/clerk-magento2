@@ -42,7 +42,7 @@ class FacetTitles extends Field
     public function getConfiguredAttributes()
     {
         $attributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE);
-        $configuredAttributes = explode(',', $attributes);
+        $configuredAttributes = is_string($attributes) ? explode(',', $attributes) : array();
 
         return $configuredAttributes;
     }

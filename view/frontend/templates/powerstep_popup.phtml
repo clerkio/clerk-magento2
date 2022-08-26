@@ -16,42 +16,47 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
     </div>
     <div class="clerk_powerstep_templates">
     <?php
-    $Issetdataexclude = false;
-    $dataexcludestring = '';
-    $count = 0;
-    foreach ($block->getTemplates() as $template) :
-        $count++;
-        $id = 'clerk_'.$block->generateRandomString();
-    ?>
-        <span class="clerk"
-              id="<?php echo $id ?>"
-              <?php if($Issetdataexclude) {
+    $filter_duplicates = $block->getExcludeState();
+    $slider_count = 0;
+    $spanAttributes = [];
+    $spanAttributes['class'] = 'clerk';
+    $spanAttributes['products'] = $block->escapeHtmlAttr($block->getProduct()->getId());
+    $spanAttributes['category'] = $block->escapeHtmlAttr(reset($categoryIds));
 
-                  echo 'data-exclude-from="'.$dataexcludestring.'"';
-
-              } ?>
-              data-template="@<?php echo $block->escapeHtmlAttr($template); ?>"
-              data-products="[<?php echo $block->escapeHtmlAttr($block->getProduct()->getId()); ?>]"
-              data-category="<?php echo $block->escapeHtmlAttr(reset($categoryIds)); ?>"
-        ></span>
-    <?php
-
-        if ($count == 1) {
-
-            $dataexcludestring .= '#'.$id.':limit(4)';
-
-        }else {
-
-            $dataexcludestring .= ',#'.$id.':limit(4)';
-
+    foreach ($block->getTemplates() as $template):
+        if($filter_duplicates){
+            $spanAttributes['class'] = 'clerk clerk_' . (string)$slider_count;
         }
-        $Issetdataexclude = true;
-
-    endforeach; ?>
+        if($slider_count > 0 && $filter_duplicates){
+            $filter_string = '';
+            for($i = 0; $i < $slider_count; $i++){
+                if($i > 0){
+                    $filter_string .= ', ';
+                }
+                $filter_string .= '.clerk_'.(string)$i;
+            }
+            $spanAttributes['exclude'] = $filter_string;
+        }
+    ?>
+    <span
+        class="<?php echo $spanAttributes['class']; ?>"
+        <?php
+        if($slider_count > 0 && $filter_duplicates){
+            echo 'data-exclude-from="'.$spanAttributes['exclude'].'"';
+        }
+        ?>
+        data-template="@<?php echo $block->escapeHtmlAttr($template); ?>"
+        data-products="[<?php echo $spanAttributes['products']; ?>]"
+        data-category="<?php echo $spanAttributes['category']; ?>"
+    ></span>
+    <?php
+    $slider_count++;
+    endforeach;
+    ?>
     </div>
 </div>
 <script>
-require(['jquery', 'clerk'], function($, Clerk) {
+require(['jquery'], function($) {
     var popup = $("#clerk_powerstep");
 
     $(".clerk_powerstep_close").on("click", function() {
