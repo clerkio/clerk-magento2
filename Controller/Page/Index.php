@@ -68,7 +68,6 @@ class Index extends AbstractAction
         StoreManagerInterface $storeManager,
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         LoggerInterface $logger,
-        ObjectManagerInterface $objectManager,
         ClerkLogger $ClerkLogger,
         ModuleList $moduleList
     )
@@ -76,7 +75,7 @@ class Index extends AbstractAction
         $this->_searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->_PageRepositoryInterface = $PageRepositoryInterface;
         $this->_SearchCriteriaBuilder = $SearchCriteriaBuilder;
-        $this->_objectManager = $objectManager;
+        $this->_objectManager = $context->getObjectManager();
         $this->clerk_logger = $ClerkLogger;
         $this->_scopeConfig = $scopeConfig;
         $this->moduleList = $moduleList;
