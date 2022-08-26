@@ -90,7 +90,7 @@ class Api
             /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
             $httpClient = $this->httpClientFactory->create();
             $httpClient->setUri($this->baseurl . $endpoint);
-            $httpClient->setRawData(json_encode($params), 'application/json');
+            $httpClient->setRawData(json_encode($params, JSON_NUMERIC_CHECK), 'application/json');
 
             $result = $httpClient->request('POST');
 
