@@ -85,15 +85,6 @@ class Index extends AbstractAction
 
             $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order, $this->scope, $this->scopeid);
 
-            foreach ($response as $key => $product) {
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product['id']);
-                $productType = $product->getTypeID();
-
-                $response[$key]['product_type'] = $productType;
-                $response[$key]['created_at'] = strtotime($product->getCreatedAt());
-            }
-
             $this->clerk_logger->log('Feched page ' . $this->page . ' with ' . count($response) . ' products', ['response' => $response]);
 
             $this->getResponse()->setBody(json_encode($response));

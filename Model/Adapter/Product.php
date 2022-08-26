@@ -422,6 +422,17 @@ class Product extends AbstractAdapter
                 return floor($diff / (60 * 60 * 24));
             });
 
+            //Add created_at fieldhandler
+            $this->addFieldHandler('created_at', function ($item) {
+                $createdAt = strtotime($item->getCreatedAt());
+                return $createdAt;
+            });
+
+            $this->addFieldHandler('product_type', function ($item) {
+                $type = $item->getTypeId();
+                return $type;
+            });
+
             //Add on_sale fieldhandler
             $this->addFieldHandler('on_sale', function ($item) {
                 try {
@@ -480,8 +491,10 @@ class Product extends AbstractAdapter
                 'categories',
                 'sku',
                 'age',
+                'created_at',
                 'on_sale',
                 'stock',
+                'product_type',
                 'tier_price_values',
                 'tier_price_quantities'
             ];
