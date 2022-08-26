@@ -56,7 +56,7 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
     </div>
 </div>
 <script>
-require(['jquery', 'clerk'], function($, Clerk) {
+require(['jquery'], function($) {
     var popup = $("#clerk_powerstep");
 
     $(".clerk_powerstep_close").on("click", function() {
