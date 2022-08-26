@@ -21,7 +21,7 @@ if(!empty($block->getPublicKey())):
             }
             ?>
             globals: {
-                uenc: '<?php echo base64_encode((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"); ?>',
+                uenc: '<?php echo base64_encode((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[SERVER_NAME]$_SERVER[REQUEST_URI]"); ?>',
                 formkey: '<?php echo $block->getFormKey(); ?>'
             }
         });
