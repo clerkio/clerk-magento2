@@ -433,6 +433,11 @@ class Product extends AbstractAdapter
                 return $type;
             });
 
+            $this->addFieldHandler('manufacturer', function ($item) {
+                $brand = $item->getAttributeText('manufacturer');
+                return $brand;
+            });
+
             //Add on_sale fieldhandler
             $this->addFieldHandler('on_sale', function ($item) {
                 try {
@@ -489,6 +494,7 @@ class Product extends AbstractAdapter
                 'image',
                 'url',
                 'categories',
+                'manufacturer',
                 'sku',
                 'age',
                 'created_at',
