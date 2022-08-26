@@ -67,7 +67,7 @@ class Image
         if (!$imageUrl) {
             $store = $this->storeManager->getStore();
             $itemImage = $item->getImage() ?? $item->getSmallImage() ?? $item->getThumbnail();
-
+            
             if ($itemImage === 'no_selection' || !$itemImage ) {
                 $imageUrl = $helper->getDefaultPlaceholderUrl('small_image');
             } else {

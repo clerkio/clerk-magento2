@@ -120,7 +120,7 @@ class Api
         try {
 
             $params = [
-                'products' => $productId,
+                'products' => [$productId],
             ];
 
             $this->get('product/remove', $params);
