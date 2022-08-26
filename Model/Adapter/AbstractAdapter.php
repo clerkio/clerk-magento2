@@ -167,7 +167,7 @@ abstract class AbstractAdapter
                             }
                         }
                         if(!empty($configurablelist)){
-                            $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($configurablelist));
+                            $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($configurablelist, SORT_REGULAR));
                         }
 
                     }
@@ -190,7 +190,7 @@ abstract class AbstractAdapter
                         }
 
                         if(!empty($groupedList)){
-                            $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($groupedList));
+                            $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($groupedList, SORT_REGULAR));
                         }
 
                     }
