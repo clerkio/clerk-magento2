@@ -16,6 +16,7 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Bundle\Model\Product\Type as Bundle;
 use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Catalog\Model\ProductRepository;
 
 class Product extends AbstractAdapter
 {
@@ -69,6 +70,9 @@ class Product extends AbstractAdapter
      * @var ProductMetadataInterface
      */
     protected $ProductMetadataInterface;
+
+    protected ProductRepository $_productRepository;
+
     /**
      * Product constructor.
      *
@@ -89,7 +93,8 @@ class Product extends AbstractAdapter
         \Magento\CatalogInventory\Helper\Stock $stockFilter,
         Data $taxHelper,
         StockStateInterface $StockStateInterface,
-        ProductMetadataInterface $ProductMetadataInterface
+        ProductMetadataInterface $ProductMetadataInterface,
+        ProductRepository $productRepository
 
     )
     {
@@ -100,6 +105,7 @@ class Product extends AbstractAdapter
         $this->storeManager = $storeManager;
         $this->StockStateInterface = $StockStateInterface;
         $this->ProductMetadataInterface = $ProductMetadataInterface;
+        $this->_productRepository = $productRepository;
         parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger);
     }
 
@@ -369,7 +375,14 @@ class Product extends AbstractAdapter
                         }
                         break;
                     case 'simple':
-                        $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
+                        $product = $this->getProductById($item->getId());
+
+                        // if not stock managed always return in stock
+                        if(!$this->isStockManagedForProduct($product)){
+                            $total_stock = 10000;
+                        } else {
+                            $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
+                        }
                         break;
                     case 'bundle':
                         // Get the inventory qty of each child item
@@ -523,6 +536,22 @@ class Product extends AbstractAdapter
 
             $this->clerk_logger->error('Getting Default Fields Error', ['error' => $e->getMessage()]);
 
+        }
+    }
+
+    private function getProductById($id)
+    {
+        return $this->_productRepository->getById($id);
+    }
+
+    private function isStockManagedForProduct($product)
+    {
+        /** @var  ProductExtension $productExtension */
+        $productExtension = $product->getExtensionAttributes();
+        if($productExtension->getStockItem() == null){
+            return false;
+        } else {
+            return $productExtension->getStockItem()->getManageStock();
         }
     }
 }
