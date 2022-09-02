@@ -122,6 +122,11 @@ class Product extends AbstractAdapter
 
             $collection->addFieldToSelect('*');
             $collection->addStoreFilter($scopeid);
+
+            $collection->addAttributeToFilter([
+                ['attribute' => 'name', 'nlike' => '%FORBIDDEN%']
+            ]);
+
             $productMetadata = $this->ProductMetadataInterface;
             $version = $productMetadata->getVersion();
 
@@ -163,6 +168,8 @@ class Product extends AbstractAdapter
                 'adapter' => $this,
                 'collection' => $collection
             ]);
+
+
 
             return $collection;
 
