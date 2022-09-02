@@ -365,6 +365,7 @@ class Product extends AbstractAdapter
                 $productType = $item->getTypeID();
                 $StockState = $this->StockStateInterface;
                 $total_stock = 0;
+                $product = $this->getProductById($item->getId());
 
                 switch($productType){
                     case 'configurable':
@@ -373,16 +374,25 @@ class Product extends AbstractAdapter
                         foreach ($usedProducts as $simple) {
                             $total_stock += $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
                         }
+                        // if stock is 0 then check if stock is disabled and set a high number
+                        if($total_stock == 0){
+                            if(!$this->isStockManagedForProduct($product)){
+                                $total_stock = 10000;
+                            } else {
+                                $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
+                            }
+                        }
+
                         break;
                     case 'simple':
-                        $product = $this->getProductById($item->getId());
 
-                        // if not stock managed always return in stock
+                        // if not stock managed always return in stock with a high number
                         if(!$this->isStockManagedForProduct($product)){
                             $total_stock = 10000;
                         } else {
                             $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
                         }
+
                         break;
                     case 'bundle':
                         // Get the inventory qty of each child item
