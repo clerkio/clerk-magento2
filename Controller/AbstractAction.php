@@ -144,8 +144,11 @@ abstract class AbstractAction extends Action
             $version = $productMetadata->getVersion();
             header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
 
+            $this->privateKey = $request->getParam('private_key');
+            $this->publicKey = $request->getParam('key');
+
             //Validate supplied keys
-            if ($this->verifyKeys($request) == 0 && $this->verifyWebsiteKeys($request) == 0) {
+            if ($this->verifyKeys($request) == 0 && $this->verifyWebsiteKeys($request) == 0 || (!$this->privateKey && !$this->publicKey)) {
                 $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
                 $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
 
@@ -362,6 +365,7 @@ abstract class AbstractAction extends Action
             /**
              * Explode fields on , and filter out "empty" entries
              */
+            if()
             $fields = $request->getParam('fields');
             if ($fields) {
                 $this->fields = array_filter(explode(',', $fields), 'strlen');
