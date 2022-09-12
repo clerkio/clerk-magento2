@@ -365,7 +365,6 @@ abstract class AbstractAction extends Action
             /**
              * Explode fields on , and filter out "empty" entries
              */
-            if()
             $fields = $request->getParam('fields');
             if ($fields) {
                 $this->fields = array_filter(explode(',', $fields), 'strlen');
