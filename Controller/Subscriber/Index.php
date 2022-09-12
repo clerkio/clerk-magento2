@@ -1,6 +1,6 @@
 <?php
 
-namespace Clerk\Clerk\Controller\Subcriber;
+namespace Clerk\Clerk\Controller\Subscriber;
 
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;

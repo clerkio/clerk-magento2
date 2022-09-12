@@ -1,6 +1,6 @@
 <?php
 
-namespace Clerk\Clerk\Controller\setconfig;
+namespace Clerk\Clerk\Controller\Setconfig;
 
 use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Framework\App\Action\Context;
