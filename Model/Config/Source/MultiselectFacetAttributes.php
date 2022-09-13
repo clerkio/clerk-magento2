@@ -64,7 +64,6 @@ class MultiselectFacetAttributes implements ArrayInterface
      */
     private function getConfiguredAttributes()
     {
-	    setcookie('stubbe', ScopeInterface::SCOPE_STORE, 86400);
         return $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE);
     }
 }
