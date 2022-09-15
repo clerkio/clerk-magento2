@@ -167,6 +167,7 @@ abstract class AbstractAdapter
                             }
                         }
                         if(!empty($configurablelist)){
+                            $configurablelist = is_array($configurablelist) ? $this->flattenArray( $configurablelist ) : $configurablelist;
                             $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($configurablelist));
                         }
 
@@ -190,6 +191,7 @@ abstract class AbstractAdapter
                         }
 
                         if(!empty($groupedList)){
+                            $groupedList = is_array($groupedList) ? $this->flattenArray( $groupedList ) : $groupedList;
                             $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($groupedList));
                         }
 
@@ -286,6 +288,12 @@ abstract class AbstractAdapter
     public function addFieldHandler($field, callable $handler)
     {
         $this->fieldHandlers[$field] = $handler;
+    }
+
+    public function flattenArray(array $array){
+        $return = array();
+        array_walk_recursive($array, function($a) use (&$return) { $return[] = $a; });
+        return $return;
     }
 
     /**
