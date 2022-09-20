@@ -57,23 +57,23 @@
                     <label>Additional Fields</label>
                     <comment>A comma separated list of additional fields to sync to Clerk.io</comment>
                 </field>
-                <field id="saleable_only" translate="label" type="select" sortOrder="40" showInDefault="0" showInWebsite="1" showInStore="1">
+                <field id="saleable_only" translate="label" type="select" sortOrder="35" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Only synchronize saleable products</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="visibility" translate="label" type="select" sortOrder="50" showInDefault="0" showInWebsite="1" showInStore="1">
+                <field id="visibility" translate="label" type="select" sortOrder="40" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Only synchronize product with visibility</label>
                     <source_model>Clerk\Clerk\Model\Config\Source\Visibility</source_model>
                 </field>
-                <field id="return_order_synchronization" translate="label" type="select" sortOrder="60" showInDefault="0" showInWebsite="1" showInStore="1">
+                <field id="return_order_synchronization" translate="label" type="select" sortOrder="45" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Track returned orders</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="disable_order_synchronization" translate="label" type="select" sortOrder="70" showInDefault="0" showInWebsite="1" showInStore="1">
+                <field id="disable_order_synchronization" translate="label" type="select" sortOrder="50" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Disable order synchronization</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="image_type" translate="label comment" type="select" sortOrder="80" showInDefault="0" showInWebsite="1" showInStore="1">
+                <field id="image_type" translate="label comment" type="select" sortOrder="55" showInDefault="0" showInWebsite="1" showInStore="1">
                     <label>Image type</label>
                     <comment>Select image type to send to Clerk</comment>
                     <source_model>Clerk\Clerk\Model\Config\Source\ImageType</source_model>
