@@ -211,9 +211,8 @@ class Index extends AbstractAction
             $collection->addAttributeToFilter('name', ['neq' => null]);
             $collection->addPathsFilter('1/' . $rootCategory . '/%');
             $collection->addFieldToFilter('is_active',array("in"=>array('1')));
-
-            $offset = ($this->page == 0) ? 0 : ($this->page * $this->limit);
-            $collection->setPage($offset, $this->limit)->addOrder($this->orderBy, $this->order);
+            
+            $collection->setCurPage($this->page)->setPageSize($this->limit);
 
             return $collection;
 
