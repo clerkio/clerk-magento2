@@ -143,7 +143,8 @@ class Index extends AbstractAction
 
                     $item['parent'] = $resourceItem->getParentId();
                     $item['url'] = $resourceItem->getUrl();
-
+                    $item['name'] = $resourceItem->getName();
+                    
                     $children = $resourceItem->getAllChildren(true);
                     $subcategories = array_values(array_diff($children, [$resourceItem->getId()]));
                     $item['subcategories'] = $subcategories;
