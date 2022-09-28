@@ -50,6 +50,8 @@ class Index extends AbstractAction
 
     protected $moduleList;
 
+    protected $categoryFactory;
+
     /**
      * Category controller constructor.
      *
@@ -61,12 +63,14 @@ class Index extends AbstractAction
      * @param Page $pageHelper
      * @param StoreManagerInterface $storeManager
      * @param Magento\Catalog\Api\CategoryRepositoryInterface $categoryRepository
+     * @param Magento\Catalog\Model\CategoryFactory $categoryFactory,
      */
     public function __construct(
         Context $context,
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         CollectionFactory $categoryCollectionFactory,
+        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
         LoggerInterface $logger,
         PageCollectionFactory $pageCollectionFactory,
         Page $pageHelper,
@@ -80,6 +84,7 @@ class Index extends AbstractAction
         $this->pageHelper = $pageHelper;
         $this->storeManager = $storeManager;
         $this->clerk_logger = $ClerkLogger;
+        $this->categoryFactory = $categoryFactory;
         $this->fields = array(
             "entity_id",
             "parent_id"
@@ -100,6 +105,13 @@ class Index extends AbstractAction
                 return $item->getParentId();
             });
 
+            $this->addFieldHandler('parent_name', function ($item) {
+                $parentId = $item->getParentId();
+                $parent = $this->categoryFactory->create()->load($parentId);
+                $parent_name = $parent->getName();
+                return $parent_name;
+            });
+
             //Add url fieldhandler
             $this->addFieldHandler('url', function ($item) {
                 return $item->getUrl();
@@ -110,6 +122,10 @@ class Index extends AbstractAction
                 $children = $item->getAllChildren(true);
                 //Remove own ID from subcategories array
                 return array_values(array_diff($children, [$item->getId()]));
+            });
+
+            $this->addFieldHandler('name', function ($item) {
+                return $item->getName();
             });
 
         } catch (\Exception $e) {
@@ -140,14 +156,6 @@ class Index extends AbstractAction
                 foreach ($collection as $resourceItem) {
 
                     $item = [];
-
-                    $item['parent'] = $resourceItem->getParentId();
-                    $item['url'] = $resourceItem->getUrl();
-                    $item['name'] = $resourceItem->getName();
-                    
-                    $children = $resourceItem->getAllChildren(true);
-                    $subcategories = array_values(array_diff($children, [$resourceItem->getId()]));
-                    $item['subcategories'] = $subcategories;
 
                     foreach ($this->fields as $field) {
 
@@ -212,8 +220,10 @@ class Index extends AbstractAction
             $collection->addAttributeToFilter('name', ['neq' => null]);
             $collection->addPathsFilter('1/' . $rootCategory . '/%');
             $collection->addFieldToFilter('is_active',array("in"=>array('1')));
-            
+
+
             $collection->setCurPage($this->page)->setPageSize($this->limit);
+
 
             return $collection;
 
