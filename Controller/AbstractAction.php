@@ -169,15 +169,18 @@ abstract class AbstractAction extends Action
                 return parent::dispatch($request);
             }
 
-            $scopeID = $this->verifyKeys($request);
-            $request->setParams(['scope_id' => $scopeID]);
-            $request->setParams(['scope' => 'store']);
-
             if($this->verifyWebsiteKeys($request) !==0){
                 $scopeID = $this->verifyWebsiteKeys($request);
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'website']);
             }
+            
+            if($this->verifyKeys($request) !==0){
+                $scopeID = $this->verifyKeys($request);
+                $request->setParams(['scope_id' => $scopeID]);
+                $request->setParams(['scope' => 'store']);
+            }
+
 
             //Filter out request arguments
             $this->getArguments($request);
