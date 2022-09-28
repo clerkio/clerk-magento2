@@ -22,11 +22,17 @@ class FacetedSearch extends Fieldset
     protected $systemConfig;
 
     /**
+     * @var RequestInterface
+     */
+    protected $requestInterface;
+
+    /**
      * FacetedSearch constructor.
      *
      * @param \Magento\Backend\Block\Context $context
      * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Magento\Framework\View\Helper\Js $jsHelper
+     * @param \Magento\Framework\App\RequestInterface $requestInterface
      * @param Api $api
      * @param array $data
      */
@@ -34,12 +40,14 @@ class FacetedSearch extends Fieldset
         \Magento\Backend\Block\Context $context,
         \Magento\Backend\Model\Auth\Session $authSession,
         \Magento\Framework\View\Helper\Js $jsHelper,
+        \Magento\Framework\App\RequestInterface $requestInterface,
         Api $api,
         SystemConfig $systemConfig,
         array $data = [])
     {
         $this->api = $api;
         $this->systemConfig = $systemConfig;
+        $this->requestInterface = $requestInterface;
 
         parent::__construct($context, $authSession, $jsHelper, $data);
     }
@@ -78,7 +86,8 @@ class FacetedSearch extends Fieldset
      */
     private function isConfigured()
     {
-        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE));
+        $store_id = (string)$this->requestInterface->getParam('store', 0);
+        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE, $store_id) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE, $store_id));
     }
 
     /**
@@ -88,8 +97,9 @@ class FacetedSearch extends Fieldset
      */
     private function keysValid()
     {
-        $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE);
-        $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE);
+        $store_id = (string)$this->requestInterface->getParam('store', 0);
+        $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE, $store_id);
+        $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE, $store_id);
 
         $keysValid = json_decode($this->api->keysValid($publicKey, $privateKey));
 

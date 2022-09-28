@@ -36,21 +36,29 @@ class Api
     protected $baseurl = 'http://api.clerk.io/v2/';
 
     /**
+     * @var RequestInterface
+     */
+    protected $requestInterface;
+
+    /**
      * Api constructor
      *
      * @param ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\App\RequestInterface $requestInterface
      */
     public function __construct(
         LoggerInterface $logger,
         ScopeConfigInterface $scopeConfig,
         ZendClientFactory $httpClientFactory,
-        ClerkLogger $Clerklogger
+        ClerkLogger $Clerklogger,
+        \Magento\Framework\App\RequestInterface $requestInterface
     )
     {
         $this->clerk_logger = $Clerklogger;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
         $this->httpClientFactory = $httpClientFactory;
+        $this->requestInterface = $requestInterface;
     }
 
     /**
@@ -103,9 +111,10 @@ class Api
 
     private function getDefaultParams()
     {
+        $store_id = (string)$this->requestInterface->getParam('store', 0);
         return [
-            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE),
-            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE),
+            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE, $store_id),
+            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE, $store_id),
         ];
     }
 
@@ -248,10 +257,10 @@ class Api
     public function getContent($storeId = null)
     {
         try {
-
+            $store_id = (string)$this->requestInterface->getParam('store', 0);
             $params = [
-                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE),
-                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE),
+                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE, $store_id),
+                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE, $store_id),
             ];
 
             return $this->get('client/account/content/list', $params)->getBody();

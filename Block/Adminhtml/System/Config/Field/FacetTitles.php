@@ -9,12 +9,22 @@ use Magento\Store\Model\ScopeInterface;
 class FacetTitles extends Field
 {
     /**
+     * @var RequestInterface
+     */
+    protected $requestInterface;
+
+    /**
      * FacetTitles constructor.
      * @param \Magento\Backend\Block\Template\Context $context
      * @param array $data
      */
-    public function __construct(\Magento\Backend\Block\Template\Context $context, array $data = [])
+    public function __construct(
+        \Magento\Backend\Block\Template\Context $context,
+        \Magento\Framework\App\RequestInterface $requestInterface,
+        array $data = []
+        )
     {
+        $this->requestInterface = $requestInterface;
         $this->setTemplate('Clerk_Clerk::facettitles.phtml');
         parent::__construct($context, $data);
     }
@@ -41,7 +51,8 @@ class FacetTitles extends Field
      */
     public function getConfiguredAttributes()
     {
-        $attributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE);
+        $store_id = (string)$this->requestInterface->getParam('store', 0);
+        $attributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $store_id);
         $configuredAttributes = is_string($attributes) ? explode(',', $attributes) : array();
 
         return $configuredAttributes;

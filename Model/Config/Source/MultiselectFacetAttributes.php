@@ -14,9 +14,18 @@ class MultiselectFacetAttributes implements ArrayInterface
      */
     protected $scopeConfig;
 
-    public function __construct(ScopeConfigInterface $scopeConfig)
+    /**
+     * @var RequestInterface
+     */
+    protected $requestInterface;
+
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\App\RequestInterface $requestInterface
+        )
     {
         $this->scopeConfig = $scopeConfig;
+        $this->requestInterface = $requestInterface;
     }
 
     /**
@@ -64,6 +73,7 @@ class MultiselectFacetAttributes implements ArrayInterface
      */
     private function getConfiguredAttributes()
     {
-        return $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE);
+        $store_id = (string)$this->requestInterface->getParam('store', 0);
+        return $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $store_id);
     }
 }
