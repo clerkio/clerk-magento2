@@ -75,6 +75,7 @@ class Index extends AbstractAction
 
                 'PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, $scope, $scopeID),
                 'PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS, $scope, $scopeID),
+                'PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS, $scope, $scopeID),
                 'PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeID),
                 'PRODUCT_SYNCHRONIZATION_SALABLE_ONLY' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, $scope, $scopeID),
                 'PRODUCT_SYNCHRONIZATION_VISIBILITY' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, $scope, $scopeID),

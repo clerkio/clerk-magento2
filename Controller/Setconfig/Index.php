@@ -98,6 +98,10 @@ class Index extends AbstractAction
                         $this->config_Writer->save(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS, $value, $scope, $scopeId);
                         $count++;
                     }
+                    if ($key == "PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS"){
+                        $this->config_Writer->save(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS, $value, $scope, $scopeId);
+                        $count++;
+                    }
                     if ($key == "PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS"){
                         $this->config_Writer->save(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $value, $scope, $scopeId);
                         $count++;
