@@ -249,7 +249,11 @@ class Index extends AbstractAction
                         $this->config_Writer->save(Config::XML_PATH_POWERSTEP_TEMPLATES, $value, $scope, $scopeId);
                         $count++;
                     }
-                    
+                    if ($key == "POWERSTEP_FILTER_DUPLICATES"){
+                        $this->config_Writer->save(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, $value, $scope, $scopeId);
+                        $count++;
+                    }
+
                     // exit intent
 
                     if ($key == "EXIT_INTENT_ENABLED"){
@@ -271,7 +275,11 @@ class Index extends AbstractAction
                         $this->config_Writer->save(Config::XML_PATH_CATEGORY_CONTENT, $value, $scope, $scopeId);
                         $count++;
                     }
-    
+                    if ($key == "CATEGORY_FILTER_DUPLICATES"){
+                        $this->config_Writer->save(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, $value, $scope, $scopeId);
+                        $count++;
+                    }
+
                     // product
 
                     if ($key == "PRODUCT_ENABLED"){
@@ -282,7 +290,11 @@ class Index extends AbstractAction
                         $this->config_Writer->save(Config::XML_PATH_PRODUCT_CONTENT, $value, $scope, $scopeId);
                         $count++;
                     }
-    
+                    if ($key == "PRODUCT_FILTER_DUPLICATES"){
+                        $this->config_Writer->save(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, $value, $scope, $scopeId);
+                        $count++;
+                    }
+
                     // cart 
 
                     if ($key == "CART_ENABLED"){
@@ -291,6 +303,10 @@ class Index extends AbstractAction
                     }
                     if ($key == "CART_CONTENT"){
                         $this->config_Writer->save(Config::XML_PATH_CART_CONTENT, $value, $scope, $scopeId);
+                        $count++;
+                    }
+                    if ($key == "CART_FILTER_DUPLICATES"){
+                        $this->config_Writer->save(Config::XML_PATH_CART_FILTER_DUPLICATES, $value, $scope, $scopeId);
                         $count++;
                     }
 

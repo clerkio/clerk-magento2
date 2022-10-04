@@ -115,18 +115,22 @@ class Index extends AbstractAction
                 'POWERSTEP_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_ENABLED, $scope, $scopeID),
                 'POWERSTEP_TYPE' => $this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TYPE, $scope, $scopeID),
                 'POWERSTEP_TEMPLATES' => $this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scopeID),
-
+                'POWERSTEP_FILTER_DUPLICATES' => $this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, $scope, $scopeID),
+                
                 'EXIT_INTENT_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_ENABLED, $scope, $scopeID),
                 'EXIT_INTENT_TEMPLATE' => $this->scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE, $scope, $scopeID),
 
                 'CATEGORY_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_CATEGORY_ENABLED, $scope, $scopeID),
                 'CATEGORY_CONTENT' => $this->scopeConfig->getValue(Config::XML_PATH_CATEGORY_CONTENT, $scope, $scopeID),
+                'CATEGORY_FILTER_DUPLICATES' => $this->scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, $scope, $scopeID),
 
                 'PRODUCT_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_ENABLED, $scope, $scopeID),
                 'PRODUCT_CONTENT' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_CONTENT, $scope, $scopeID),
+                'PRODUCT_FILTER_DUPLICATES' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, $scope, $scopeID),
 
                 'CART_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_CART_ENABLED, $scope, $scopeID),
                 'CART_CONTENT' => $this->scopeConfig->getValue(Config::XML_PATH_CART_CONTENT, $scope, $scopeID),
+                'CART_FILTER_DUPLICATES' => $this->scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, $scope, $scopeID),
 
                 'LOG_LEVEL' => $this->scopeConfig->getValue(Config::XML_PATH_LOG_LEVEL, $scope, $scopeID),
                 'LOG_TO' => $this->scopeConfig->getValue(Config::XML_PATH_LOG_TO, $scope, $scopeID),
