@@ -27,10 +27,23 @@ require(['jquery', 'mage/url'], function($, urlBuilder) {
     $(document).on('ajax:addToCart', function(e) {
         getPowerstepPopup(true);
     });
-
+    
     $(document).ready(function() {
-        getPowerstepPopup();
-    })
+        let product_added_with_reload = (document.querySelectorAll('[data-ui-id="message-success"]').length > 0) ? true : false;
+        if(product_added_with_reload){
+            getPowerstepPopup();
+        }
+    });
+
+    /*
+    $(document).ready(function() {
+        let invoke_powerstep = ''; // Build PHP Function that checks checkoutsession for showpowertep
+        if(invoke_powerstep){
+            getPowerstepPopup(true);
+        }
+
+    });
+    */
 });
 </script>
 <?php endif; ?>
