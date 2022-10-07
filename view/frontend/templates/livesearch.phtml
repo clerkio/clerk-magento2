@@ -4,9 +4,9 @@
 <span
     class="clerk"
     data-template="@<?php echo $block->getLiveSearchTemplate(); ?>"
-    data-instant-search-suggestions="<?php echo $block->getSuggestions(); ?>"
-    data-instant-search-categories="<?php echo $block->getCategories(); ?>"
-    data-instant-search-pages="<?php echo $block->getPages(); ?>"
+    data-instant-search-suggestions="<?php echo ($block->getSuggestions() ? $block->getSuggestions() : "0"); ?>"
+    data-instant-search-categories="<?php echo ($block->getCategories() ? $block->getCategories() : "0"); ?>"
+    data-instant-search-pages="<?php echo ($block->getPages() ? $block->getPages() : "0"); ?>"
     data-instant-search-pages-type="<?php echo $block->getPagesType(); ?>"
     data-instant-search-positioning="<?php echo $block->getDropdownPosition(); ?>"
     <?php if (empty($block->getInputSelector())) {
