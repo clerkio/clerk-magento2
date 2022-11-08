@@ -10,6 +10,16 @@ use Magento\Store\Model\ScopeInterface;
 
 class Powerstep extends AbstractProduct
 {
+
+    protected $storeManager;
+
+    public function __construct(
+        \Magento\Store\Model\StoreManagerInterface $storeManager
+        )
+    {
+        $this->storeManager = $storeManager;
+    }
+
     /**
      * Get Cart URL
      *
@@ -59,12 +69,30 @@ class Powerstep extends AbstractProduct
 
     public function getExcludeState()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, $scope, $scope_id);
     }
 
     public function getTemplates()
     {
-        $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);
         $templates = explode(',', $configTemplates);
 
         foreach ($templates as $key => $template) {

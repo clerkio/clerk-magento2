@@ -8,6 +8,16 @@ use Magento\Store\Model\ScopeInterface;
 
 class ExitIntent extends Template
 {
+
+    protected $storeManager;
+
+    public function __construct(
+        \Magento\Store\Model\StoreManagerInterface $storeManager
+        )
+    {
+        $this->storeManager = $storeManager;
+    }
+
     /**
      * Get exit intent template
      *
@@ -15,6 +25,15 @@ class ExitIntent extends Template
      */
     public function getExitIntentTemplate()
     {
-        return explode(',',$this->_scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE, ScopeInterface::SCOPE_STORE));
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return explode(',',$this->_scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE, $scope, $scope_id));
     }
 }

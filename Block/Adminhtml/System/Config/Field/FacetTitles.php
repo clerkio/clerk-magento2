@@ -51,8 +51,18 @@ class FacetTitles extends Field
      */
     public function getConfiguredAttributes()
     {
-        $store_id = (string)$this->requestInterface->getParam('store', 0);
-        $attributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $store_id);
+        $_params = $this->requestInterface->getParams();
+        $scope_id = '0';
+        $scope = 'default';
+        if (array_key_exists('store', $_params)){
+            $scope = 'store';
+            $scope_id = $_params[$scope];
+        }
+        if (array_key_exists('website', $_params)){
+            $scope = 'website';
+            $scope_id = $_params[$scope];
+        }
+        $attributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, $scope, $scope_id);
         $configuredAttributes = is_string($attributes) ? explode(',', $attributes) : array();
 
         return $configuredAttributes;

@@ -111,10 +111,11 @@ class Api
 
     private function getDefaultParams()
     {
-        $store_id = (string)$this->requestInterface->getParam('store', 0);
+        $scope = (string)$this->requestInterface->getParam('scope', 'default');
+        $scope_id = (string)$this->requestInterface->getParam($scope, 0);
         return [
-            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE, $store_id),
-            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE, $store_id),
+            'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, $scope, $scope_id),
+            'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, $scope, $scope_id),
         ];
     }
 
@@ -257,10 +258,11 @@ class Api
     public function getContent($storeId = null)
     {
         try {
-            $store_id = (string)$this->requestInterface->getParam('store', 0);
+            $scope = (string)$this->requestInterface->getParam('scope', 'default');
+            $scope_id = (string)$this->requestInterface->getParam($scope, 0);
             $params = [
-                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE, $store_id),
-                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE, $store_id),
+                'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, $scope, $scope_id),
+                'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, $scope, $scope_id),
             ];
 
             return $this->get('client/account/content/list', $params)->getBody();

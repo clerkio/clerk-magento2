@@ -8,6 +8,16 @@ use Magento\Store\Model\ScopeInterface;
 
 class LiveSearch extends Template
 {
+
+    protected $storeManager;
+
+    public function __construct(
+        \Magento\Store\Model\StoreManagerInterface $storeManager
+        )
+    {
+        $this->storeManager = $storeManager;
+    }
+
     /**
      * Get live search template
      *
@@ -15,7 +25,16 @@ class LiveSearch extends Template
      */
     public function getLiveSearchTemplate()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_TEMPLATE, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_TEMPLATE, $scope, $scope_id);
     }
 
     public function getShopBaseDomainUrl()
@@ -30,37 +49,109 @@ class LiveSearch extends Template
      */
     public function shouldIncludeCategories()
     {
-        return ($this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES, ScopeInterface::SCOPE_STORE)) ? 'true' : 'false';
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return ($this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES, $scope, $scope_id)) ? 'true' : 'false';
     }
     public function getSuggestions()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_SUGGESTIONS, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_SUGGESTIONS, $scope, $scope_id);
     }
 
     public function getCategories()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_CATEGORIES, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_CATEGORIES, $scope, $scope_id);
     }
 
     public function getPages()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES, $scope, $scope_id);
     }
 
     public function getPagesType()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES_TYPE, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES_TYPE, $scope, $scope_id);
     }
     public function getDropdownPosition()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_DROPDOWN_POSITION, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_DROPDOWN_POSITION, $scope, $scope_id);
     }
     public function getInputSelector()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INPUT_SELECTOR, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INPUT_SELECTOR, $scope, $scope_id);
     }
     public function getFormSelector()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_FORM_SELECTOR, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_FORM_SELECTOR, $scope, $scope_id);
     }
 }

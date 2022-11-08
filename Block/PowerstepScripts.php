@@ -8,6 +8,16 @@ use Magento\Store\Model\ScopeInterface;
 
 class PowerstepScripts extends Template
 {
+
+    protected $storeManager;
+
+    public function __construct(
+        \Magento\Store\Model\StoreManagerInterface $storeManager
+        )
+    {
+        $this->storeManager = $storeManager;
+    }
+
     /**
      * Determine if we should show scripts
      *
@@ -15,6 +25,13 @@ class PowerstepScripts extends Template
      */
     public function shouldShow()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TYPE, ScopeInterface::SCOPE_STORE) == Config\Source\PowerstepType::TYPE_POPUP;
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->storeManager->getStore()->getId();
+        }
+        return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TYPE, $scope, $scope_id) == Config\Source\PowerstepType::TYPE_POPUP;
     }
 }

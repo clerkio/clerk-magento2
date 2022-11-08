@@ -73,7 +73,8 @@ class MultiselectFacetAttributes implements ArrayInterface
      */
     private function getConfiguredAttributes()
     {
-        $store_id = (string)$this->requestInterface->getParam('store', 0);
-        return $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $store_id);
+        $scope = (string)$this->requestInterface->getParam('scope', 'default');
+        $scope_id = (string)$this->requestInterface->getParam($scope, 0);
+        return $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, $scope, $scope_id);
     }
 }
