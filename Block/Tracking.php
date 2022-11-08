@@ -16,11 +16,9 @@ class Tracking extends Template
     public function __construct(
         \Magento\Backend\Block\Widget\Context $context,
         \Magento\Framework\Data\Form\FormKey $formKey,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
         $this->formKey = $formKey;
-        $this->storeManager = $storeManager;
     }
     /**
      * Get public key
@@ -35,7 +33,7 @@ class Tracking extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(
@@ -53,7 +51,7 @@ class Tracking extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(
@@ -76,7 +74,7 @@ class Tracking extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return ($this->_scopeConfig->isSetFlag(
@@ -99,7 +97,7 @@ class Tracking extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         $collectBaskets = "false";

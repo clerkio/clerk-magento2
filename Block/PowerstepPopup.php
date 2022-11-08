@@ -37,7 +37,6 @@ class PowerstepPopup extends Template
      */
     protected $imageHelper;
 
-    protected $storeManager;
 
     /**
      * PowerstepPopup constructor.
@@ -49,7 +48,6 @@ class PowerstepPopup extends Template
      */
     public function __construct(
         Template\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         Session $checkoutSession,
         ProductRepositoryInterface $productRepository,
         Cart $cartHelper,
@@ -61,7 +59,6 @@ class PowerstepPopup extends Template
         $this->productRepository = $productRepository;
         $this->cartHelper = $cartHelper;
         $this->imageHelper = $imageHelper;
-        $this->storeManager = $storeManager;
         $this->setTemplate('powerstep_popup.phtml');
     }
 
@@ -156,7 +153,7 @@ class PowerstepPopup extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, $scope, $scope_id);
@@ -175,7 +172,7 @@ class PowerstepPopup extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);

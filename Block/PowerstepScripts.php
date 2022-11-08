@@ -9,15 +9,6 @@ use Magento\Store\Model\ScopeInterface;
 class PowerstepScripts extends Template
 {
 
-    protected $storeManager;
-
-    public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager
-        )
-    {
-        $this->storeManager = $storeManager;
-    }
-
     /**
      * Determine if we should show scripts
      *
@@ -30,7 +21,7 @@ class PowerstepScripts extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
         return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TYPE, $scope, $scope_id) == Config\Source\PowerstepType::TYPE_POPUP;
     }

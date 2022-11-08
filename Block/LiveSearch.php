@@ -9,15 +9,6 @@ use Magento\Store\Model\ScopeInterface;
 class LiveSearch extends Template
 {
 
-    protected $storeManager;
-
-    public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager
-        )
-    {
-        $this->storeManager = $storeManager;
-    }
-
     /**
      * Get live search template
      *
@@ -31,7 +22,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_TEMPLATE, $scope, $scope_id);
@@ -55,7 +46,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return ($this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES, $scope, $scope_id)) ? 'true' : 'false';
@@ -68,7 +59,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_SUGGESTIONS, $scope, $scope_id);
@@ -82,7 +73,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_CATEGORIES, $scope, $scope_id);
@@ -96,7 +87,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES, $scope, $scope_id);
@@ -110,7 +101,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES_TYPE, $scope, $scope_id);
@@ -123,7 +114,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_DROPDOWN_POSITION, $scope, $scope_id);
@@ -136,7 +127,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INPUT_SELECTOR, $scope, $scope_id);
@@ -149,7 +140,7 @@ class LiveSearch extends Template
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_FORM_SELECTOR, $scope, $scope_id);

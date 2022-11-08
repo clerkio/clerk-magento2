@@ -12,15 +12,6 @@ use Magento\Store\Model\ScopeInterface;
 class Add extends BaseAdd
 {
 
-    protected $storeManager;
-
-    public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager
-        )
-    {
-        $this->storeManager = $storeManager;
-    }
-
     /**
      * Get resolved back url
      *
@@ -36,7 +27,7 @@ class Add extends BaseAdd
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         $returnUrl = $this->getRequest()->getParam('return_url');

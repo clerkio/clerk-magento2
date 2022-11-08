@@ -21,8 +21,6 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     protected $cart;
 
-    protected $storeManager;
-
     /**
      * Content constructor.
      * @param Template\Context $context
@@ -31,17 +29,14 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     public function __construct(
         Template\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         Registry $registry,
         Cart $cart,
         array $data = []
         )
     {
         parent::__construct($context, $data);
-
         $this->registry = $registry;
         $this->cart = $cart;
-        $this->storeManager = $storeManager;
         $this->setTemplate('Clerk_Clerk::widget.phtml');
     }
 
@@ -83,7 +78,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         if ($this->getType() === 'cart') {
@@ -121,7 +116,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, $scope, $scope_id);
@@ -289,7 +284,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_CONTENT, $scope, $scope_id);
@@ -322,7 +317,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_CONTENT, $scope, $scope_id);
@@ -352,7 +347,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_CART_CONTENT, $scope, $scope_id);
@@ -366,7 +361,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, $scope, $scope_id);

@@ -11,15 +11,6 @@ use Magento\Store\Model\ScopeInterface;
 class Powerstep extends AbstractProduct
 {
 
-    protected $storeManager;
-
-    public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager
-        )
-    {
-        $this->storeManager = $storeManager;
-    }
-
     /**
      * Get Cart URL
      *
@@ -75,7 +66,7 @@ class Powerstep extends AbstractProduct
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, $scope, $scope_id);
@@ -89,7 +80,7 @@ class Powerstep extends AbstractProduct
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);

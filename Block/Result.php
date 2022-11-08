@@ -9,15 +9,6 @@ use Magento\Store\Model\ScopeInterface;
 class Result extends BaseResult
 {
 
-    protected $storeManager;
-
-    public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager
-        )
-    {
-        $this->storeManager = $storeManager;
-    }
-
     const TARGET_ID = 'clerk-search-results';
 
     /**
@@ -43,7 +34,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_TEMPLATE, $scope, $scope_id);
@@ -62,7 +53,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_DESIGN, $scope, $scope_id);
@@ -83,7 +74,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return ($this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_INCLUDE_CATEGORIES, $scope, $scope_id)) ? 'true' : 'false';
@@ -96,7 +87,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_SUGGESTIONS, $scope, $scope_id);
@@ -110,7 +101,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_CATEGORIES, $scope, $scope_id);
@@ -124,7 +115,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_PAGES, $scope, $scope_id);
@@ -138,7 +129,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_PAGES_TYPE, $scope, $scope_id);
@@ -159,7 +150,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         $spanAttributes = [
@@ -238,7 +229,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_NO_RESULTS_TEXT, $scope, $scope_id);
@@ -257,7 +248,7 @@ class Result extends BaseResult
             $scope_id = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $scope_id = $this->_storeManager->getStore()->getId();
         }
 
         return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_LOAD_MORE_TEXT, $scope, $scope_id);
