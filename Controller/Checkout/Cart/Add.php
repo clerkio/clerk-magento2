@@ -11,6 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class Add extends BaseAdd
 {
+
     /**
      * Get resolved back url
      *
@@ -21,6 +22,14 @@ class Add extends BaseAdd
     protected function getBackUrl($defaultUrl = null)
     {
 
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
         $returnUrl = $this->getRequest()->getParam('return_url');
         if ($returnUrl && $this->_isInternalUrl($returnUrl)) {
             $this->messageManager->getMessages()->clear();
@@ -29,12 +38,14 @@ class Add extends BaseAdd
 
         $shouldRedirectPowerstep = $this->_scopeConfig->getValue(
             Config::XML_PATH_POWERSTEP_ENABLED,
-            ScopeInterface::SCOPE_STORE
+            $scope,
+            $scope_id
         );
 
         $powerstepType = $this->_scopeConfig->getValue(
             Config::XML_PATH_POWERSTEP_TYPE,
-            ScopeInterface::SCOPE_STORE
+            $scope,
+            $scope_id
         );
 
         $productId = (int)$this->getRequest()->getParam('product');
@@ -48,7 +59,8 @@ class Add extends BaseAdd
 
         $shouldRedirectToCart = $this->_scopeConfig->getValue(
             'checkout/cart/redirect_to_cart',
-            ScopeInterface::SCOPE_STORE
+            $scope,
+            $scope_id
         );
 
         if ($shouldRedirectToCart || $this->getRequest()->getParam('in_cart')) {

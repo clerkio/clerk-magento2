@@ -148,7 +148,6 @@ abstract class AbstractAction extends Action
             $this->publicKey = $request->getParam('key');
 
             $singlestore =  $this->ScopeConfigInterface->getValue('general/single_store_mode/enabled');
-            $scope = 'default';
             //Validate supplied keys
             if ($this->verifyKeys($request) == 0 && $this->verifyWebsiteKeys($request) == 0 || (!$this->privateKey && !$this->publicKey)) {
                 $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
@@ -187,7 +186,7 @@ abstract class AbstractAction extends Action
 
             if($singlestore == 1){
                 $scope = 'default';
-                $scopeID = 0;
+                $scopeID = '0';
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => $scope]);
             }

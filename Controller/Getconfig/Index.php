@@ -31,11 +31,18 @@ class Index extends AbstractAction
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, StoreManagerInterface $storeManager, ClerkLogger $ClerkLogger)
+    public function __construct(
+        Context $context,
+        ScopeConfigInterface $scopeConfig,
+        LoggerInterface $logger,
+        ModuleList $moduleList,
+        StoreManagerInterface $storeManager,
+        ClerkLogger $ClerkLogger
+        )
     {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $ClerkLogger;
-        $this->store_manager = $storeManager;
+        $this->storeManager = $storeManager;
         parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
@@ -46,12 +53,14 @@ class Index extends AbstractAction
     {
         try {
 
-            $scope = $this->getRequest()->getParam('scope');
-
-            $scopeID = 1;
-
-            if(null !== $this->getRequest()->getParam('scope_id')){
-                $scopeID = $this->getRequest()->getParam('scope_id');
+            if($this->scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+                $scope = 'default';
+                $scopeID = '0';
+                $websiteID = '0';
+            } else {
+                $scope = ScopeInterface::SCOPE_STORE;
+                $scopeID = $this->storeManager->getStore()->getId();
+                $websiteID = $this->storeManager->getStore()->getWebsiteId();
             }
 
             if($scope == 'store'){
