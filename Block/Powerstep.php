@@ -83,10 +83,14 @@ class Powerstep extends AbstractProduct
             $scope_id = $this->_storeManager->getStore()->getId();
         }
 
-        $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);
-        $templates = explode(',', $configTemplates);
+        $template_contents = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);
+        if($template_contents){
+            $template_contents = explode(',', $template_contents);
+        } else {
+            $template_contents = [0 => ''];
+        }
 
-        foreach ($templates as $key => $template) {
+        foreach ($template_contents as $key => $template) {
 
             $templates[$key] = str_replace(' ','',$template);
 

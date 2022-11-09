@@ -46,7 +46,7 @@ class PowerstepPopup extends Template
      * @param Session $checkoutSession
      * @param ProductRepositoryInterface $productRepository
      */
-    public function __construct(
+    public function __construct( 
         Template\Context $context,
         Session $checkoutSession,
         ProductRepositoryInterface $productRepository,
@@ -175,10 +175,14 @@ class PowerstepPopup extends Template
             $scope_id = $this->_storeManager->getStore()->getId();
         }
 
-        $configTemplates = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);
-        $templates = explode(',', $configTemplates);
-
-        foreach ($templates as $key => $template) {
+        $template_contents = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);
+        if($template_contents){
+            $template_contents = explode(',', $template_contents);
+        } else {
+            $template_contents = [0 => ''];
+        }
+        
+        foreach ($template_contents as $key => $template) {
 
             $templates[$key] = str_replace(' ','', $template);
 

@@ -24,6 +24,13 @@ class ExitIntent extends Template
             $scope_id = $this->_storeManager->getStore()->getId();
         }
 
-        return explode(',',$this->_scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE, $scope, $scope_id));
+        $template_contents = $this->_scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE, $scope, $scope_id);
+        if($template_contents){
+            $template_contents = explode(',', $template_contents);
+        } else {
+            $template_contents = [0 => ''];
+        }
+
+        return $template_contents;
     }
 }
