@@ -63,18 +63,6 @@ class Index extends AbstractAction
                 $websiteID = $this->storeManager->getStore()->getWebsiteId();
             }
 
-            /*
-
-            $scope = $this->getRequest()->getParam('scope');
-
-            $scopeID = 1;
-
-            if(null !== $this->getRequest()->getParam('scope_id')){
-                $scopeID = $this->getRequest()->getParam('scope_id');
-            }
-
-            */
-
             if($scope == 'store'){
                 $storeID = $scopeID;
                 $websiteID = null;
