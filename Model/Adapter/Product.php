@@ -181,7 +181,10 @@ class Product extends AbstractAdapter
             $attribute = $resourceItem->getResource()->getAttribute($field);
 
             if ($attribute->usesSource()) {
-                return $attribute->getSource()->getOptionText($resourceItem[$field]);
+                $source = $attribute->getSource();
+                if($source) {
+                    return $source->getOptionText($resourceItem[$field]);
+                }
             }
 
             return parent::getAttributeValue($resourceItem, $field);
@@ -434,7 +437,7 @@ class Product extends AbstractAdapter
             });
 
             $this->addFieldHandler('manufacturer', function ($item) {
-                $brand = $item->getAttributeText('manufacturer');
+                $brand = $this->getAttributeValue($item, 'manufacturer');
                 return $brand;
             });
 

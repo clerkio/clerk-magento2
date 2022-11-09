@@ -13,8 +13,7 @@ class Tracking extends Template
 
     public function __construct(
         \Magento\Backend\Block\Widget\Context $context,
-        \Magento\Framework\Data\Form\FormKey $formKey,
-    ) {
+        \Magento\Framework\Data\Form\FormKey $formKey) {
         parent::__construct($context);
         $this->formKey = $formKey;
     }

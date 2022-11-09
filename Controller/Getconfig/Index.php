@@ -60,6 +60,9 @@ class Index extends AbstractAction
             }elseif($scope == 'website'){
                 $websiteID = $scopeID;
                 $storeID = null;
+            }elseif($scope == 'default'){
+                $storeID = $scopeID;
+                $websiteID = '0';
             }
             
             $this->getResponse()
