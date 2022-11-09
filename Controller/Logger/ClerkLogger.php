@@ -66,13 +66,7 @@ class ClerkLogger
      * @param ConfigInterface $configWriter
      * @throws \Magento\Framework\Exception\FileSystemException
      */
-    function __construct(
-        ScopeConfigInterface $scopeConfig,
-        DirectoryList $dir,
-        TimezoneInterface $date,
-        ConfigInterface $configWriter,
-        ModuleList $moduleList
-        )
+    function __construct(ScopeConfigInterface $scopeConfig, DirectoryList $dir, TimezoneInterface $date, ConfigInterface $configWriter, ModuleList $moduleList)
     {
 
         $this->configWriter = $configWriter;

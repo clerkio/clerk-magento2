@@ -11,8 +11,6 @@ class Tracking extends Template
 
     protected $formKey;
 
-    protected $storeManager;
-
     public function __construct(
         \Magento\Backend\Block\Widget\Context $context,
         \Magento\Framework\Data\Form\FormKey $formKey,

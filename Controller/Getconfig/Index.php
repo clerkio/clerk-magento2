@@ -31,18 +31,11 @@ class Index extends AbstractAction
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
      */
-    public function __construct(
-        Context $context,
-        ScopeConfigInterface $scopeConfig,
-        LoggerInterface $logger,
-        ModuleList $moduleList,
-        StoreManagerInterface $storeManager,
-        ClerkLogger $ClerkLogger
-        )
+    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, StoreManagerInterface $storeManager, ClerkLogger $ClerkLogger)
     {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $ClerkLogger;
-        $this->storeManager = $storeManager;
+        $this->store_manager = $storeManager;
         parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
@@ -53,14 +46,12 @@ class Index extends AbstractAction
     {
         try {
 
-            if($this->scopeConfig->getValue('general/single_store_mode/enabled') == 1){
-                $scope = 'default';
-                $scopeID = '0';
-                $websiteID = '0';
-            } else {
-                $scope = ScopeInterface::SCOPE_STORE;
-                $scopeID = $this->storeManager->getStore()->getId();
-                $websiteID = $this->storeManager->getStore()->getWebsiteId();
+            $scope = $this->getRequest()->getParam('scope');
+
+            $scopeID = 1;
+
+            if(null !== $this->getRequest()->getParam('scope_id')){
+                $scopeID = $this->getRequest()->getParam('scope_id');
             }
 
             if($scope == 'store'){
@@ -69,9 +60,6 @@ class Index extends AbstractAction
             }elseif($scope == 'website'){
                 $websiteID = $scopeID;
                 $storeID = null;
-            }elseif($scope == 'default'){
-                $storeID = $scopeID;
-                $websiteID = 0;
             }
             
             $this->getResponse()
@@ -81,7 +69,6 @@ class Index extends AbstractAction
             $response = [
                 'storeID' => $storeID,
                 'wepsiteID' => $websiteID,
-                'scope' => $scope,
                 'LANGUAGE' => $this->scopeConfig->getValue(Config::XML_PATH_LANGUAGE, $scope, $scopeID),
                 'PATH_INCLUDE_PAGES' => $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES, $scope, $scopeID),
                 'PAGES_ADDITIONAL_FIELDS' => $this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $scope, $scopeID),
