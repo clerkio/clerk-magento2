@@ -86,8 +86,18 @@ class FacetedSearch extends Fieldset
      */
     private function isConfigured()
     {
-        $store_id = (string)$this->requestInterface->getParam('store', 0);
-        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE, $store_id) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE, $store_id));
+        $_params = $this->requestInterface->getParams();
+        $scope_id = '0';
+        $scope = 'default';
+        if (array_key_exists('website', $_params)){
+            $scope = 'website';
+            $scope_id = $_params[$scope];
+        }
+        if (array_key_exists('store', $_params)){
+            $scope = 'store';
+            $scope_id = $_params[$scope];
+        }
+        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, $scope, $scope_id) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, $scope, $scope_id));
     }
 
     /**
@@ -97,9 +107,19 @@ class FacetedSearch extends Fieldset
      */
     private function keysValid()
     {
-        $store_id = (string)$this->requestInterface->getParam('store', 0);
-        $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE, $store_id);
-        $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, ScopeInterface::SCOPE_STORE, $store_id);
+        $_params = $this->requestInterface->getParams();
+        $scope_id = '0';
+        $scope = 'default';
+        if (array_key_exists('website', $_params)){
+            $scope = 'website';
+            $scope_id = $_params[$scope];
+        }
+        if (array_key_exists('store', $_params)){
+            $scope = 'store';
+            $scope_id = $_params[$scope];
+        }
+        $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, $scope, $scope_id);
+        $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, $scope, $scope_id);
 
         $keysValid = json_decode($this->api->keysValid($publicKey, $privateKey));
 

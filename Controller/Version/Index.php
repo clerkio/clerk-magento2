@@ -49,12 +49,22 @@ class Index extends AbstractAction
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
-
-            $response = [
+	    
+            if($this->scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+		$scope = 'default';
+		$scope_id = '0';
+	    } else {
+		$scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+		$scope_id = $this->_storeManager->getStore()->getId();
+	    }
+	    
+	    $response = [
                 'platform' => 'Magento2',
                 'platform_version' => $version,
                 'clerk_version' => $this->moduleList->getOne('Clerk_Clerk')['setup_version'],
-                'php_version' => phpversion()
+		'php_version' => phpversion(),
+		'scope' => $scope,
+		'scope_id' => $scope_id
             ];
 
             if ($this->debug) {

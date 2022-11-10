@@ -60,9 +60,6 @@ class Index extends AbstractAction
             }elseif($scope == 'website'){
                 $websiteID = $scopeID;
                 $storeID = null;
-            }elseif($scope == 'default'){
-                $storeID = $scopeID;
-                $websiteID = 0;
             }
             
             $this->getResponse()
@@ -72,7 +69,6 @@ class Index extends AbstractAction
             $response = [
                 'storeID' => $storeID,
                 'wepsiteID' => $websiteID,
-                'scope' => $scope,
                 'LANGUAGE' => $this->scopeConfig->getValue(Config::XML_PATH_LANGUAGE, $scope, $scopeID),
                 'PATH_INCLUDE_PAGES' => $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES, $scope, $scopeID),
                 'PAGES_ADDITIONAL_FIELDS' => $this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $scope, $scopeID),

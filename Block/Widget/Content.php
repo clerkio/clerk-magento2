@@ -27,10 +27,14 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      * @param Registry $registry
      * @param array $data
      */
-    public function __construct(Template\Context $context, Registry $registry, Cart $cart, array $data = [])
+    public function __construct(
+        Template\Context $context,
+        Registry $registry,
+        Cart $cart,
+        array $data = []
+        )
     {
         parent::__construct($context, $data);
-
         $this->registry = $registry;
         $this->cart = $cart;
         $this->setTemplate('Clerk_Clerk::widget.phtml');
@@ -54,7 +58,13 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
 
         $output = '';
 
-        foreach (explode(',', $contents) as $content) {
+        if($contents){
+            $contents_array = explode(',', $contents);
+        } else {
+            $contents_array = [0 => ''];
+        }
+        
+        foreach ($contents_array as $content) {
             $output .= $this->getHtmlForContent(str_replace(' ','',$content));
         }
 
@@ -69,20 +79,28 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     protected function _toHtml()
     {
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
         if ($this->getType() === 'cart') {
-            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CART_ENABLED, ScopeInterface::SCOPE_STORE)) {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CART_ENABLED, $scope, $scope_id)) {
                 return;
             }
         }
 
         if ($this->getType() === 'category') {
-            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CATEGORY_ENABLED, ScopeInterface::SCOPE_STORE)) {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_CATEGORY_ENABLED, $scope, $scope_id)) {
                 return;
             }
         }
 
         if ($this->getType() === 'product') {
-            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_ENABLED, ScopeInterface::SCOPE_STORE)) {
+            if (! $this->_scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_ENABLED, $scope, $scope_id)) {
                 return;
             }
         }
@@ -99,9 +117,17 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
     public function getSpanAttributes()
     {
 
-        $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
-        $filter_product = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
-        $filter_cart = $this->_scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, $scope, $scope_id);
+        $filter_product = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, $scope, $scope_id);
+        $filter_cart = $this->_scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, $scope, $scope_id);
 
         static $product_contents = 0;
         static $cart_contents = 0;
@@ -258,7 +284,16 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     protected function getCategoryContents()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_CONTENT, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_CONTENT, $scope, $scope_id);
     }
 
     /**
@@ -282,7 +317,16 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     protected function getProductContents()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_CONTENT, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_CONTENT, $scope, $scope_id);
     }
 
     /**
@@ -303,15 +347,32 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
      */
     protected function getCartContents()
     {
-        return $this->_scopeConfig->getValue(Config::XML_PATH_CART_CONTENT, ScopeInterface::SCOPE_STORE);
+
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_CART_CONTENT, $scope, $scope_id);
     }
 
     private function getHtmlForContent($content)
     {
 
-        $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
-        $filter_product = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
-        $filter_cart = $this->_scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, ScopeInterface::SCOPE_STORE);
+        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, $scope, $scope_id);
+        $filter_product = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, $scope, $scope_id);
+        $filter_cart = $this->_scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, $scope, $scope_id);
 
         static $product_contents = 0;
         static $cart_contents = 0;
