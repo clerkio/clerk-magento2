@@ -174,7 +174,7 @@ abstract class AbstractAction extends Action
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'website']);
             }
-            
+
             if($this->verifyKeys($request) !==0){
                 $scopeID = $this->verifyKeys($request);
                 $request->setParams(['scope_id' => $scopeID]);
