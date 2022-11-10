@@ -61,9 +61,9 @@ class Result extends BaseResult
 
     /**
      * Determine if we should include categories and pages in search results
-     * 
+     *
      * @return bool
-     * 
+     *
      */
 
     public function shouldIncludeCategories()
@@ -123,7 +123,7 @@ class Result extends BaseResult
 
     public function getPagesType()
     {
-        
+
         if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
             $scope = 'default';
             $scope_id = '0';
@@ -242,7 +242,7 @@ class Result extends BaseResult
      */
     public function getLoadMoreText()
     {
-        
+
         if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
             $scope = 'default';
             $scope_id = '0';

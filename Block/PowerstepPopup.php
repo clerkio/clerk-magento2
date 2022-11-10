@@ -181,7 +181,7 @@ class PowerstepPopup extends Template
         } else {
             $template_contents = [0 => ''];
         }
-        
+
         foreach ($template_contents as $key => $template) {
 
             $templates[$key] = str_replace(' ','', $template);
