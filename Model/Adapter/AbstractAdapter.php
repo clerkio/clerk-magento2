@@ -97,6 +97,11 @@ abstract class AbstractAdapter
     {
         try {
 
+            if($this->storeManager->isSingleStoreMode()){
+                $scope = 'store';
+                $scopeid = $this->storeManager->getDefaultStoreView()->getId();
+            }
+
             $this->setFields($fields, $scope, $scopeid);
 
             $collection = $this->prepareCollection($page, $limit, $orderBy, $order, $scope, $scopeid);
