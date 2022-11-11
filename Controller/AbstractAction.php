@@ -169,6 +169,8 @@ abstract class AbstractAction extends Action
                 return parent::dispatch($request);
             }
 
+            $singlestore =  $this->scopeConfig->getValue('general/single_store_mode/enabled');
+
             if($this->verifyWebsiteKeys($request) !==0){
                 $scopeID = $this->verifyWebsiteKeys($request);
                 $request->setParams(['scope_id' => $scopeID]);
@@ -177,10 +179,14 @@ abstract class AbstractAction extends Action
 
             if($this->verifyKeys($request) !==0){
                 $scopeID = $this->verifyKeys($request);
-                $request->setParams(['scope_id' => $scopeID]);
-                $request->setParams(['scope' => 'store']);
+                if($singlestore){
+                    $request->setParams(['scope_id' => '0']);
+                    $request->setParams(['scope' => 'default']);
+                } else {
+                    $request->setParams(['scope_id' => $scopeID]);
+                    $request->setParams(['scope' => 'store']);
+                }
             }
-
 
             //Filter out request arguments
             $this->getArguments($request);
