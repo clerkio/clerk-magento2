@@ -6,7 +6,7 @@ use Magento\Framework\Option\ArrayInterface;
 
 class PagesType implements ArrayInterface
 {
-    
+
     /**
      * Options getter
      *
@@ -21,5 +21,5 @@ class PagesType implements ArrayInterface
 
         return $PagesType;
     }
-    
+
 }

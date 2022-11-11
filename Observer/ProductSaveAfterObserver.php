@@ -134,29 +134,28 @@ class ProductSaveAfterObserver implements ObserverInterface
             if ($product->getId()) {
 
                  // 21-10-2021 KKY update parent products if in Grouped or child to Configurable before we check visibility and saleable - start
-                    
+
                  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
                  $confParentProductIds = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')->getParentIdsByChild($product->getId());
                  if(isset($confParentProductIds[0])){
                      $confparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($confParentProductIds[0]);
- 
+
                      $productInfo = $this->productAdapter->getInfoForItem($confparentproduct, 'store', $storeId);
                      $this->api->addProduct($productInfo);
-    
+
                  }
                  $groupParentProductIds = $objectManager->create('Magento\GroupedProduct\Model\Product\Type\Grouped')->getParentIdsByChild($product->getId());
                  if(isset($groupParentProductIds[0])){
                      foreach ($groupParentProductIds as $groupParentProductId) {
                          $groupparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($groupParentProductId);
- 
+
                          $productInfo = $this->productAdapter->getInfoForItem($groupparentproduct, 'store', $storeId);
                          $this->api->addProduct($productInfo);
- 
+
                      }
-    
                  }
- 
+
                  // 21-10-2021 KKY update parent products if in Grouped or child to Configurable - end
 
                 //Cancel if product visibility is not as defined

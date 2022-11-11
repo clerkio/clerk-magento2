@@ -48,7 +48,7 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
             $order_id = $creditmemo->getOrderId();
             $order = $this->orderRepository->get($order_id);
             $orderIncrementId = $order->getIncrementId();
-           
+
             foreach ($creditmemo->getAllItems() as $item) {
 
                 $product_id = $item->getProductId();

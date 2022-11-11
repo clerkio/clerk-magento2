@@ -61,7 +61,7 @@ class Index extends AbstractAction
                 $websiteID = $scopeID;
                 $storeID = null;
             }
-            
+
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
@@ -100,7 +100,7 @@ class Index extends AbstractAction
                 'FACETED_SEARCH_ATTRIBUTES' => $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, $scope, $scopeID),
                 'FACETED_SEARCH_MULTISELECT_ATTRIBUTES' => $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES, $scope, $scopeID),
                 'FACETED_SEARCH_TITLES' => $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES, $scope, $scopeID),
-               
+
                 'LIVESEARCH_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_ENABLED, $scope, $scopeID),
                 'LIVESEARCH_INCLUDE_CATEGORIES' => $this->scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES, $scope, $scopeID),
                 'LIVESEARCH_CATEGORIES' => $this->scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_CATEGORIES, $scope, $scopeID),
@@ -116,7 +116,7 @@ class Index extends AbstractAction
                 'POWERSTEP_TYPE' => $this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TYPE, $scope, $scopeID),
                 'POWERSTEP_TEMPLATES' => $this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scopeID),
                 'POWERSTEP_FILTER_DUPLICATES' => $this->scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, $scope, $scopeID),
-                
+
                 'EXIT_INTENT_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_ENABLED, $scope, $scopeID),
                 'EXIT_INTENT_TEMPLATE' => $this->scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE, $scope, $scopeID),
 
@@ -135,7 +135,7 @@ class Index extends AbstractAction
                 'LOG_LEVEL' => $this->scopeConfig->getValue(Config::XML_PATH_LOG_LEVEL, $scope, $scopeID),
                 'LOG_TO' => $this->scopeConfig->getValue(Config::XML_PATH_LOG_TO, $scope, $scopeID),
                 'LOG_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_LOG_ENABLED, $scope, $scopeID)
-                
+
             ];
 
             if ($this->debug) {
