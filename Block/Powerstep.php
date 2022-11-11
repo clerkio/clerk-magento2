@@ -61,7 +61,7 @@ class Powerstep extends AbstractProduct
     public function getExcludeState()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -75,7 +75,7 @@ class Powerstep extends AbstractProduct
     public function getTemplates()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {

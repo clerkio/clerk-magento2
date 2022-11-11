@@ -45,12 +45,12 @@ class Index extends AbstractAction
      * @param ModuleList $moduleList
      */
     public function __construct(
-        Context $context, 
-        ScopeConfigInterface $ScopeConfigInterface, 
-        LoggerInterface $logger, 
-        ModuleList $moduleList, 
-        StoreManagerInterface $storeManager, 
-        ClerkLogger $ClerkLogger, 
+        Context $context,
+        ScopeConfigInterface $ScopeConfigInterface,
+        LoggerInterface $logger,
+        ModuleList $moduleList,
+        StoreManagerInterface $storeManager,
+        ClerkLogger $ClerkLogger,
         WriterInterface $configWriter)
     {
         $this->clerk_logger = $ClerkLogger;
@@ -69,7 +69,7 @@ class Index extends AbstractAction
 
             $scope = $this->getRequest()->getParam('scope')."s";
             $scopeId = intval($this->getRequest()->getParam('scope_id'));
-            
+
             if($post){
                 $arr_settings = json_decode($post, true);
 
@@ -133,7 +133,7 @@ class Index extends AbstractAction
                         $this->config_Writer->save(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $value, $scope, $scopeId);
                         $count++;
                     }
-                    
+
                     //search
 
                     if ($key == "SEARCH_ENABLED"){
@@ -264,9 +264,9 @@ class Index extends AbstractAction
                         $this->config_Writer->save(Config::XML_PATH_EXIT_INTENT_TEMPLATE, $value, $scope, $scopeId);
                         $count++;
                     }
-                   
+
                     //category
-                   
+
                     if ($key == "CATEGORY_ENABLED"){
                         $this->config_Writer->save(Config::XML_PATH_CATEGORY_ENABLED, $value, $scope, $scopeId);
                         $count++;
@@ -295,7 +295,7 @@ class Index extends AbstractAction
                         $count++;
                     }
 
-                    // cart 
+                    // cart
 
                     if ($key == "CART_ENABLED"){
                         $this->config_Writer->save(Config::XML_PATH_CART_ENABLED, $value, $scope, $scopeId);
@@ -324,7 +324,7 @@ class Index extends AbstractAction
                         $this->config_Writer->save(Config::XML_PATH_LOG_ENABLED, $value, $scope, $scopeId);
                         $count++;
                     }
-                
+
                 } // foreach
 
                 if($count !=0){
@@ -345,9 +345,9 @@ class Index extends AbstractAction
                 '$arr_settings' => $arr_settings,
                 'scope' => $scope,
                 'scopeId' => $scopeId
-                
+
             ];
-        
+
 
             if ($this->debug) {
                 $this->getResponse()->setBody(json_encode($response, JSON_PRETTY_PRINT));

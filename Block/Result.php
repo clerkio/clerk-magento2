@@ -29,7 +29,7 @@ class Result extends BaseResult
     public function getSearchTemplate()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -48,7 +48,7 @@ class Result extends BaseResult
     public function getFacetsDesign()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -69,7 +69,7 @@ class Result extends BaseResult
     public function shouldIncludeCategories()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -82,7 +82,7 @@ class Result extends BaseResult
     public function getSuggestions()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -96,7 +96,7 @@ class Result extends BaseResult
     public function getCategories()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -110,7 +110,7 @@ class Result extends BaseResult
     public function getPages()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -124,7 +124,7 @@ class Result extends BaseResult
     public function getPagesType()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -145,7 +145,7 @@ class Result extends BaseResult
     {
         $output = '';
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -224,7 +224,7 @@ class Result extends BaseResult
     public function getNoResultsText()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -243,7 +243,7 @@ class Result extends BaseResult
     public function getLoadMoreText()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {

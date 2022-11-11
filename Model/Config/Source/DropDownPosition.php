@@ -6,7 +6,7 @@ use Magento\Framework\Option\ArrayInterface;
 
 class DropDownPosition implements ArrayInterface
 {
-    
+
     /**
      * Options getter
      *
@@ -24,5 +24,5 @@ class DropDownPosition implements ArrayInterface
 
         return $Positions;
     }
-    
+
 }

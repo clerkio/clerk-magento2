@@ -28,7 +28,7 @@ class Index extends AbstractAction
         $this->collectionFactory = $suscriberCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
         $this->_storeManager = $storeManager;
-    
+
         parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
     }
 
@@ -53,7 +53,7 @@ class Index extends AbstractAction
                 }
 
                     $response = $this->getSubscriberCollection($this->page, $this->limit, $this->scopeid);
-                    
+
                     foreach ($response->getData() as $subscriber) {
                         $_subscriber = [];
 

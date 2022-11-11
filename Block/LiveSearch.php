@@ -17,7 +17,7 @@ class LiveSearch extends Template
     public function getLiveSearchTemplate()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -41,7 +41,7 @@ class LiveSearch extends Template
     public function shouldIncludeCategories()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -54,7 +54,7 @@ class LiveSearch extends Template
     public function getSuggestions()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -68,7 +68,7 @@ class LiveSearch extends Template
     public function getCategories()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -82,7 +82,7 @@ class LiveSearch extends Template
     public function getPages()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -96,7 +96,7 @@ class LiveSearch extends Template
     public function getPagesType()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -109,7 +109,7 @@ class LiveSearch extends Template
     public function getDropdownPosition()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -122,7 +122,7 @@ class LiveSearch extends Template
     public function getInputSelector()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -135,7 +135,7 @@ class LiveSearch extends Template
     public function getFormSelector()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {

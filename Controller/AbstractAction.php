@@ -148,7 +148,7 @@ abstract class AbstractAction extends Action
             $this->publicKey = $request->getParam('key');
 
             //Validate supplied keys
-            if ($this->verifyKeys($request) == 0 && $this->verifyWebsiteKeys($request) == 0 || (!$this->privateKey && !$this->publicKey)) {
+            if (($this->verifyKeys($request) == -1 && $this->verifyWebsiteKeys($request) == -1 && $this->verifyDefaultKeys($request) == -1) || !$this->privateKey || !$this->publicKey) {
                 $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
                 $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
 
@@ -169,23 +169,23 @@ abstract class AbstractAction extends Action
                 return parent::dispatch($request);
             }
 
-            $singlestore =  $this->scopeConfig->getValue('general/single_store_mode/enabled');
-
-            if($this->verifyWebsiteKeys($request) !==0){
+            if($this->verifyWebsiteKeys($request) !==-1){
                 $scopeID = $this->verifyWebsiteKeys($request);
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'website']);
             }
 
-            if($this->verifyKeys($request) !==0){
+            if($this->verifyKeys($request) !==-1){
                 $scopeID = $this->verifyKeys($request);
-                if($singlestore){
-                    $request->setParams(['scope_id' => '0']);
-                    $request->setParams(['scope' => 'default']);
-                } else {
-                    $request->setParams(['scope_id' => $scopeID]);
-                    $request->setParams(['scope' => 'store']);
-                }
+                $request->setParams(['scope_id' => $scopeID]);
+                $request->setParams(['scope' => 'store']);
+
+            }
+
+            if($this->_storeManager->isSingleStoreMode()){
+                $scopeID = $this->verifyDefaultKeys($request);
+                $request->setParams(['scope_id' => $scopeID]);
+                $request->setParams(['scope' => 'default']);
             }
 
             //Filter out request arguments
@@ -195,6 +195,33 @@ abstract class AbstractAction extends Action
         } catch (\Exception $e) {
 
             $this->clerk_logger->error('Validating API Keys ERROR', ['error' => $e->getMessage()]);
+
+        }
+    }
+
+    /**
+     * Verify public & private key
+     *
+     * @param RequestInterface $request
+     * @return bool
+     */
+    private function verifyDefaultKeys(RequestInterface $request)
+    {
+
+        try {
+
+            $privateKey = $request->getParam('private_key');
+            $publicKey = $request->getParam('key');
+            $scopeID = $this->_storeManager->getDefaultStoreView()->getId();
+            if ($this->timingSafeEquals($this->getPrivateDefaultKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicDefaultKey($scopeID), $publicKey)) {
+                return $scopeID;
+            }
+
+            return -1;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('verifyKeys ERROR', ['error' => $e->getMessage()]);
 
         }
     }
@@ -215,12 +242,12 @@ abstract class AbstractAction extends Action
 
             $storeids = $this->getStores();
             foreach($storeids as $scopeID){
-                if ($privateKey == $this->getPrivateKey($scopeID) && $publicKey == $this->getPublicKey($scopeID)) {
+                if ($this->timingSafeEquals($this->getPrivateKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicKey($scopeID), $publicKey)) {
                     return $scopeID;
                 }
             }
 
-            return 0;
+            return -1;
 
         } catch (\Exception $e) {
 
@@ -245,12 +272,12 @@ abstract class AbstractAction extends Action
 
             $websiteids = $this->getWebsites();
             foreach($websiteids as $scopeID){
-                if ($privateKey == $this->getPrivateWebsiteKey($scopeID) && $publicKey == $this->getPublicWebsiteKey($scopeID)) {
+                if ($this->timingSafeEquals($this->getPrivateWebsiteKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicWebsiteKey($scopeID), $publicKey)) {
                     return $scopeID;
                 }
             }
 
-            return 0;
+            return -1;
 
         } catch (\Exception $e) {
 
@@ -258,6 +285,52 @@ abstract class AbstractAction extends Action
 
         }
     }
+
+
+    /**
+     * Get public store key
+     *
+     * @return string
+     */
+    private function getPublicDefaultKey($scopeID)
+    {
+        try {
+
+            return $this->scopeConfig->getValue(
+                Config::XML_PATH_PUBLIC_KEY,
+                ScopeInterface::SCOPE_STORE,
+                $scopeID
+            );
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('getPublicKey ERROR', ['error' => $e->getMessage()]);
+
+        }
+    }
+
+    /**
+     * Get private website key
+     *
+     * @return string
+     */
+    private function getPrivateDefaultKey($scopeID)
+    {
+        try {
+
+            return $this->scopeConfig->getValue(
+                Config::XML_PATH_PRIVATE_KEY,
+                ScopeInterface::SCOPE_STORE,
+                $scopeID
+            );
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('getPrivateKey ERROR', ['error' => $e->getMessage()]);
+
+        }
+    }
+
 
     /**
      * Get private store key
@@ -348,6 +421,28 @@ abstract class AbstractAction extends Action
         }
     }
 
+    /**
+     * Timing safe key comparison
+     *
+     * @return boolean
+     */
+    private function timingSafeEquals($safe, $user) {
+        $safeLen = strlen($safe);
+        $userLen = strlen($user);
+
+        if ($userLen != $safeLen) {
+            return false;
+        }
+
+        $result = 0;
+
+        for ($i = 0; $i < $userLen; $i++) {
+            $result |= (ord($safe[$i]) ^ ord($user[$i]));
+        }
+
+        // They are only identical strings if $result is exactly 0...
+        return $result === 0;
+    }
 
     /**
      * Parse request arguments

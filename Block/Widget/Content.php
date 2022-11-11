@@ -348,7 +348,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
     protected function getCartContents()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -362,7 +362,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
     private function getHtmlForContent($content)
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {

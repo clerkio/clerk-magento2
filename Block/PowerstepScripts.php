@@ -16,7 +16,7 @@ class PowerstepScripts extends Template
      */
     public function shouldShow()
     {
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {

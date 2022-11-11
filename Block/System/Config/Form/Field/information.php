@@ -57,7 +57,7 @@ class information extends \Magento\Config\Block\System\Config\Form\Field
 
         $currentUrl = $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
         $urlParts = explode("/", $currentUrl);
-        
+
         $scope = 'default';
 
         if(in_array("store", $urlParts)) {

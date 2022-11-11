@@ -6,7 +6,7 @@ use Magento\Framework\Option\ArrayInterface;
 
 class Language implements ArrayInterface
 {
-    
+
     /**
      * Options getter
      *
@@ -75,5 +75,5 @@ class Language implements ArrayInterface
 
         return $Langs;
     }
-    
+
 }

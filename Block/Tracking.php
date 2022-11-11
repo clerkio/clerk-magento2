@@ -26,7 +26,7 @@ class Tracking extends Template
     public function getPublicKey()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -44,7 +44,7 @@ class Tracking extends Template
     public function getLanguage()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -67,7 +67,7 @@ class Tracking extends Template
     public function getCollectionEmails()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -90,7 +90,7 @@ class Tracking extends Template
     public function getCollectionBaskets()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if($this->_storeManager->isSingleStoreMode()){
             $scope = 'default';
             $scope_id = '0';
         } else {

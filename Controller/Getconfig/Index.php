@@ -60,6 +60,9 @@ class Index extends AbstractAction
             }elseif($scope == 'website'){
                 $websiteID = $scopeID;
                 $storeID = null;
+            }elseif($scope == 'default'){
+                $websiteID = $scopeID;
+                $storeID = $scopeID;
             }
 
             $this->getResponse()
@@ -67,6 +70,7 @@ class Index extends AbstractAction
                 ->setHeader('Content-Type', 'application/json', true);
 
             $response = [
+                'scopeNAME' => $scope,
                 'storeID' => $storeID,
                 'wepsiteID' => $websiteID,
                 'LANGUAGE' => $this->scopeConfig->getValue(Config::XML_PATH_LANGUAGE, $scope, $scopeID),

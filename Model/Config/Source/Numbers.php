@@ -6,7 +6,7 @@ use Magento\Framework\Option\ArrayInterface;
 
 class Numbers implements ArrayInterface
 {
-    
+
     /**
      * Options getter
      *
@@ -30,5 +30,5 @@ class Numbers implements ArrayInterface
 
         return $Numbers;
     }
-    
+
 }

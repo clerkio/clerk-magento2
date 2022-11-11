@@ -36,7 +36,7 @@ class Popup extends Action
     public function execute()
     {
         try {
-            
+
             /** @var Page $response */
             $response = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
             $layout = $response->addHandle('clerk_clerk_powerstep_popup')->getLayout();

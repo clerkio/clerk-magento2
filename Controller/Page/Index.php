@@ -132,9 +132,9 @@ class Index extends AbstractAction
 
                             $Pages_Additional_Field = str_replace(' ','',$Pages_Additional_Field);
 
-                            if (!empty($page_raw[$Pages_Additional_Field])) {
+                            if (!empty($page_default[$Pages_Additional_Field])) {
 
-                                $page[$Pages_Additional_Field] = $page_raw[$Pages_Additional_Field];
+                                $page[$Pages_Additional_Field] = $page_default[$Pages_Additional_Field];
 
                             }
 
@@ -176,9 +176,9 @@ class Index extends AbstractAction
 
                             $Pages_Additional_Field = str_replace(' ','',$Pages_Additional_Field);
 
-                            if (!empty($page_raw[$Pages_Additional_Field])) {
+                            if (!empty($page_store[$Pages_Additional_Field])) {
 
-                                $page[$Pages_Additional_Field] = $page_raw[$Pages_Additional_Field];
+                                $page[$Pages_Additional_Field] = $page_store[$Pages_Additional_Field];
 
                             }
 
