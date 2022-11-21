@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Block;
 
+use Clerk\Clerk\Model\Config;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Checkout\Model\Session;
