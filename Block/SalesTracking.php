@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Block;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Checkout\Model\Session;
+use Magento\Store\Model\ScopeInterface;
 
 class SalesTracking extends Template
 {
@@ -43,7 +44,20 @@ class SalesTracking extends Template
      */
     public function getCustomerEmail()
     {
-        return $this->getOrder()->getCustomerEmail();
+        if($this->_storeManager->isSingleStoreMode()){
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        $collect_emails = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS, $scope, $scope_id);
+        if($collect_emails == '1'){
+            return $this->getOrder()->getCustomerEmail();
+        } else {
+            return "";
+        }
     }
 
     /**
