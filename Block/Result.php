@@ -178,17 +178,17 @@ class Result extends BaseResult
                 if ($titles = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES, $scope, $scope_id)) {
                     $titles = json_decode($titles, true);
 
-                    // sort alphabetically by name
-                    uasort($titles, function($a, $b) {
-                        if (isset($a['sort_order']) && isset($b['sort_order'])) {
-                            return $a['sort_order'] > $b['sort_order'];
+                    $titles_sorting = array();
+                    foreach($titles as $k => $v){
+                        if(array_key_exists('sort_order', $v)){
+                            $titles_sorting[$k] = $v['sort_order'];
                         }
+                    }
 
-                        return true;
-                    });
+                    asort($titles_sorting);
 
                     $spanAttributes['data-facets-titles'] = json_encode(array_filter(array_combine(array_keys($titles), array_column($titles, 'label'))));
-                    $spanAttributes['data-facets-attributes'] = json_encode(array_keys($titles));
+                    $spanAttributes['data-facets-attributes'] = json_encode(array_keys($titles_sorting));
 
                     if ($multiselectAttributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES, $scope, $scope_id)) {
                         $spanAttributes['data-facets-multiselect-attributes'] = '["' . str_replace(',', '","', $multiselectAttributes) . '"]';
