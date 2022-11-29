@@ -66,8 +66,10 @@ class Index extends AbstractAction
         try {
 
             $post = $this->getRequest()->getcontent();
-
-            $scope = $this->getRequest()->getParam('scope')."s";
+            $scope = $this->getRequest()->getParam('scope');
+            if($scope !== 'default'){
+                $scope = $scope . 's';
+            }
             $scopeId = intval($this->getRequest()->getParam('scope_id'));
 
             if($post){
