@@ -101,10 +101,10 @@ class ProductSaveAfterObserver implements ObserverInterface
     {
         if($this->storeManager->isSingleStoreMode()){
             $scope = 'default';
-            $scope_id = '0';
+            $storeId = '0';
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->storeManager->getStore()->getId();
+            $storeId = $this->storeManager->getStore()->getId();
         }
         $product = $observer->getEvent()->getProduct();
         if ($storeId == 0) {
