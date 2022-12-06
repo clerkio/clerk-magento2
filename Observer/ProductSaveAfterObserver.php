@@ -99,12 +99,16 @@ class ProductSaveAfterObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        if($this->storeManager->isSingleStoreMode()){
-            $scope = 'default';
-            $storeId = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $storeId = $this->storeManager->getStore()->getId();
+        $_params = $this->request->getParams();
+        $storeId = '0';
+        $scope = 'default';
+        if (array_key_exists('website', $_params)){
+            $scope = 'website';
+            $storeId = $_params[$scope];
+        }
+        if (array_key_exists('store', $_params)){
+            $scope = 'store';
+            $storeId = $_params[$scope];
         }
         $product = $observer->getEvent()->getProduct();
         if ($storeId == 0) {
