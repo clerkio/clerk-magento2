@@ -173,7 +173,7 @@ abstract class AbstractAdapter
                         }
                         if(!empty($configurablelist)){
                             $configurablelist = is_array($configurablelist) ? $this->flattenArray( $configurablelist ) : $configurablelist;
-                            $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($configurablelist));
+                            $info["child_".$this->getFieldName($field)."s"] = $configurablelist;
                         }
 
                     }
@@ -197,7 +197,7 @@ abstract class AbstractAdapter
 
                         if(!empty($groupedList)){
                             $groupedList = is_array($groupedList) ? $this->flattenArray( $groupedList ) : $groupedList;
-                            $info["child_".$this->getFieldName($field)."s"] = array_values(array_unique($groupedList));
+                            $info["child_".$this->getFieldName($field)."s"] = $groupedList;
                         }
 
                     }
@@ -205,7 +205,7 @@ abstract class AbstractAdapter
                 //21-10-2021 KKY Additional Fields for Configurable and grouped Products - end
 
                 if (isset($this->fieldHandlers[$field])) {
-                    if (in_array($this->getFieldName($field), ['price','list_price'])) {
+                    if (in_array($this->getFieldName($field), ['price','list_price','child_prices','child_regular_prices'])) {
                             $price = str_replace(',','',$this->fieldHandlers[$field]($resourceItem));
                             $info[$this->getFieldName($field)] = (float)$price;
                     }
