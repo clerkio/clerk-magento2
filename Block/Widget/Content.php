@@ -62,7 +62,6 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
         } else {
             $contents_array = [0 => ''];
         }
-        
         foreach ($contents_array as $content) {
             $output .= $this->getHtmlForContent(str_replace(' ', '', $content));
         }

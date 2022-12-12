@@ -4,31 +4,30 @@
 <span
     class="clerk"
     data-template="@<?php echo $block->getLiveSearchTemplate(); ?>"
-    data-instant-search-suggestions="<?php echo ($block->getSuggestions() ? $block->getSuggestions() : "0"); ?>"
-    data-instant-search-categories="<?php echo ($block->getCategories() ? $block->getCategories() : "0"); ?>"
-    data-instant-search-pages="<?php echo ($block->getPages() ? $block->getPages() : "0"); ?>"
+    data-instant-search-suggestions="<?php echo($block->getSuggestions() ? $block->getSuggestions() : "0"); ?>"
+    data-instant-search-categories="<?php echo($block->getCategories() ? $block->getCategories() : "0"); ?>"
+    data-instant-search-pages="<?php echo($block->getPages() ? $block->getPages() : "0"); ?>"
     data-instant-search-pages-type="<?php echo $block->getPagesType(); ?>"
     data-instant-search-positioning="<?php echo $block->getDropdownPosition(); ?>"
-    <?php if (empty($block->getInputSelector())) {
-        echo "data-instant-search=\"#search\">";
-    } else {
-        echo "data-instant-search=\"".$block->getInputSelector()."\">";
-    }?>
-
-</span>
+    data-instant-search="<?php echo(!empty($block->getInputSelector()) ? $block->getInputSelector() : '#search'); ?>"
+></span>
 <?php
+if (!empty($block->getFormSelector())):
+    $search_page_route = $block->getShopBaseDomainUrl() . 'catalogsearch/result';
+?>
+    <script>
+        require(['jquery','jquery/ui','domReady!'],
+        function($){
+            let elems = document.querySelectorAll('<?php echo $block->getFormSelector(); ?>');
+            elems.forEach(form_element => {
+                form_element.setAttribute('action', <?php echo $search_page_route; ?>);
+            });
+        });
+    </script>
+    <style type="text/css">
+    #search_autocomplete { display: none !important; }
+    </style>
+<?php
+endif;
+?>
 
-if (!empty($block->getFormSelector())) {?>
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        ClerkSearchPage = function(){
-            var elems = document.querySelectorAll('<?php echo $block->getFormSelector(); ?>');
-            elems.forEach(element => element.action = "<?php echo $block->getShopBaseDomainUrl(); ?>catalogsearch/result/");
-        };
-        ClerkSearchPage();
-    });
-</script>
-<?php } ?>
-<style type="text/css">
-#search_autocomplete { display: none !important; }
-</style>

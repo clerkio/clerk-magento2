@@ -12,28 +12,12 @@
 </div>
 
 <script>
-require(['jquery'], function($) {
-    var total_loaded = 0;
-
-    window._clerk_after_load_event = function(data) {
-        total_loaded += data.response.result.length;
-
-        // If limit is undefined set limit to result length
-        var e = $('#clerk-search');
-
-        console.log(e);
-
-        if (typeof e.data('limit') === "undefined"){
-            e.data('limit', data.response.result.length)
+if(typeof Clerk === 'function'){
+    Clerk('on', 'response', function(content, data){
+        res_len = (data?.products.length) ? data?.products.length : 0;
+        if(res_len){
+            document.getElementById('clerk-search-no-results').style.display = 'block';
         }
-
-        // If total is 0, show no results
-        if (total_loaded == 0) {
-            $('#clerk-search-no-results').show();
-        } else {
-            $('#clerk-search-no-results').hide();
-        }
-        
-    }
-});
+    });
+}
 </script>

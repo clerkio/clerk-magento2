@@ -15,7 +15,7 @@ case "$1" in
                 echo "-------------------"
                 echo "- Creating Backup -"
                 echo "-------------------"
-                tar -czf clerkbackup.tar.gz . --exclude=./*.gz;
+                tar -czvf clerkbackup.tar.gz . --exclude=./*.gz;
                 echo "---------------------"
                 echo "- Backup Completed! -"
                 echo "---------------------"
@@ -71,7 +71,7 @@ case "$1" in
                 echo "-------------------"
                 echo "- Creating Backup -"
                 echo "-------------------"
-                tar -czf clerkbackup.tar.gz . --exclude=./*.gz;
+                tar -czvf clerkbackup.tar.gz . --exclude=./*.gz;
                 echo "---------------------"
                 echo "- Backup Completed! -"
                 echo "---------------------"
@@ -171,7 +171,7 @@ case "$1" in
 			echo "-------------------"
 			echo "- Creating Backup -"
 			echo "-------------------"
-			tar -czf clerkbackup.tar.gz . --exclude=./*.gz;
+			tar -czvf clerkbackup.tar.gz . --exclude=./*.gz;
 			echo "---------------------"
 			echo "- Backup Completed! -"
 			echo "---------------------"
