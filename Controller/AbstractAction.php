@@ -148,7 +148,7 @@ abstract class AbstractAction extends Action
             $this->publicKey = $request->getParam('key');
 
             //Validate supplied keys
-            if (($this->verifyKeys($request) == -1 && $this->verifyWebsiteKeys($request) == -1 && $this->verifyDefaultKeys($request) == -1) || !$this->privateKey || !$this->publicKey) {
+            if (($this->verifyKeys($request) === -1 && $this->verifyWebsiteKeys($request) === -1 && $this->verifyDefaultKeys($request) === -1) || !$this->privateKey || !$this->publicKey) {
                 $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
                 $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
 
