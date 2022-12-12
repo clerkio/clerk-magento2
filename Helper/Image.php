@@ -75,7 +75,7 @@ class Image
                 /***
                  * Fix malformed image url's.
                  */
-                if (!strpos($imageUrl, 'catalog/product/')) {
+                if (-1 === strpos($imageUrl, 'catalog/product/')) {
                     $imageUrl = str_replace('catalog/product', 'catalog/product/', $imageUrl);
                 }
             }
