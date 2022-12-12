@@ -20,7 +20,7 @@ if (!empty($block->getFormSelector())):
         function($){
             let elems = document.querySelectorAll('<?php echo $block->getFormSelector(); ?>');
             elems.forEach(form_element => {
-                form_element.setAttribute('action', <?php echo $search_page_route; ?>);
+                form_element.setAttribute('action', '<?php echo $search_page_route; ?>');
             });
         });
     </script>
