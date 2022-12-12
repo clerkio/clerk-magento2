@@ -30,5 +30,4 @@ class Numbers implements ArrayInterface
 
         return $Numbers;
     }
-
 }

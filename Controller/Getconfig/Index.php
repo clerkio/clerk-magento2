@@ -50,17 +50,17 @@ class Index extends AbstractAction
 
             $scopeID = 1;
 
-            if(null !== $this->getRequest()->getParam('scope_id')){
+            if (null !== $this->getRequest()->getParam('scope_id')) {
                 $scopeID = $this->getRequest()->getParam('scope_id');
             }
 
-            if($scope == 'store'){
+            if ($scope == 'store') {
                 $storeID = $scopeID;
                 $websiteID = null;
-            }elseif($scope == 'website'){
+            } elseif ($scope == 'website') {
                 $websiteID = $scopeID;
                 $storeID = null;
-            }elseif($scope == 'default'){
+            } elseif ($scope == 'default') {
                 $websiteID = $scopeID;
                 $storeID = $scopeID;
             }
@@ -152,6 +152,5 @@ class Index extends AbstractAction
             $this->clerk_logger->error('Getconfig execute ERROR', ['error' => $e->getMessage()]);
 
         }
-
     }
 }

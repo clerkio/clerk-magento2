@@ -22,8 +22,8 @@ class MultiselectFacetAttributes extends Field
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\App\RequestInterface $requestInterface,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         $this->requestInterface = $requestInterface;
         parent::__construct($context, $data);
     }
@@ -39,11 +39,11 @@ class MultiselectFacetAttributes extends Field
         $_params = $this->requestInterface->getParams();
         $scope_id = '0';
         $scope = 'default';
-        if (array_key_exists('website', $_params)){
+        if (array_key_exists('website', $_params)) {
             $scope = 'website';
             $scope_id = $_params[$scope];
         }
-        if (array_key_exists('store', $_params)){
+        if (array_key_exists('store', $_params)) {
             $scope = 'store';
             $scope_id = $_params[$scope];
         }

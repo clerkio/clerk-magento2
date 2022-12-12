@@ -16,7 +16,7 @@ class ExitIntent extends Template
     public function getExitIntentTemplate()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -25,7 +25,7 @@ class ExitIntent extends Template
         }
 
         $template_contents = $this->_scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE, $scope, $scope_id);
-        if($template_contents){
+        if ($template_contents) {
             $template_contents = explode(',', $template_contents);
         } else {
             $template_contents = [0 => ''];

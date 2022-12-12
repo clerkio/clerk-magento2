@@ -52,8 +52,7 @@ class Api
         ZendClientFactory $httpClientFactory,
         ClerkLogger $Clerklogger,
         \Magento\Framework\App\RequestInterface $requestInterface
-    )
-    {
+    ) {
         $this->clerk_logger = $Clerklogger;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
@@ -114,11 +113,11 @@ class Api
         $_params = $this->requestInterface->getParams();
         $scope_id = '0';
         $scope = 'default';
-        if (array_key_exists('website', $_params)){
+        if (array_key_exists('website', $_params)) {
             $scope = 'website';
             $scope_id = $_params[$scope];
         }
-        if (array_key_exists('store', $_params)){
+        if (array_key_exists('store', $_params)) {
             $scope = 'store';
             $scope_id = $_params[$scope];
         }
@@ -270,11 +269,11 @@ class Api
             $_params = $this->requestInterface->getParams();
             $scope_id = '0';
             $scope = 'default';
-            if (array_key_exists('website', $_params)){
+            if (array_key_exists('website', $_params)) {
                 $scope = 'website';
                 $scope_id = $_params[$scope];
             }
-            if (array_key_exists('store', $_params)){
+            if (array_key_exists('store', $_params)) {
                 $scope = 'store';
                 $scope_id = $_params[$scope];
             }

@@ -116,7 +116,7 @@ abstract class AbstractAction extends Action
      * @param ModuleList $moduleList
      * @param ClerkLogger $ClerkLogger
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager,  ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
     {
         $this->moduleList = $moduleList;
         $this->scopeConfig = $scopeConfig;
@@ -169,20 +169,20 @@ abstract class AbstractAction extends Action
                 return parent::dispatch($request);
             }
 
-            if($this->verifyWebsiteKeys($request) !==-1){
+            if ($this->verifyWebsiteKeys($request) !==-1) {
                 $scopeID = $this->verifyWebsiteKeys($request);
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'website']);
             }
 
-            if($this->verifyKeys($request) !==-1){
+            if ($this->verifyKeys($request) !==-1) {
                 $scopeID = $this->verifyKeys($request);
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'store']);
 
             }
 
-            if($this->_storeManager->isSingleStoreMode()){
+            if ($this->_storeManager->isSingleStoreMode()) {
                 $scopeID = $this->verifyDefaultKeys($request);
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'default']);
@@ -241,7 +241,7 @@ abstract class AbstractAction extends Action
             $publicKey = $request->getParam('key');
 
             $storeids = $this->getStores();
-            foreach($storeids as $scopeID){
+            foreach ($storeids as $scopeID) {
                 if ($this->timingSafeEquals($this->getPrivateKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicKey($scopeID), $publicKey)) {
                     return $scopeID;
                 }
@@ -271,7 +271,7 @@ abstract class AbstractAction extends Action
             $publicKey = $request->getParam('key');
 
             $websiteids = $this->getWebsites();
-            foreach($websiteids as $scopeID){
+            foreach ($websiteids as $scopeID) {
                 if ($this->timingSafeEquals($this->getPrivateWebsiteKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicWebsiteKey($scopeID), $publicKey)) {
                     return $scopeID;
                 }
@@ -426,7 +426,8 @@ abstract class AbstractAction extends Action
      *
      * @return boolean
      */
-    private function timingSafeEquals($safe, $user) {
+    private function timingSafeEquals($safe, $user)
+    {
         $safeLen = strlen($safe);
         $userLen = strlen($user);
 
@@ -452,8 +453,8 @@ abstract class AbstractAction extends Action
         try {
 
             $this->debug = (bool)$request->getParam('debug', false);
-            $this->start_date = date('Y-m-d',$request->getParam('start_date', strtotime('today - 200 years')));
-            $this->end_date = date('Y-m-d',$request->getParam('end_date', strtotime('today + 1 day')));
+            $this->start_date = date('Y-m-d', $request->getParam('start_date', strtotime('today - 200 years')));
+            $this->end_date = date('Y-m-d', $request->getParam('end_date', strtotime('today + 1 day')));
             $this->limit = (int)$request->getParam('limit', 0);
             $this->page = (int)$request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
@@ -580,11 +581,11 @@ abstract class AbstractAction extends Action
 
             $collection->addFieldToSelect('*');
 
-            if($this->start_date) {
+            if ($this->start_date) {
 
                 $collection->setPageSize($this->limit)
                     ->setCurPage($this->page)
-                    ->addAttributeToFilter('created_at', array('from'=>$this->start_date, 'to'=>$this->end_date))
+                    ->addAttributeToFilter('created_at', ['from'=>$this->start_date, 'to'=>$this->end_date])
                     ->addOrder($this->orderBy, $this->order);
             } else {
 
@@ -652,7 +653,7 @@ abstract class AbstractAction extends Action
 
     public function getWebsites()
     {
-        $websiteIds = array();
+        $websiteIds = [];
         foreach ($this->_storeManager->getWebsites() as $website) {
             $websiteId = $website["website_id"];
             array_push($websiteIds, $websiteId);

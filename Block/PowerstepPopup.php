@@ -46,14 +46,14 @@ class PowerstepPopup extends Template
      * @param Session $checkoutSession
      * @param ProductRepositoryInterface $productRepository
      */
-    public function __construct( 
+    public function __construct(
         Template\Context $context,
         Session $checkoutSession,
         ProductRepositoryInterface $productRepository,
         Cart $cartHelper,
         Image $imageHelper,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $data);
         $this->checkoutSession = $checkoutSession;
         $this->productRepository = $productRepository;
@@ -128,7 +128,7 @@ class PowerstepPopup extends Template
     {
         $showPowerstep = ($this->getRequest()->getParam('isAjax')) || ($this->checkoutSession->getClerkShowPowerstep(true));
 
-        if($showPowerstep){
+        if ($showPowerstep) {
             $this->checkoutSession->setClerkShowPowerstep(false);
         }
 
@@ -148,7 +148,7 @@ class PowerstepPopup extends Template
     public function getExcludeState()
     {
 
-        if($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1){
+        if ($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -167,7 +167,7 @@ class PowerstepPopup extends Template
     public function getTemplates()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -176,7 +176,7 @@ class PowerstepPopup extends Template
         }
 
         $template_contents = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);
-        if($template_contents){
+        if ($template_contents) {
             $template_contents = explode(',', $template_contents);
         } else {
             $template_contents = [0 => ''];
@@ -184,14 +184,15 @@ class PowerstepPopup extends Template
 
         foreach ($template_contents as $key => $template) {
 
-            $templates[$key] = str_replace(' ','', $template);
+            $templates[$key] = str_replace(' ', '', $template);
 
         }
 
         return (array) $templates;
     }
 
-    public function generateRandomString($length = 25) {
+    public function generateRandomString($length = 25)
+    {
 
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -202,6 +203,5 @@ class PowerstepPopup extends Template
         }
 
         return $randomString;
-
     }
 }

@@ -50,8 +50,7 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         ModuleList $moduleList,
         ClerkLogger $ClerkLogger
-    )
-    {
+    ) {
         $this->collectionFactory = $orderCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
         $this->moduleList = $moduleList;

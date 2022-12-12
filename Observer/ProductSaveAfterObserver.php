@@ -79,8 +79,7 @@ class ProductSaveAfterObserver implements ObserverInterface
         StoreManagerInterface $storeManager,
         Api $api,
         ProductAdapter $productAdapter
-    )
-    {
+    ) {
         $this->objectManager = $objectManager;
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
@@ -102,7 +101,7 @@ class ProductSaveAfterObserver implements ObserverInterface
         $_params = $this->request->getParams();
         $storeId = '0';
         $scope = 'default';
-        if (array_key_exists('store', $_params)){
+        if (array_key_exists('store', $_params)) {
             $scope = 'store';
             $storeId = $_params[$scope];
         }
@@ -112,7 +111,7 @@ class ProductSaveAfterObserver implements ObserverInterface
             $productstoreIds = $product->getStoreIds();
             foreach ($productstoreIds as $productstoreId) {
 
-                if ($this->storeManager->getStore($productstoreId)->isActive() == True) {
+                if ($this->storeManager->getStore($productstoreId)->isActive() == true) {
                     try {
                         $this->updateStore($product, $productstoreId);
                     } finally {
@@ -139,30 +138,30 @@ class ProductSaveAfterObserver implements ObserverInterface
         if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, ScopeInterface::SCOPE_STORE, $storeId)) {
             if ($product->getId()) {
 
-                 // 21-10-2021 KKY update parent products if in Grouped or child to Configurable before we check visibility and saleable - start
+                // 21-10-2021 KKY update parent products if in Grouped or child to Configurable before we check visibility and saleable - start
 
-                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-                 $confParentProductIds = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')->getParentIdsByChild($product->getId());
-                 if(isset($confParentProductIds[0])){
-                     $confparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($confParentProductIds[0]);
+                $confParentProductIds = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')->getParentIdsByChild($product->getId());
+                if (isset($confParentProductIds[0])) {
+                    $confparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($confParentProductIds[0]);
 
-                     $productInfo = $this->productAdapter->getInfoForItem($confparentproduct, 'store', $storeId);
-                     $this->api->addProduct($productInfo);
+                    $productInfo = $this->productAdapter->getInfoForItem($confparentproduct, 'store', $storeId);
+                    $this->api->addProduct($productInfo);
 
-                 }
-                 $groupParentProductIds = $objectManager->create('Magento\GroupedProduct\Model\Product\Type\Grouped')->getParentIdsByChild($product->getId());
-                 if(isset($groupParentProductIds[0])){
-                     foreach ($groupParentProductIds as $groupParentProductId) {
-                         $groupparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($groupParentProductId);
+                }
+                $groupParentProductIds = $objectManager->create('Magento\GroupedProduct\Model\Product\Type\Grouped')->getParentIdsByChild($product->getId());
+                if (isset($groupParentProductIds[0])) {
+                    foreach ($groupParentProductIds as $groupParentProductId) {
+                        $groupparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($groupParentProductId);
 
-                         $productInfo = $this->productAdapter->getInfoForItem($groupparentproduct, 'store', $storeId);
-                         $this->api->addProduct($productInfo);
+                        $productInfo = $this->productAdapter->getInfoForItem($groupparentproduct, 'store', $storeId);
+                        $this->api->addProduct($productInfo);
 
-                     }
-                 }
+                    }
+                }
 
-                 // 21-10-2021 KKY update parent products if in Grouped or child to Configurable - end
+                // 21-10-2021 KKY update parent products if in Grouped or child to Configurable - end
 
                 //Cancel if product visibility is not as defined
                 if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
@@ -182,6 +181,5 @@ class ProductSaveAfterObserver implements ObserverInterface
 
             }
         }
-
     }
 }

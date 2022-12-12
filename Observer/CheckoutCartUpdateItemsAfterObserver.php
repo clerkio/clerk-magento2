@@ -53,15 +53,15 @@ class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        if($this->scopeConfig->getValue('clerk/product_synchronization/collect_baskets', ScopeInterface::SCOPE_STORE) == '1') {
+        if ($this->scopeConfig->getValue('clerk/product_synchronization/collect_baskets', ScopeInterface::SCOPE_STORE) == '1') {
             $cart_productIds = [];
-            foreach ($this->cart->getQuote()->getAllVisibleItems() as $item){
+            foreach ($this->cart->getQuote()->getAllVisibleItems() as $item) {
                 if (!in_array($item->getProductId(), $cart_productIds)) {
                     array_push($cart_productIds, $item->getProductId());
                 }
             }
 
-            if($this->customerSession->isLoggedIn()) {
+            if ($this->customerSession->isLoggedIn()) {
                 $Endpoint = 'https://api.clerk.io/v2/log/basket/set';
 
                 $data_string = json_encode([
@@ -80,5 +80,4 @@ class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
             }
         }
     }
-
 }

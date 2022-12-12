@@ -109,5 +109,4 @@ class Config
     const XML_PATH_LOG_LEVEL = 'clerk/log/level';
     const XML_PATH_LOG_TO = 'clerk/log/to';
     const XML_PATH_LOG_ENABLED = 'clerk/log/enabled';
-
 }

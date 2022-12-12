@@ -53,6 +53,5 @@ class Index extends AbstractAction
             $this->clerk_logger->error('Plugin execute ERROR', ['error' => $e->getMessage()]);
 
         }
-
     }
 }

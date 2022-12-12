@@ -32,7 +32,7 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $customerCollectionFactory
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $customerCollectionFactory, LoggerInterface $logger,  ModuleList $moduleList, ClerkLogger $ClerkLogger, CustomerMetadataInterface $customerMetadata)
+    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $customerCollectionFactory, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger, CustomerMetadataInterface $customerMetadata)
     {
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
@@ -55,7 +55,7 @@ class Index extends AbstractAction
 
                 if (!empty($this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid))) {
 
-                    $Fields = explode(',',str_replace(' ','', $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid)));
+                    $Fields = explode(',', str_replace(' ', '', $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid)));
 
                 } else {
 
@@ -65,30 +65,30 @@ class Index extends AbstractAction
 
                     $response = $this->getCustomerCollection($this->page, $this->limit, $this->scopeid);
 
-                    foreach ($response->getData() as $customer) {
+                foreach ($response->getData() as $customer) {
 
-                        $_customer = [];
-                        $_customer['id'] = $customer['entity_id'];
-                        $_customer['name'] = $customer['firstname'] . " " . (!is_null($customer['middlename']) ? $customer['middlename'] . " " : "") . $customer['lastname'];
-                        $_customer['email'] = $customer['email'];
+                    $_customer = [];
+                    $_customer['id'] = $customer['entity_id'];
+                    $_customer['name'] = $customer['firstname'] . " " . (!is_null($customer['middlename']) ? $customer['middlename'] . " " : "") . $customer['lastname'];
+                    $_customer['email'] = $customer['email'];
 
-                        foreach ($Fields as $Field) {
-                            if (isset($customer[$Field])) {
-                                if ($Field == "gender") {
+                    foreach ($Fields as $Field) {
+                        if (isset($customer[$Field])) {
+                            if ($Field == "gender") {
 
-                                    $_customer[$Field] = $this->getCustomerGender($customer[$Field]);
+                                $_customer[$Field] = $this->getCustomerGender($customer[$Field]);
 
-                                } else {
+                            } else {
 
-                                    $_customer[$Field] = $customer[$Field];
-
-                                }
+                                $_customer[$Field] = $customer[$Field];
 
                             }
-                        }
 
-                        $Customers[] = $_customer;
+                        }
                     }
+
+                    $Customers[] = $_customer;
+                }
 
                 if ($this->debug) {
                     $this->getResponse()->setBody(json_encode($Customers, JSON_PRETTY_PRINT));
@@ -110,14 +110,13 @@ class Index extends AbstractAction
             $this->clerk_logger->error('Customer execute ERROR', ['error' => $e->getMessage()]);
 
         }
-
     }
 
     public function getCustomerCollection($page, $limit, $storeid)
     {
         $store = $this->_storeManager->getStore($storeid);
         $customerCollection = $this->collectionFactory->create();
-        $customerCollection->setOrder('title','ASC');
+        $customerCollection->setOrder('title', 'ASC');
         $customerCollection->addFilter('store_id', $store->getId());
         $customerCollection->setPageSize($limit);
         $customerCollection->setCurPage($page);
@@ -128,5 +127,4 @@ class Index extends AbstractAction
     {
         return $this->_customerMetadata->getAttributeMetadata('gender')->getOptions()[$GenderCode]->getLabel();
     }
-
 }

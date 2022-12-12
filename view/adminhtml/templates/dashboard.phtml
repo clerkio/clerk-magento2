@@ -1,11 +1,11 @@
 <?php
 /** @var \Clerk\Clerk\Block\Adminhtml\Dashboard $block */
 
-if ($block->getStoreId()) :
-?>
-    <?php if ($block->getEmbedUrl()) : ?>
-    <iframe id="clerk-embed" src="<?php echo $this->getEmbedUrl(); ?>" frameborder="0" width="100%" height="2400"></iframe>
-    <?php else : ?>
+if ($block->getStoreId()):
+    ?>
+    <?php if ($block->getEmbedUrl()): ?>
+    <iframe id="clerk-embed" src="<?php echo $block->getEmbedUrl(); ?>" frameborder="0" width="100%" height="2400"></iframe>
+    <?php else: ?>
         <?php echo __('Clerk is not configured for this store. <a href="%1">Click here to configure</a>', $block->getConfigureUrl()); ?>
     <?php endif; ?>
 <?php else: ?>

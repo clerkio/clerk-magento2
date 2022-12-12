@@ -60,6 +60,5 @@ class Add extends BaseAdd
         }
 
         return $defaultUrl;
-
     }
 }

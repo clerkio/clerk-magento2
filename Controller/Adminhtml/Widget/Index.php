@@ -227,6 +227,4 @@ class Index extends Action
 
         }
     }
-
-
 }

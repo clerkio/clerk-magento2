@@ -21,5 +21,4 @@ class PagesType implements ArrayInterface
 
         return $PagesType;
     }
-
 }

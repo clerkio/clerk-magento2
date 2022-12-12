@@ -76,8 +76,7 @@ class Index extends AbstractAction
         Page $pageHelper,
         ClerkLogger $ClerkLogger,
         ModuleList $moduleList
-    )
-    {
+    ) {
         $this->moduleList = $moduleList;
         $this->collectionFactory = $categoryCollectionFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
@@ -85,10 +84,10 @@ class Index extends AbstractAction
         $this->storeManager = $storeManager;
         $this->clerk_logger = $ClerkLogger;
         $this->categoryFactory = $categoryFactory;
-        $this->fields = array(
+        $this->fields = [
             "entity_id",
             "parent_id"
-        );
+        ];
         $this->addFieldHandlers();
 
         parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
@@ -219,7 +218,7 @@ class Index extends AbstractAction
             $collection->addAttributeToFilter('level', ['gteq' => 2]);
             $collection->addAttributeToFilter('name', ['neq' => null]);
             $collection->addPathsFilter('1/' . $rootCategory . '/%');
-            $collection->addFieldToFilter('is_active',array("in"=>array('1')));
+            $collection->addFieldToFilter('is_active', ["in"=>['1']]);
 
 
             $collection->setCurPage($this->page)->setPageSize($this->limit);

@@ -77,6 +77,5 @@ class Index extends AbstractAction
             $this->clerk_logger->error('Version execute ERROR', ['error' => $e->getMessage()]);
 
         }
-
     }
 }

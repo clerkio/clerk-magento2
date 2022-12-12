@@ -24,8 +24,7 @@ class ImageType implements ArrayInterface
     public function __construct(
         ConfigInterface $viewConfig,
         CollectionFactory $themeCollectionFactory
-    )
-    {
+    ) {
         $this->viewConfig = $viewConfig;
         $this->themeCollectionFactory = $themeCollectionFactory;
     }
@@ -58,7 +57,7 @@ class ImageType implements ArrayInterface
 
                 $common = $common ? array_intersect_key($common, $types[$theme->getCode()]) : $types[$theme->getCode()];
 
-            }catch(\Exception $e) {
+            } catch (\Exception $e) {
 
                 continue;
 

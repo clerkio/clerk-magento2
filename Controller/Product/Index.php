@@ -48,8 +48,7 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         Data $taxHelper,
         ModuleList $moduleList
-    )
-    {
+    ) {
         $this->taxHelper = $taxHelper;
         $this->moduleList = $moduleList;
         $this->productAdapter = $productAdapter;

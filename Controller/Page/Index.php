@@ -17,7 +17,6 @@ use Psr\Log\LoggerInterface;
 use Magento\Store\Model\ScopeInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
-
 class Index extends AbstractAction
 {
 
@@ -70,8 +69,7 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         ClerkLogger $ClerkLogger,
         ModuleList $moduleList
-    )
-    {
+    ) {
         $this->_searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->_PageRepositoryInterface = $PageRepositoryInterface;
         $this->_SearchCriteriaBuilder = $SearchCriteriaBuilder;
@@ -94,7 +92,7 @@ class Index extends AbstractAction
 
             $Include_pages = $this->scopeConfig->getValue(Config::XML_PATH_INCLUDE_PAGES, $this->scope, $this->scopeid);
 
-            $Pages_Additional_Fields = is_string($this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $this->scope, $this->scopeid)) ? explode(',',$this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $this->scope, $this->scopeid)) : array();
+            $Pages_Additional_Fields = is_string($this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $this->scope, $this->scopeid)) ? explode(',', $this->scopeConfig->getValue(Config::XML_PATH_PAGES_ADDITIONAL_FIELDS, $this->scope, $this->scopeid)) : [];
 
             $pages = [];
 
@@ -111,7 +109,7 @@ class Index extends AbstractAction
 
                     try {
                         $geturl = $this->_objectManager->create('Magento\Cms\Helper\Page')->getPageUrl($page_default['page_id']);
-                        if($geturl){
+                        if ($geturl) {
                             $url = $geturl;
                         } else {
                             continue;
@@ -130,7 +128,7 @@ class Index extends AbstractAction
 
                         foreach ($Pages_Additional_Fields as $Pages_Additional_Field) {
 
-                            $Pages_Additional_Field = str_replace(' ','',$Pages_Additional_Field);
+                            $Pages_Additional_Field = str_replace(' ', '', $Pages_Additional_Field);
 
                             if (!empty($page_default[$Pages_Additional_Field])) {
 
@@ -157,7 +155,7 @@ class Index extends AbstractAction
                     try {
                         $url = "not found";
                         $geturl = $this->_objectManager->create('Magento\Cms\Helper\Page')->getPageUrl($page_store['page_id']);
-                        if($geturl){
+                        if ($geturl) {
                             $url = $geturl;
                         }
                         $page['id'] = $page_store['page_id'];
@@ -174,7 +172,7 @@ class Index extends AbstractAction
 
                         foreach ($Pages_Additional_Fields as $Pages_Additional_Field) {
 
-                            $Pages_Additional_Field = str_replace(' ','',$Pages_Additional_Field);
+                            $Pages_Additional_Field = str_replace(' ', '', $Pages_Additional_Field);
 
                             if (!empty($page_store[$Pages_Additional_Field])) {
 
@@ -206,7 +204,8 @@ class Index extends AbstractAction
     }
 
 
-    public function ValidatePage($Page) {
+    public function ValidatePage($Page)
+    {
 
         foreach ($Page as $key => $content) {
 
@@ -219,7 +218,6 @@ class Index extends AbstractAction
         }
 
         return true;
-
     }
 
     public function getPageCollection($page, $limit, $storeid)
@@ -236,6 +234,4 @@ class Index extends AbstractAction
         $collection->setCurPage($page);
         return $collection;
     }
-
-
 }

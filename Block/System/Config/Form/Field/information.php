@@ -60,11 +60,11 @@ class information extends \Magento\Config\Block\System\Config\Form\Field
 
         $scope = 'default';
 
-        if(in_array("store", $urlParts)) {
+        if (in_array("store", $urlParts)) {
             $scope = 'store';
         }
 
-        if(in_array("website", $urlParts)){
+        if (in_array("website", $urlParts)) {
             $scope = 'website';
         }
 
@@ -72,7 +72,7 @@ class information extends \Magento\Config\Block\System\Config\Form\Field
 
         $singlestore =  $this->ScopeConfigInterface->getValue('general/single_store_mode/enabled');
 
-        if($singlestore !== '1' && $scope === 'default'){
+        if ($singlestore !== '1' && $scope === 'default') {
             $html = 'Your current scope is "Default Config", to configure Clerk settings please change scope to "website" or "store.';
             return $this->_decorateRowHtml($element, $html);
         } else {
@@ -90,6 +90,6 @@ class information extends \Magento\Config\Block\System\Config\Form\Field
      */
     protected function _decorateRowHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element, $html)
     {
-        return '<tr id="row_' . $element->getHtmlId() . '">' . $html . '</tr>'; 
+        return '<tr id="row_' . $element->getHtmlId() . '">' . $html . '</tr>';
     }
 }

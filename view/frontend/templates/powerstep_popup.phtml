@@ -2,7 +2,7 @@
 /** @var \Clerk\Clerk\Block\PowerstepPopup $block */
 $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [];
 ?>
-<?php if ($block->shouldShow()) : ?>
+<?php if ($block->shouldShow()): ?>
 <div id="clerk_powerstep" class="clerk-popup">
     <div class="clerk_powerstep_header">
         <h2><?php echo $block->getHeaderText(); ?></h2>
@@ -24,24 +24,24 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
     $spanAttributes['category'] = $block->escapeHtmlAttr(reset($categoryIds));
 
     foreach ($block->getTemplates() as $template):
-        if($filter_duplicates){
+        if ($filter_duplicates) {
             $spanAttributes['class'] = 'clerk clerk_' . (string)$slider_count;
         }
-        if($slider_count > 0 && $filter_duplicates){
+        if ($slider_count > 0 && $filter_duplicates) {
             $filter_string = '';
-            for($i = 0; $i < $slider_count; $i++){
-                if($i > 0){
+            for ($i = 0; $i < $slider_count; $i++) {
+                if ($i > 0) {
                     $filter_string .= ', ';
                 }
                 $filter_string .= '.clerk_'.(string)$i;
             }
             $spanAttributes['exclude'] = $filter_string;
         }
-    ?>
+        ?>
     <span
         class="<?php echo $spanAttributes['class']; ?>"
         <?php
-        if($slider_count > 0 && $filter_duplicates){
+        if ($slider_count > 0 && $filter_duplicates) {
             echo 'data-exclude-from="'.$spanAttributes['exclude'].'"';
         }
         ?>
@@ -49,8 +49,8 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
         data-products="[<?php echo $spanAttributes['products']; ?>]"
         data-category="<?php echo $spanAttributes['category']; ?>"
     ></span>
-    <?php
-    $slider_count++;
+        <?php
+        $slider_count++;
     endforeach;
     ?>
     </div>
@@ -63,7 +63,7 @@ require(['jquery'], function($) {
         popup.hide();
     });
 
-    <?php if ($block->isAjax()) : ?>
+    <?php if ($block->isAjax()): ?>
     popup.show();
     <?php endif; ?>
 });

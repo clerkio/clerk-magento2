@@ -23,8 +23,8 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
     protected $api;
 
      /**
-     * @var OrderRepositoryInterface
-     */
+      * @var OrderRepositoryInterface
+      */
     protected $orderRepository;
 
     public function __construct(ScopeConfigInterface $scopeConfig, Api $api, OrderRepositoryInterface $orderRepository)
@@ -54,7 +54,7 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
                 $product_id = $item->getProductId();
                 $quantity = $item->getQty();
 
-                if ($product_id && $orderIncrementId && $quantity !=0 ) {
+                if ($product_id && $orderIncrementId && $quantity !=0) {
                     $this->api->returnProduct($orderIncrementId, $product_id, $quantity);
                 }
 

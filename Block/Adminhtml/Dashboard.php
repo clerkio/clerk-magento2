@@ -34,12 +34,14 @@ class Dashboard extends Template
             return false;
         }
 
-        $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY,
+        $publicKey = $this->_scopeConfig->getValue(
+            Config::XML_PATH_PUBLIC_KEY,
             ScopeInterface::SCOPE_STORES,
             $this->getStore()->getCode()
         );
 
-        $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY,
+        $privateKey = $this->_scopeConfig->getValue(
+            Config::XML_PATH_PRIVATE_KEY,
             ScopeInterface::SCOPE_STORES,
             $this->getStore()->getCode()
         );

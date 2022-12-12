@@ -43,8 +43,8 @@ class FacetedSearch extends Fieldset
         \Magento\Framework\App\RequestInterface $requestInterface,
         Api $api,
         SystemConfig $systemConfig,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         $this->api = $api;
         $this->systemConfig = $systemConfig;
         $this->requestInterface = $requestInterface;
@@ -89,11 +89,11 @@ class FacetedSearch extends Fieldset
         $_params = $this->requestInterface->getParams();
         $scope_id = '0';
         $scope = 'default';
-        if (array_key_exists('website', $_params)){
+        if (array_key_exists('website', $_params)) {
             $scope = 'website';
             $scope_id = $_params[$scope];
         }
-        if (array_key_exists('store', $_params)){
+        if (array_key_exists('store', $_params)) {
             $scope = 'store';
             $scope_id = $_params[$scope];
         }
@@ -110,11 +110,11 @@ class FacetedSearch extends Fieldset
         $_params = $this->requestInterface->getParams();
         $scope_id = '0';
         $scope = 'default';
-        if (array_key_exists('website', $_params)){
+        if (array_key_exists('website', $_params)) {
             $scope = 'website';
             $scope_id = $_params[$scope];
         }
-        if (array_key_exists('store', $_params)){
+        if (array_key_exists('store', $_params)) {
             $scope = 'store';
             $scope_id = $_params[$scope];
         }

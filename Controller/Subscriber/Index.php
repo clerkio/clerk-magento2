@@ -23,7 +23,7 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $suscriberCollectionFactory
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $suscriberCollectionFactory, LoggerInterface $logger,  ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $suscriberCollectionFactory, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
     {
         $this->collectionFactory = $suscriberCollectionFactory;
         $this->clerk_logger = $ClerkLogger;
@@ -44,7 +44,7 @@ class Index extends AbstractAction
                     ->setHeader('Content-Type', 'application/json', true);
                 if (!empty($this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid))) {
 
-                    $Fields = explode(',',str_replace(' ','', $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid)));
+                    $Fields = explode(',', str_replace(' ', '', $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $this->scope, $this->scopeid)));
 
                 } else {
 
@@ -54,15 +54,15 @@ class Index extends AbstractAction
 
                     $response = $this->getSubscriberCollection($this->page, $this->limit, $this->scopeid);
 
-                    foreach ($response->getData() as $subscriber) {
-                        $_subscriber = [];
+                foreach ($response->getData() as $subscriber) {
+                    $_subscriber = [];
 
-                        $_subscriber['id'] = $subscriber['subscriber_id'];
-                        $_subscriber['customerid'] = $subscriber['customer_id'];
-                        $_subscriber['status'] = $subscriber['subscriber_status'];
-                        $_subscriber['email'] = $subscriber['subscriber_email'];
-                        $Subscribers[] = $_subscriber;
-                    }
+                    $_subscriber['id'] = $subscriber['subscriber_id'];
+                    $_subscriber['customerid'] = $subscriber['customer_id'];
+                    $_subscriber['status'] = $subscriber['subscriber_status'];
+                    $_subscriber['email'] = $subscriber['subscriber_email'];
+                    $Subscribers[] = $_subscriber;
+                }
 
                 if ($this->debug) {
                     $this->getResponse()->setBody(json_encode($Subscribers, JSON_PRETTY_PRINT));
@@ -84,7 +84,6 @@ class Index extends AbstractAction
             $this->clerk_logger->error('Customer execute ERROR', ['error' => $e->getMessage()]);
 
         }
-
     }
 
     public function getSubscriberCollection($page, $limit, $storeid)
@@ -97,6 +96,4 @@ class Index extends AbstractAction
         $collection->setCurPage($page);
         return $collection;
     }
-    
-
 }

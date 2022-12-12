@@ -61,7 +61,7 @@ class Powerstep extends AbstractProduct
     public function getExcludeState()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -75,7 +75,7 @@ class Powerstep extends AbstractProduct
     public function getTemplates()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -84,7 +84,7 @@ class Powerstep extends AbstractProduct
         }
 
         $template_contents = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);
-        if($template_contents){
+        if ($template_contents) {
             $template_contents = explode(',', $template_contents);
         } else {
             $template_contents = [0 => ''];
@@ -92,14 +92,15 @@ class Powerstep extends AbstractProduct
 
         foreach ($template_contents as $key => $template) {
 
-            $templates[$key] = str_replace(' ','',$template);
+            $templates[$key] = str_replace(' ', '', $template);
 
         }
 
         return (array) $templates;
     }
 
-    public function generateRandomString($length = 25) {
+    public function generateRandomString($length = 25)
+    {
 
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -110,6 +111,5 @@ class Powerstep extends AbstractProduct
         }
 
         return $randomString;
-
     }
 }

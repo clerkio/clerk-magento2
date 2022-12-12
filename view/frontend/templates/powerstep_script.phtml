@@ -1,7 +1,7 @@
 <?php
 /** @var \Clerk\Clerk\Block\PowerstepScripts $block */
-if ($block->shouldShow()) :
-?>
+if ($block->shouldShow()):
+    ?>
 <script>
 require(['jquery', 'mage/url'], function($, urlBuilder) {
     function getPowerstepPopup(isAjax)

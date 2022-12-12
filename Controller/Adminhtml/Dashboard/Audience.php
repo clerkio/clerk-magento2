@@ -26,8 +26,7 @@ class Audience extends Action
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         ClerkLogger $clerkLogger
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
         $this->clerk_logger = $clerkLogger;

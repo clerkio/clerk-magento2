@@ -22,8 +22,7 @@ class MultiselectFacetAttributes implements ArrayInterface
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\RequestInterface $requestInterface
-        )
-    {
+    ) {
         $this->scopeConfig = $scopeConfig;
         $this->requestInterface = $requestInterface;
     }
@@ -53,16 +52,16 @@ class MultiselectFacetAttributes implements ArrayInterface
     {
         $attributes = $this->getConfiguredAttributes();
 
-	    $attributes_defined = is_null($attributes) ? false : true;
+        $attributes_defined = is_null($attributes) ? false : true;
 
-	    if(!$attributes_defined){
-		    return [];
-	    }
+        if (!$attributes_defined) {
+            return [];
+        }
 
         $values = [];
 
         foreach (explode(',', $attributes) as $attribute) {
-            $values[$attribute] = str_replace(' ','', $attribute);
+            $values[$attribute] = str_replace(' ', '', $attribute);
         }
 
         return $values;
@@ -76,11 +75,11 @@ class MultiselectFacetAttributes implements ArrayInterface
         $_params = $this->requestInterface->getParams();
         $scope_id = '0';
         $scope = 'default';
-        if (array_key_exists('website', $_params)){
+        if (array_key_exists('website', $_params)) {
             $scope = 'website';
             $scope_id = $_params[$scope];
         }
-        if (array_key_exists('store', $_params)){
+        if (array_key_exists('store', $_params)) {
             $scope = 'store';
             $scope_id = $_params[$scope];
         }

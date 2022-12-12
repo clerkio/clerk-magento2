@@ -45,7 +45,7 @@ class SalesTracking extends Template
      */
     public function getCustomerEmail()
     {
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -54,7 +54,7 @@ class SalesTracking extends Template
         }
 
         $collect_emails = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS, $scope, $scope_id);
-        if($collect_emails == '1'){
+        if ($collect_emails == '1') {
             return $this->getOrder()->getCustomerEmail();
         } else {
             return "";

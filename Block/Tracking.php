@@ -26,7 +26,7 @@ class Tracking extends Template
     public function getPublicKey()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -44,7 +44,7 @@ class Tracking extends Template
     public function getLanguage()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -67,7 +67,7 @@ class Tracking extends Template
     public function getCollectionEmails()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -90,7 +90,7 @@ class Tracking extends Template
     public function getCollectionBaskets()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -99,15 +99,15 @@ class Tracking extends Template
         }
 
         $collectBaskets = "false";
-        if($this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS, $scope, $scope_id) == '1'){
+        if ($this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS, $scope, $scope_id) == '1') {
             $collectBaskets = "true";
         }
         return $collectBaskets;
     }
 
-    public function getFormKey() {
+    public function getFormKey()
+    {
 
         return $this->formKey->getFormKey();
-
     }
 }

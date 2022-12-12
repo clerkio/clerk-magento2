@@ -30,8 +30,7 @@ class ControllerActionLayoutRenderBeforeObserver implements ObserverInterface
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         PageFactory $resultPageFactory
-    )
-    {
+    ) {
         $this->scopeConfig = $scopeConfig;
         $this->resultPageFactory = $resultPageFactory;
     }

@@ -24,5 +24,4 @@ class DropDownPosition implements ArrayInterface
 
         return $Positions;
     }
-
 }

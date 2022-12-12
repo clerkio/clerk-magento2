@@ -29,7 +29,7 @@ class Result extends BaseResult
     public function getSearchTemplate()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -48,7 +48,7 @@ class Result extends BaseResult
     public function getFacetsDesign()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -69,7 +69,7 @@ class Result extends BaseResult
     public function shouldIncludeCategories()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -82,7 +82,7 @@ class Result extends BaseResult
     public function getSuggestions()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -96,7 +96,7 @@ class Result extends BaseResult
     public function getCategories()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -110,7 +110,7 @@ class Result extends BaseResult
     public function getPages()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -124,7 +124,7 @@ class Result extends BaseResult
     public function getPagesType()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -145,7 +145,7 @@ class Result extends BaseResult
     {
         $output = '';
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -178,9 +178,9 @@ class Result extends BaseResult
                 if ($titles = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES, $scope, $scope_id)) {
                     $titles = json_decode($titles, true);
 
-                    $titles_sorting = array();
-                    foreach($titles as $k => $v){
-                        if(array_key_exists('sort_order', $v)){
+                    $titles_sorting = [];
+                    foreach ($titles as $k => $v) {
+                        if (array_key_exists('sort_order', $v)) {
                             $titles_sorting[$k] = $v['sort_order'];
                         }
                     }
@@ -224,7 +224,7 @@ class Result extends BaseResult
     public function getNoResultsText()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
@@ -243,7 +243,7 @@ class Result extends BaseResult
     public function getLoadMoreText()
     {
 
-        if($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->isSingleStoreMode()) {
             $scope = 'default';
             $scope_id = '0';
         } else {
