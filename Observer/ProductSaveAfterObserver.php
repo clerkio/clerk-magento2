@@ -101,10 +101,6 @@ class ProductSaveAfterObserver implements ObserverInterface
         $_params = $this->request->getParams();
         $storeId = 0;
         $scope = 'default';
-        if (array_key_exists('website', $_params)){
-            $scope = 'website';
-            $storeId = $_params[$scope];
-        }
         if (array_key_exists('store', $_params)){
             $scope = 'store';
             $storeId = $_params[$scope];

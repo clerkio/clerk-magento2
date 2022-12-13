@@ -138,7 +138,7 @@ class Api
      * @param $productId
      * @throws \Zend_Http_Client_Exception
      */
-    public function removeProduct($productId)
+    public function removeProduct($productId, $store_id = null)
     {
         try {
 
@@ -146,7 +146,7 @@ class Api
                 'products' => [$productId],
             ];
 
-            $this->get('product/remove', $params);
+            $this->get('product/remove', $params, $store_id);
             $this->clerk_logger->log('Removed Product', ['response' => $params]);
 
         } catch (\Exception $e) {
@@ -164,11 +164,11 @@ class Api
      * @return \Zend_Http_Response
      * @throws \Zend_Http_Client_Exception
      */
-    private function get($endpoint, $params = [])
+    private function get($endpoint, $params = [], $store_id = null)
     {
         try {
 
-            $params = array_merge($this->getDefaultParams(), $params);
+            $params = array_merge($this->getDefaultParams($store_id), $params);
 
             /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
             $httpClient = $this->httpClientFactory->create();
