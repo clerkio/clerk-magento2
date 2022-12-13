@@ -83,6 +83,10 @@ class Index extends AbstractAction
             }
 
             $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order, $this->scope, $this->scopeid);
+            
+            if(is_array($response)){
+                $response = array_values(array_filter($response));
+            }
 
             $this->clerk_logger->log('Feched page ' . $this->page . ' with ' . count($response) . ' products', ['response' => $response]);
 
