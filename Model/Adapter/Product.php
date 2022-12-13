@@ -24,6 +24,10 @@ class Product extends AbstractAdapter
    */
     protected $clerk_logger;
 
+    /**
+   * @var RequestInterface
+   */
+    protected $requestInterface;
   /**
    * @var CollectionFactory
    */
@@ -89,7 +93,8 @@ class Product extends AbstractAdapter
         \Magento\CatalogInventory\Helper\Stock $stockFilter,
         Data $taxHelper,
         StockStateInterface $StockStateInterface,
-        ProductMetadataInterface $ProductMetadataInterface
+        ProductMetadataInterface $ProductMetadataInterface,
+        \Magento\Framework\App\RequestInterface $requestInterface
     ) {
         $this->taxHelper = $taxHelper;
         $this->_stockFilter = $stockFilter;
@@ -98,6 +103,7 @@ class Product extends AbstractAdapter
         $this->storeManager = $storeManager;
         $this->StockStateInterface = $StockStateInterface;
         $this->ProductMetadataInterface = $ProductMetadataInterface;
+        $this->requestInterface = $requestInterface;
         parent::__construct($scopeConfig, $eventManager, $storeManager, $collectionFactory, $Clerklogger);
     }
 
@@ -355,9 +361,15 @@ class Product extends AbstractAdapter
                   return $imageUrl;
             });
 
-          //Add url fieldhandler
+            //Add url fieldhandler
             $this->addFieldHandler('url', function ($item) {
-                  return $item->setStoreId($this->storeManager->getStore()->getId())->getUrlInStore();
+                $_params = $this->requestInterface->getParams();
+                if (array_key_exists('scope_id', $_params)){
+                    $storeId = $_params['scope_id'];
+                } else {
+                    $storeId = $this->storeManager->getStore()->getId();
+                }
+                return $item->setStoreId($storeId)->getUrlInStore();
             });
 
           //Add categories fieldhandler

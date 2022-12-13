@@ -12,6 +12,10 @@ use Magento\Store\Model\ScopeInterface;
 class Image
 {
     /**
+     * @var RequestInterface
+     */
+    protected $requestInterface;
+    /**
      * @var ImageFactory
      */
     protected $helperFactory;
@@ -34,11 +38,13 @@ class Image
     public function __construct(
         ImageFactory $helperFactory,
         ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        \Magento\Framework\App\RequestInterface $requestInterface
     ) {
         $this->helperFactory = $helperFactory;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
+        $this->requestInterface = $requestInterface;
     }
 
     /**
@@ -65,7 +71,13 @@ class Image
         }
 
         if (!$imageUrl) {
-            $store = $this->storeManager->getStore();
+            $_params = $this->requestInterface->getParams();
+            if (array_key_exists('scope_id', $_params)){
+                $storeId = $_params['scope_id'];
+                $store = $this->storeManager->getStore($storeId);
+            } else {
+                $store = $this->storeManager->getStore();
+            }
             $itemImage = $item->getImage() ?? $item->getSmallImage() ?? $item->getThumbnail();
 
             if ($itemImage === 'no_selection' || !$itemImage) {
