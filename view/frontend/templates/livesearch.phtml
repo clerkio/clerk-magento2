@@ -7,7 +7,13 @@
     data-instant-search-suggestions="<?php echo($block->getSuggestions() ? $block->getSuggestions() : "0"); ?>"
     data-instant-search-categories="<?php echo($block->getCategories() ? $block->getCategories() : "0"); ?>"
     data-instant-search-pages="<?php echo($block->getPages() ? $block->getPages() : "0"); ?>"
+    <?php
+    if('all' !== $block->getPagesType()):
+    ?>
     data-instant-search-pages-type="<?php echo $block->getPagesType(); ?>"
+    <?php
+    endif;
+    ?>
     data-instant-search-positioning="<?php echo $block->getDropdownPosition(); ?>"
     data-instant-search="<?php echo(!empty($block->getInputSelector()) ? $block->getInputSelector() : '#search'); ?>"
 ></span>
