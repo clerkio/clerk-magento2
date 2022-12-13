@@ -202,7 +202,17 @@ class Product extends AbstractAdapter
 
         try {
 
-          //Add price fieldhandler
+            $this->addFieldHandler('description_html', function ($item) {
+                $description = $this->getAttributeValue($item, 'description') ? htmlentities($this->getAttributeValue($item, 'description'), ENT_QUOTES) : '';
+                return $description;
+            });
+
+            $this->addFieldHandler('description', function ($item) {
+                $description = $this->getAttributeValue($item, 'description') ? str_replace(array("\r", "\n"), ' ', strip_tags($this->getAttributeValue($item, 'description'))) : '';
+                return $description;
+            });
+
+            //Add price fieldhandler
             $this->addFieldHandler('price', function ($item) {
                 try {
 
