@@ -29,7 +29,7 @@
       "Clerk\\Clerk\\": ""
     }
   },
-  "require-dev": {
+  "require": {
     "magento/magento-coding-standard": "^27.0"
   }
 }
