@@ -28,8 +28,5 @@
     "psr-4": {
       "Clerk\\Clerk\\": ""
     }
-  },
-  "require": {
-    "magento/magento-coding-standard": "^27.0"
   }
 }
