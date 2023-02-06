@@ -7,13 +7,13 @@
         });
 
         $(document).on('change', 'select#clerk_widget_content', function() {
-            getParametersForContent($(this).val());
+            getParametersForContent($(this).val(), $("#<?php echo $block->getSelectId(); ?>").val());
         });
 
         function getContentForStore(storeId) {
             $.ajax({
                 url: "<?php echo $block->getAjaxUrl(); ?>",
-                data: { type: 'content', store_id : storeId },
+                data: { type: 'content', store : storeId },
                 dataType: 'json',
                 showLoader: true,
                 success: function(response) {
@@ -24,10 +24,10 @@
             });
         }
 
-        function getParametersForContent(content) {
+        function getParametersForContent(content, storeId) {
             $.ajax({
                 url: "<?php echo $block->getAjaxUrl(); ?>",
-                data: { type: 'parameters', content : content },
+                data: { type: 'parameters', content : content, store : storeId },
                 dataType: 'json',
                 showLoader: true,
                 success: function(response) {
