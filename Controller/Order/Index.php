@@ -49,14 +49,21 @@ class Index extends AbstractAction
         StoreManagerInterface $storeManager,
         LoggerInterface $logger,
         ModuleList $moduleList,
-        ClerkLogger $ClerkLogger
+        ClerkLogger $clerk_logger
     ) {
         $this->collectionFactory = $orderCollectionFactory;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->moduleList = $moduleList;
         $this->addFieldHandlers();
 
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct(
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $clerk_logger
+        );
     }
 
     /**

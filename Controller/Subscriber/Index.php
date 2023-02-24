@@ -23,13 +23,28 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $suscriberCollectionFactory
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $suscriberCollectionFactory, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    public function __construct(
+        Context $context,
+        StoreManagerInterface $storeManager,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $suscriberCollectionFactory,
+        LoggerInterface $logger,
+        ModuleList $moduleList,
+        ClerkLogger $clerk_logger
+        )
     {
         $this->collectionFactory = $suscriberCollectionFactory;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->_storeManager = $storeManager;
 
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct(
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $clerk_logger
+        );
     }
 
     public function execute()

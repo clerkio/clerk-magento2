@@ -26,10 +26,14 @@ class Added extends Product
      * @param Context $context
      * @param PageFactory $resultPageFactory
      */
-    public function __construct(Context $context, PageFactory $resultPageFactory, ClerkLogger $ClerkLogger)
+    public function __construct(
+        Context $context,
+        PageFactory $resultPageFactory,
+        ClerkLogger $clerk_logger
+        )
     {
         $this->resultPageFactory = $resultPageFactory;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         parent::__construct($context);
     }
 

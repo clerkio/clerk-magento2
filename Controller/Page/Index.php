@@ -49,6 +49,7 @@ class Index extends AbstractAction
 
     protected $moduleList;
 
+    protected $storeManager;
 
     /**
      * Index constructor.
@@ -57,7 +58,7 @@ class Index extends AbstractAction
      * @param PageRepositoryInterface $PageRepositoryInterface
      * @param SearchCriteriaBuilder $SearchCriteriaBuilder
      * @param LoggerInterface $logger
-     * @param ClerkLogger $ClerkLogger
+     * @param ClerkLogger $clerk_logger
      */
     public function __construct(
         Context $context,
@@ -67,18 +68,18 @@ class Index extends AbstractAction
         StoreManagerInterface $storeManager,
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         LoggerInterface $logger,
-        ClerkLogger $ClerkLogger,
+        ClerkLogger $clerk_logger,
         ModuleList $moduleList
     ) {
         $this->_searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->_PageRepositoryInterface = $PageRepositoryInterface;
         $this->_SearchCriteriaBuilder = $SearchCriteriaBuilder;
         $this->_objectManager = $context->getObjectManager();
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->_scopeConfig = $scopeConfig;
         $this->moduleList = $moduleList;
         $this->storeManager = $storeManager;
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $clerk_logger);
     }
 
     /**

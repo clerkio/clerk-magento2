@@ -66,14 +66,13 @@ abstract class AbstractAdapter
         ManagerInterface $eventManager,
         StoreManagerInterface $storeManager,
         CollectionFactory $collectionFactory,
-        ClerkLogger $clerkLogger
+        ClerkLogger $clerk_logger
     ) {
-        $this->clerk_logger = $clerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
         $this->storeManager = $storeManager;
         $this->collectionFactory = $collectionFactory;
-
         $this->addFieldHandlers();
     }
 

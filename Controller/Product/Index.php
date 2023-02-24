@@ -31,6 +31,8 @@ class Index extends AbstractAction
 
     protected $moduleList;
 
+    protected $taxHelper;
+
     /**
      * Index constructor.
      *
@@ -44,7 +46,7 @@ class Index extends AbstractAction
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         ProductAdapter $productAdapter,
-        ClerkLogger $ClerkLogger,
+        ClerkLogger $clerk_logger,
         LoggerInterface $logger,
         Data $taxHelper,
         ModuleList $moduleList
@@ -52,8 +54,8 @@ class Index extends AbstractAction
         $this->taxHelper = $taxHelper;
         $this->moduleList = $moduleList;
         $this->productAdapter = $productAdapter;
-        $this->clerk_logger = $ClerkLogger;
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        $this->clerk_logger = $clerk_logger;
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $clerk_logger);
     }
 
     /**

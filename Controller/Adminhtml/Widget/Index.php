@@ -41,12 +41,18 @@ class Index extends Action
      * @param FormFactory $formFactory
      * @param ArrayPool $sourceModelPool
      */
-    public function __construct(Action\Context $context, Api $api, FormFactory $formFactory, ArrayPool $sourceModelPool, ClerkLogger $clerkLogger)
+    public function __construct(
+        Action\Context $context,
+        Api $api,
+        FormFactory $formFactory,
+        ArrayPool $sourceModelPool,
+        ClerkLogger $clerk_logger
+        )
     {
         $this->api = $api;
         $this->formFactory = $formFactory;
         $this->sourceModelPool = $sourceModelPool;
-        $this->clerk_logger = $clerkLogger;
+        $this->clerk_logger = $clerk_logger;
 
         parent::__construct($context);
     }

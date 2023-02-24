@@ -25,11 +25,11 @@ class Index extends Action
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        ClerkLogger $clerkLogger
+        ClerkLogger $clerk_logger
     ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
-        $this->clerk_logger = $clerkLogger;
+        $this->clerk_logger = $clerk_logger;
     }
 
     /**

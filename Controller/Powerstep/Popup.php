@@ -21,11 +21,15 @@ class Popup extends Action
      */
     protected $checkoutSession;
 
-    public function __construct(Context $context, Session $checkoutSession, ClerkLogger $ClerkLogger)
+    public function __construct(
+        Context $context,
+        Session $checkoutSession,
+        ClerkLogger $clerk_logger
+        )
     {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
     }
 
     /**

@@ -74,7 +74,7 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         PageCollectionFactory $pageCollectionFactory,
         Page $pageHelper,
-        ClerkLogger $ClerkLogger,
+        ClerkLogger $clerk_logger,
         ModuleList $moduleList
     ) {
         $this->moduleList = $moduleList;
@@ -82,7 +82,7 @@ class Index extends AbstractAction
         $this->pageCollectionFactory = $pageCollectionFactory;
         $this->pageHelper = $pageHelper;
         $this->storeManager = $storeManager;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->categoryFactory = $categoryFactory;
         $this->fields = [
             "entity_id",
@@ -90,7 +90,7 @@ class Index extends AbstractAction
         ];
         $this->addFieldHandlers();
 
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $clerk_logger);
     }
 
     /**

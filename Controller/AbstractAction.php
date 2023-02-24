@@ -114,14 +114,22 @@ abstract class AbstractAction extends Action
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
-     * @param ClerkLogger $ClerkLogger
+     * @param ClerkLogger $clerk_logger
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    public function __construct(
+        Context $context,
+        StoreManagerInterface $storeManager,
+        ScopeConfigInterface $scopeConfig,
+        LoggerInterface $logger,
+        ModuleList $moduleList,
+        ClerkLogger $clerk_logger
+        )
     {
         $this->moduleList = $moduleList;
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
         $this->_storeManager = $storeManager;
+        $this->clerk_logger = $clerk_logger;
         parent::__construct($context);
     }
 
@@ -144,8 +152,14 @@ abstract class AbstractAction extends Action
             $version = $productMetadata->getVersion();
             header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
 
+
+            /*
             $this->privateKey = $request->getParam('private_key');
             $this->publicKey = $request->getParam('key');
+            */
+
+            $this->privateKey = $request->getPostValue('private_key');
+            $this->publicKey = $request->getPostValue('key');
 
             //Validate supplied keys
             if (($this->verifyKeys($request) === -1 && $this->verifyWebsiteKeys($request) === -1 && $this->verifyDefaultKeys($request) === -1) || !$this->privateKey || !$this->publicKey) {
