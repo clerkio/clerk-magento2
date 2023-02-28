@@ -13,6 +13,7 @@ use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Catalog\Model\CategoryFactory;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 
