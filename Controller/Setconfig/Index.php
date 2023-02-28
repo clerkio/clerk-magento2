@@ -10,13 +10,22 @@ use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Clerk\Clerk\Model\Config;
-use \Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Store\Model\ScopeInterface;
+
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\App\Cache\TypeListInterface as CacheType;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var ClerkLogger
+     */
     protected $clerk_logger;
 
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
 
     /**
@@ -30,11 +39,19 @@ class Index extends AbstractAction
     protected $configWriter;
 
     /**
-     * @var WriterInterface
+     * @var ScopeConfigInterface
      */
     protected $ScopeConfigInterface;
 
-    protected $config_writer;
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
+
+    /**
+     * @var CacheType
+     */
+    protected $_cacheType;
 
     /**
      * Version controller constructor.
@@ -43,6 +60,8 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
+     * @param ProductMetadataInterface $product_metadata
+     * @param CacheType $cacheType
      */
     public function __construct(
         Context $context,
@@ -51,11 +70,22 @@ class Index extends AbstractAction
         ModuleList $moduleList,
         StoreManagerInterface $storeManager,
         ClerkLogger $clerk_logger,
-        WriterInterface $configWriter
+        WriterInterface $configWriter,
+        ProductMetadataInterface $product_metadata,
+        CacheType $cacheType
     ) {
         $this->clerk_logger = $clerk_logger;
         $this->config_writer = $configWriter;
-        parent::__construct($context, $storeManager, $ScopeConfigInterface, $logger, $moduleList, $clerk_logger);
+        $this->_cacheType = $cacheType;
+        parent::__construct(
+            $context, 
+            $storeManager, 
+            $ScopeConfigInterface, 
+            $logger, 
+            $moduleList, 
+            $clerk_logger,
+            $product_metadata
+        );
     }
 
     /**
@@ -330,9 +360,7 @@ class Index extends AbstractAction
                 } // foreach
 
                 if ($count !=0) {
-                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                    $cacheTypeList = $objectManager->get(\Magento\Framework\App\Cache\TypeListInterface::class);
-                    $cacheTypeList->cleanType('config');
+                    $this->_cacheType->cleanType('config');
                 }
             } // if post
 

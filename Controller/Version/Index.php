@@ -10,6 +10,8 @@ use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
+use Magento\Framework\App\ProductMetadataInterface;
+
 class Index extends AbstractAction
 {
     protected $clerk_logger;
@@ -22,12 +24,18 @@ class Index extends AbstractAction
     protected $storeManager;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
+
+    /**
      * Version controller constructor.
      *
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
+     * @param ProductMetadataInterface $product_metadata
      */
     public function __construct(
         Context $context,
@@ -35,18 +43,21 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         ModuleList $moduleList,
         StoreManagerInterface $storeManager,
-        ClerkLogger $clerk_logger
+        ClerkLogger $clerk_logger,
+        ProductMetadataInterface $product_metadata
         )
     {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $clerk_logger;
+        $this->_product_metadata = $product_metadata;
         parent::__construct(
             $context,
             $storeManager,
             $scopeConfig,
             $logger,
             $moduleList,
-            $clerk_logger
+            $clerk_logger,
+            $product_metadata
         );
     }
 
@@ -56,9 +67,7 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
-            $version = $productMetadata->getVersion();
+            $version = $this->_product_metadata->getVersion();
 
             $this->getResponse()
                 ->setHttpResponseCode(200)

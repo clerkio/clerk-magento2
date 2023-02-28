@@ -10,19 +10,32 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
 use Clerk\Clerk\Model\Adapter\Product as ProductAdapter;
 use Psr\Log\LoggerInterface;
 use Magento\Store\Model\ScopeInterface;
 
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable as ProductModelConfigurable;
+use Magento\GroupedProduct\Model\Product\Type\Grouped as ProductModelGrouped;
+use Magento\Catalog\Model\Product as ProductModel;
+
 class ProductSaveAfterObserver implements ObserverInterface
 {
     /**
-     * @var ObjectManagerInterface
+     * @var ProductModel
      */
-    protected $objectManager;
+    protected $_productModel;
+
+    /**
+     * @var ProductModelGrouped
+     */
+    protected $_productModelGrouped;
+
+    /**
+     * @var ProductModelConfigurable
+     */
+    protected $_productModelConfigurable;
 
     /**
      * @var ScopeConfigInterface
@@ -61,7 +74,6 @@ class ProductSaveAfterObserver implements ObserverInterface
 
     /**
      * ProductSaveAfterObserver constructor.
-     * @param ObjectManagerInterface $objectManager
      * @param ScopeConfigInterface $scopeConfig
      * @param ManagerInterface $eventManager
      * @param RequestInterface $request
@@ -69,18 +81,22 @@ class ProductSaveAfterObserver implements ObserverInterface
      * @param StoreManagerInterface $storeManager
      * @param Api $api
      * @param ProductAdapter $productAdapter
+     * @param ProductModelConfigurable $productModelConfigurable
+     * @param ProductModelGrouped $productModelGrouped
+     * @param ProductModel $productModel
      */
     public function __construct(
-        ObjectManagerInterface $objectManager,
         ScopeConfigInterface $scopeConfig,
         ManagerInterface $eventManager,
         RequestInterface $request,
         Emulation $emulation,
         StoreManagerInterface $storeManager,
         Api $api,
-        ProductAdapter $productAdapter
+        ProductAdapter $productAdapter,
+        ProductModelConfigurable $productModelConfigurable,
+        ProductModelGrouped $productModelGrouped,
+        ProductModel $productModel
     ) {
-        $this->objectManager = $objectManager;
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
         $this->request = $request;
@@ -88,6 +104,9 @@ class ProductSaveAfterObserver implements ObserverInterface
         $this->storeManager = $storeManager;
         $this->api = $api;
         $this->productAdapter = $productAdapter;
+        $this->_productModelConfigurable = $productModelConfigurable;
+        $this->_productModelGrouped = $productModelGrouped;
+        $this->_productModel = $productModel;
     }
 
     /**
@@ -152,20 +171,18 @@ class ProductSaveAfterObserver implements ObserverInterface
 
                 // 21-10-2021 KKY update parent products if in Grouped or child to Configurable before we check visibility and saleable - start
 
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
-                $confParentProductIds = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')->getParentIdsByChild($product->getId());
+                $confParentProductIds = $this->_productModelConfigurable->getParentIdsByChild($product->getId());
                 if (isset($confParentProductIds[0])) {
-                    $confparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($confParentProductIds[0]);
+                    $confparentproduct = $this->_productModel->load($confParentProductIds[0]);
 
                     $productInfo = $this->productAdapter->getInfoForItem($confparentproduct, 'store', $storeId);
                     $this->api->addProduct($productInfo, $storeId);
 
                 }
-                $groupParentProductIds = $objectManager->create('Magento\GroupedProduct\Model\Product\Type\Grouped')->getParentIdsByChild($product->getId());
+                $groupParentProductIds = $this->_productModelGrouped->getParentIdsByChild($product->getId());
                 if (isset($groupParentProductIds[0])) {
                     foreach ($groupParentProductIds as $groupParentProductId) {
-                        $groupparentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($groupParentProductId);
+                        $groupparentproduct = $this->_productModel->load($groupParentProductId);
 
                         $productInfo = $this->productAdapter->getInfoForItem($groupparentproduct, 'store', $storeId);
                         $this->api->addProduct($productInfo, $storeId);

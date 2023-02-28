@@ -12,6 +12,8 @@ use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Magento\Store\Model\ScopeInterface;
 use Clerk\Clerk\Model\Config;
 
+use Magento\Framework\App\ProductMetadataInterface;
+
 class Index extends AbstractAction
 {
     protected $clerk_logger;
@@ -30,6 +32,7 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
+     * @param ProductMetadataInterface $product_metadata
      */
     public function __construct(
         Context $context,
@@ -37,7 +40,9 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         ModuleList $moduleList,
         StoreManagerInterface $storeManager,
-        ClerkLogger $clerk_logger)
+        ClerkLogger $clerk_logger,
+        ProductMetadataInterface $product_metadata
+        )
     {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $clerk_logger;
@@ -48,7 +53,8 @@ class Index extends AbstractAction
             $scopeConfig,
             $logger,
             $moduleList,
-            $clerk_logger
+            $clerk_logger,
+            $product_metadata
         );
     }
 
