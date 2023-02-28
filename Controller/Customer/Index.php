@@ -13,12 +13,19 @@ use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\CustomerMetadataInterface;
 
+use Magento\Framework\App\ProductMetadataInterface;
+
 class Index extends AbstractAction
 {
 
     protected $collectionFactory;
     protected $clerk_logger;
     protected $_customerMetadata;
+
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
 
     /**
      * @var string
@@ -31,6 +38,7 @@ class Index extends AbstractAction
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $customerCollectionFactory
+     * @param ProductMetadataInterface $product_metadata
      */
     public function __construct(
         Context $context,
@@ -40,7 +48,8 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         ModuleList $moduleList,
         ClerkLogger $clerk_logger,
-        CustomerMetadataInterface $customerMetadata
+        CustomerMetadataInterface $customerMetadata,
+        ProductMetadataInterface $product_metadata
         )
     {
         $this->collectionFactory = $customerCollectionFactory;
@@ -54,7 +63,8 @@ class Index extends AbstractAction
             $scopeConfig,
             $logger,
             $moduleList,
-            $clerk_logger
+            $clerk_logger,
+            $product_metadata
         );
     }
 

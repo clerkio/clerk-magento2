@@ -15,6 +15,8 @@ use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Magento\Store\Api\StoreRepositoryInterface;
 
+use Magento\Framework\App\ProductMetadataInterface;
+
 abstract class AbstractAction extends Action
 {
     /**
@@ -108,6 +110,11 @@ abstract class AbstractAction extends Action
     protected $_storeManager;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
+
+    /**
      * AbstractAction constructor.
      * @param Context $context
      * @param StoreManagerInterface $storeManager
@@ -115,6 +122,7 @@ abstract class AbstractAction extends Action
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
      * @param ClerkLogger $clerk_logger
+     * @param ProductMetadataInterface $product_metadata
      */
     public function __construct(
         Context $context,
@@ -122,7 +130,8 @@ abstract class AbstractAction extends Action
         ScopeConfigInterface $scopeConfig,
         LoggerInterface $logger,
         ModuleList $moduleList,
-        ClerkLogger $clerk_logger
+        ClerkLogger $clerk_logger,
+        ProductMetadataInterface $product_metadata
         )
     {
         $this->moduleList = $moduleList;
@@ -130,6 +139,7 @@ abstract class AbstractAction extends Action
         $this->logger = $logger;
         $this->_storeManager = $storeManager;
         $this->clerk_logger = $clerk_logger;
+        $this->_product_metadata = $product_metadata;
         parent::__construct($context);
     }
 
@@ -147,19 +157,11 @@ abstract class AbstractAction extends Action
 
         try {
 
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
-            $version = $productMetadata->getVersion();
+            $version = $this->_product_metadata->getVersion();
             header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
 
-
-            /*
             $this->privateKey = $request->getParam('private_key');
             $this->publicKey = $request->getParam('key');
-            */
-
-            $this->privateKey = $request->getPostValue('private_key');
-            $this->publicKey = $request->getPostValue('key');
 
             //Validate supplied keys
             if (($this->verifyKeys($request) === -1 && $this->verifyWebsiteKeys($request) === -1 && $this->verifyDefaultKeys($request) === -1) || !$this->privateKey || !$this->publicKey) {

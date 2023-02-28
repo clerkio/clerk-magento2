@@ -7,6 +7,7 @@ use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Checkout\Model\Session;
 use Magento\Store\Model\ScopeInterface;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 
 class SalesTracking extends Template
 {
@@ -20,12 +21,22 @@ class SalesTracking extends Template
      *
      * @param Context $context
      * @param Session $checkoutSession
+     * @param Grouped $productGrouped
      * @param array $data
      */
-    public function __construct(Context $context, Session $checkoutSession, array $data = [])
+    public function __construct(
+        Context $context,
+        Session $checkoutSession,
+        Grouped $productGrouped,
+        array $data = []
+        )
     {
-        parent::__construct($context, $data);
+        parent::__construct(
+            $context,
+            $data
+        );
         $this->_checkoutSession = $checkoutSession;
+        $this->_productGrouped = $productGrouped;
     }
 
     /**
@@ -71,10 +82,8 @@ class SalesTracking extends Template
         $order = $this->getOrder();
         $products = [];
 
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
         foreach ($order->getAllVisibleItems() as $item) {
-            $groupParentId = $objectManager->create('Magento\GroupedProduct\Model\Product\Type\Grouped')->getParentIdsByChild($item->getProductId());
+            $groupParentId = $this->_productGrouped->getParentIdsByChild($item->getProductId());
 
             if (isset($groupParentId[0])) {
 

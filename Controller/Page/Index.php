@@ -8,7 +8,6 @@ use Magento\Framework\App\Action\Context;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Module\ModuleList;
-use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
@@ -17,8 +16,22 @@ use Psr\Log\LoggerInterface;
 use Magento\Store\Model\ScopeInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
+use Magento\Cms\Helper\Page as PageHelper;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageFactory;
+
 class Index extends AbstractAction
 {
+
+    /**
+     * @var PageFactory
+     */
+    protected $_pageFactory;
+
+    /**
+     * @var PageHelper
+     */
+    protected $_pageHelper;
 
     /**
      * @var ClerkLogger
@@ -41,14 +54,18 @@ class Index extends AbstractAction
     protected $_searchCriteriaBuilderFactory;
 
     /**
-     * @var ObjectManagerInterface
+     * @var ScopeConfigInterface
      */
-    protected $_objectManager;
-
     protected $_scopeConfig;
 
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
 
+    /**
+     * @var StoreManagerInterface
+     */
     protected $storeManager;
 
     /**
@@ -59,6 +76,9 @@ class Index extends AbstractAction
      * @param SearchCriteriaBuilder $SearchCriteriaBuilder
      * @param LoggerInterface $logger
      * @param ClerkLogger $clerk_logger
+     * @param PageHelper $pageHelper
+     * @param ProductMetadataInterface $product_metadata
+     * @param PageFactory $pageFactory
      */
     public function __construct(
         Context $context,
@@ -69,17 +89,29 @@ class Index extends AbstractAction
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         LoggerInterface $logger,
         ClerkLogger $clerk_logger,
-        ModuleList $moduleList
+        ModuleList $moduleList,
+        PageHelper $pageHelper,
+        ProductMetadataInterface $product_metadata,
+        PageFactory $pageFactory
     ) {
         $this->_searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->_PageRepositoryInterface = $PageRepositoryInterface;
         $this->_SearchCriteriaBuilder = $SearchCriteriaBuilder;
-        $this->_objectManager = $context->getObjectManager();
         $this->clerk_logger = $clerk_logger;
         $this->_scopeConfig = $scopeConfig;
         $this->moduleList = $moduleList;
         $this->storeManager = $storeManager;
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $clerk_logger);
+        $this->_pageHelper = $pageHelper;
+        $this->_pageFactory = $pageFactory;
+        parent::__construct(
+            $context, 
+            $storeManager, 
+            $scopeConfig, 
+            $logger, 
+            $moduleList, 
+            $clerk_logger, 
+            $product_metadata
+        );
     }
 
     /**
@@ -109,7 +141,7 @@ class Index extends AbstractAction
                 foreach ($pages_default->getData() as $page_default) {
 
                     try {
-                        $geturl = $this->_objectManager->create('Magento\Cms\Helper\Page')->getPageUrl($page_default['page_id']);
+                        $geturl = $this->_pageHelper->getPageUrl($page_default['page_id']);
                         if ($geturl) {
                             $url = $geturl;
                         } else {
@@ -155,7 +187,7 @@ class Index extends AbstractAction
 
                     try {
 
-                        $geturl = $this->_objectManager->create('Magento\Cms\Helper\Page')->getPageUrl($page_store['page_id']);
+                        $geturl = $this->_pageHelper->getPageUrl($page_store['page_id']);
                         if ($geturl) {
                             $url = $geturl;
                         } else {
@@ -225,11 +257,9 @@ class Index extends AbstractAction
 
     public function getPageCollection($page, $limit, $storeid)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $pageCollectionFactory = $objectManager->get('Magento\Cms\Model\ResourceModel\Page\CollectionFactory');
 
         $store = $this->storeManager->getStore($storeid);
-        $collection = $pageCollectionFactory->create();
+        $collection = $this->_pageFactory->create();
         $collection->addFilter('is_active', 1);
         $collection->addFilter('store_id', $store->getId());
         $collection->addStoreFilter($store);

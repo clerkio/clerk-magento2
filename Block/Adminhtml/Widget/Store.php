@@ -4,15 +4,16 @@ namespace Clerk\Clerk\Block\Adminhtml\Widget;
 
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Option\ArrayPool;
+use Magento\Framework\Data\Form\Element\Select as FormSelect;
 
 class Store extends \Magento\Backend\Block\Widget
 {
+
     /**
-     * @var ObjectManagerInterface
+     * @var FormSelect
      */
-    protected $_objectManager;
+    protected $_formSelect;
 
     /**
      * @var \Magento\Framework\Option\ArrayPool
@@ -22,14 +23,20 @@ class Store extends \Magento\Backend\Block\Widget
     /**
      * Store constructor.
      * @param Context $context
-     * @param ObjectManagerInterface $objectManager
+     * @param ArrayPool $sourceModelPool
+     * @param FormSelect $formSelect
      * @param array $data
      */
-    public function __construct(Context $context, ObjectManagerInterface $objectManager, ArrayPool $sourceModelPool, array $data = [])
+    public function __construct(
+        Context $context,
+        ArrayPool $sourceModelPool,
+        FormSelect $formSelect,
+        array $data = []
+        )
     {
         parent::__construct($context, $data);
-        $this->_objectManager = $objectManager;
         $this->_sourceModelPool = $sourceModelPool;
+        $this->_formSelect = $formSelect;
     }
 
     /**
@@ -49,7 +56,7 @@ class Store extends \Magento\Backend\Block\Widget
 
         //Since we're using block as widget parameter type we need to create the select ourselves
         /** @var \Magento\Framework\Data\Form\Element\Select $select */
-        $select = $this->_objectManager->create('Magento\Framework\Data\Form\Element\Select');
+        $select = $this->_formSelect;
         $select->setHtmlId($element->getHtmlId());
         $select->setName($element->getName());
         $configuredValue = $element->getData();
