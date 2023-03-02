@@ -168,11 +168,11 @@ abstract class AbstractAction extends Action
             $version = $this->_product_metadata->getVersion();
             header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
 
-            $this->privateKey = $request->getParam('private_key');
-            $this->publicKey = $request->getParam('key');
+            $this->privateKey = $this->getRequestBodyParam('private_key');
+            $this->publicKey = $this->getRequestBodyParam('key');
 
             //Validate supplied keys
-            if (($this->verifyKeys($request) === -1 && $this->verifyWebsiteKeys($request) === -1 && $this->verifyDefaultKeys($request) === -1) || !$this->privateKey || !$this->publicKey) {
+            if (($this->verifyKeys() === -1 && $this->verifyWebsiteKeys() === -1 && $this->verifyDefaultKeys() === -1) || !$this->privateKey || !$this->publicKey) {
                 $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
                 $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
 
@@ -183,7 +183,7 @@ abstract class AbstractAction extends Action
                         json_encode([
                             'error' => [
                                 'code' => 403,
-                                'message' => __(' Invalid keys supplied - '. json_encode($request->getParams())),
+                                'message' => __(' Invalid Authentification, please provide valid credentials.'),
                             ]
                         ])
                     );
@@ -193,21 +193,21 @@ abstract class AbstractAction extends Action
                 return parent::dispatch($request);
             }
 
-            if ($this->verifyWebsiteKeys($request) !==-1) {
-                $scopeID = $this->verifyWebsiteKeys($request);
+            if ($this->verifyWebsiteKeys() !==-1) {
+                $scopeID = $this->verifyWebsiteKeys();
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'website']);
             }
 
-            if ($this->verifyKeys($request) !==-1) {
-                $scopeID = $this->verifyKeys($request);
+            if ($this->verifyKeys() !==-1) {
+                $scopeID = $this->verifyKeys();
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'store']);
 
             }
 
             if ($this->_storeManager->isSingleStoreMode()) {
-                $scopeID = $this->verifyDefaultKeys($request);
+                $scopeID = $this->verifyDefaultKeys();
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'default']);
             }
@@ -226,16 +226,15 @@ abstract class AbstractAction extends Action
     /**
      * Verify public & private key
      *
-     * @param RequestInterface $request
      * @return bool
      */
-    private function verifyDefaultKeys(RequestInterface $request)
+    private function verifyDefaultKeys()
     {
 
         try {
 
-            $privateKey = $request->getParam('private_key');
-            $publicKey = $request->getParam('key');
+            $privateKey = $this->getRequestBodyParam('private_key');
+            $publicKey = $this->getRequestBodyParam('key');
             $scopeID = $this->_storeManager->getDefaultStoreView()->getId();
             if ($this->timingSafeEquals($this->getPrivateDefaultKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicDefaultKey($scopeID), $publicKey)) {
                 return $scopeID;
@@ -253,17 +252,15 @@ abstract class AbstractAction extends Action
     /**
      * Verify public & private key
      *
-     * @param RequestInterface $request
      * @return bool
      */
-    private function verifyKeys(RequestInterface $request)
+    private function verifyKeys()
     {
 
         try {
 
-            $privateKey = $request->getParam('private_key');
-            $publicKey = $request->getParam('key');
-
+            $privateKey = $this->getRequestBodyParam('private_key');
+            $publicKey = $this->getRequestBodyParam('key');
             $storeids = $this->getStores();
             foreach ($storeids as $scopeID) {
                 if ($this->timingSafeEquals($this->getPrivateKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicKey($scopeID), $publicKey)) {
@@ -283,17 +280,15 @@ abstract class AbstractAction extends Action
     /**
      * Verify public & private key
      *
-     * @param RequestInterface $request
      * @return bool
      */
-    private function verifyWebsiteKeys(RequestInterface $request)
+    private function verifyWebsiteKeys()
     {
 
         try {
 
-            $privateKey = $request->getParam('private_key');
-            $publicKey = $request->getParam('key');
-
+            $privateKey = $this->getRequestBodyParam('private_key');
+            $publicKey = $this->getRequestBodyParam('key');
             $websiteids = $this->getWebsites();
             foreach ($websiteids as $scopeID) {
                 if ($this->timingSafeEquals($this->getPrivateWebsiteKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicWebsiteKey($scopeID), $publicKey)) {
@@ -690,5 +685,28 @@ abstract class AbstractAction extends Action
     {
         $storeids = array_keys($this->_storeManager->getStores(true));
         return $storeids;
+    }
+
+    public function getRequestBodyParam($key)
+    {
+        try {
+
+            $body = $this->_request_api->getBodyParams();
+            if($body){
+                if(gettype($body) === 'array'){
+                    if(array_key_exists($key, $body)){
+                        return $body[$key];
+                    }
+                }
+            }
+
+            return false;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('Getting Request Body ERROR', ['error' => $e->getMessage()]);
+
+        }
+
     }
 }
