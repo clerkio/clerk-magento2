@@ -9,7 +9,7 @@ use Magento\Framework\Module\ModuleList;
 use Magento\Store\Model\StoreManagerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Psr\Log\LoggerInterface;
-
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Framework\App\ProductMetadataInterface;
 
 class Index extends AbstractAction
@@ -26,6 +26,7 @@ class Index extends AbstractAction
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
      * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
@@ -34,7 +35,8 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         ModuleList $moduleList,
         ClerkLogger $clerk_logger,
-        ProductMetadataInterface $product_metadata
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
         )
     {
         $this->moduleList = $moduleList;
@@ -46,7 +48,8 @@ class Index extends AbstractAction
             $logger,
             $moduleList,
             $clerk_logger,
-            $product_metadata
+            $product_metadata,
+            $request_api
         );
     }
 

@@ -14,11 +14,16 @@ use Magento\Store\Model\Store;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Magento\Store\Api\StoreRepositoryInterface;
-
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Framework\App\ProductMetadataInterface;
 
 abstract class AbstractAction extends Action
 {
+    /**
+     * @var RequestApi
+     */
+    protected $_request_api;
+
     /**
      * @var
      */
@@ -123,6 +128,7 @@ abstract class AbstractAction extends Action
      * @param ModuleList $moduleList
      * @param ClerkLogger $clerk_logger
      * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
@@ -131,7 +137,8 @@ abstract class AbstractAction extends Action
         LoggerInterface $logger,
         ModuleList $moduleList,
         ClerkLogger $clerk_logger,
-        ProductMetadataInterface $product_metadata
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
         )
     {
         $this->moduleList = $moduleList;
@@ -140,6 +147,7 @@ abstract class AbstractAction extends Action
         $this->_storeManager = $storeManager;
         $this->clerk_logger = $clerk_logger;
         $this->_product_metadata = $product_metadata;
+        $this->_request_api = $request_api;
         parent::__construct($context);
     }
 

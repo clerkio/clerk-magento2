@@ -16,13 +16,13 @@ use Magento\Framework\Module\ModuleList;
 use Magento\Catalog\Helper\Data;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
-
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Framework\App\ProductMetadataInterface;
 
 class Index extends AbstractAction
 {
     /**
-     * @var
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
@@ -31,8 +31,14 @@ class Index extends AbstractAction
      */
     protected $productAdapter;
 
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
 
+    /**
+     * @var Data
+     */
     protected $taxHelper;
 
     /**
@@ -48,6 +54,7 @@ class Index extends AbstractAction
      * @param LoggerInterface $logger
      * @param Product $productAdapter
      * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
@@ -58,7 +65,8 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         Data $taxHelper,
         ModuleList $moduleList,
-        ProductMetadataInterface $product_metadata
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
     ) {
         $this->taxHelper = $taxHelper;
         $this->moduleList = $moduleList;
@@ -71,7 +79,8 @@ class Index extends AbstractAction
             $logger, 
             $moduleList, 
             $clerk_logger,
-            $product_metadata
+            $product_metadata,
+            $request_api
         );
     }
 

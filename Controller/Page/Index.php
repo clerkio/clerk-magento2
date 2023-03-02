@@ -15,7 +15,7 @@ use Magento\Cms\Api\PageRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Store\Model\ScopeInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
-
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Cms\Helper\Page as PageHelper;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageFactory;
@@ -79,6 +79,7 @@ class Index extends AbstractAction
      * @param PageHelper $pageHelper
      * @param ProductMetadataInterface $product_metadata
      * @param PageFactory $pageFactory
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
@@ -92,7 +93,8 @@ class Index extends AbstractAction
         ModuleList $moduleList,
         PageHelper $pageHelper,
         ProductMetadataInterface $product_metadata,
-        PageFactory $pageFactory
+        PageFactory $pageFactory,
+        RequestApi $request_api
     ) {
         $this->_searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->_PageRepositoryInterface = $PageRepositoryInterface;
@@ -110,7 +112,8 @@ class Index extends AbstractAction
             $logger, 
             $moduleList, 
             $clerk_logger, 
-            $product_metadata
+            $product_metadata,
+            $request_api
         );
     }
 

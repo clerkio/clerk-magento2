@@ -11,11 +11,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory;
 use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
-
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Framework\App\ProductMetadataInterface;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var ClerkLogger
+     */
     protected $clerk_logger;
 
     /**
@@ -25,6 +28,7 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $suscriberCollectionFactory
      * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
@@ -34,7 +38,8 @@ class Index extends AbstractAction
         LoggerInterface $logger,
         ModuleList $moduleList,
         ClerkLogger $clerk_logger,
-        ProductMetadataInterface $product_metadata
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
         )
     {
         $this->collectionFactory = $suscriberCollectionFactory;
@@ -48,7 +53,8 @@ class Index extends AbstractAction
             $logger,
             $moduleList,
             $clerk_logger,
-            $product_metadata
+            $product_metadata,
+            $request_api
         );
     }
 

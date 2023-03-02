@@ -12,9 +12,9 @@ use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Store\Model\ScopeInterface;
-
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\Cache\TypeListInterface as CacheType;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 
 class Index extends AbstractAction
 {
@@ -62,6 +62,7 @@ class Index extends AbstractAction
      * @param ModuleList $moduleList
      * @param ProductMetadataInterface $product_metadata
      * @param CacheType $cacheType
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
@@ -72,7 +73,8 @@ class Index extends AbstractAction
         ClerkLogger $clerk_logger,
         WriterInterface $configWriter,
         ProductMetadataInterface $product_metadata,
-        CacheType $cacheType
+        CacheType $cacheType,
+        RequestApi $request_api
     ) {
         $this->clerk_logger = $clerk_logger;
         $this->config_writer = $configWriter;
@@ -84,7 +86,8 @@ class Index extends AbstractAction
             $logger, 
             $moduleList, 
             $clerk_logger,
-            $product_metadata
+            $product_metadata,
+            $request_api
         );
     }
 

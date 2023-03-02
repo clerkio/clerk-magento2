@@ -12,7 +12,7 @@ use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFact
 use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
-
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Catalog\Model\CategoryFactory;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
@@ -20,7 +20,7 @@ use Magento\Catalog\Api\CategoryRepositoryInterface;
 class Index extends AbstractAction
 {
     /**
-     * @var
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
@@ -52,8 +52,14 @@ class Index extends AbstractAction
      */
     protected $storeManager;
 
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
 
+    /**
+     * @var CategoryFactory
+     */
     protected $categoryFactory;
 
     /**
@@ -74,6 +80,7 @@ class Index extends AbstractAction
      * @param CategoryRepositoryInterface $categoryRepository
      * @param CategoryFactory $categoryFactory
      * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
@@ -86,7 +93,8 @@ class Index extends AbstractAction
         Page $pageHelper,
         ClerkLogger $clerk_logger,
         ModuleList $moduleList,
-        ProductMetadataInterface $product_metadata
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
     ) {
         $this->moduleList = $moduleList;
         $this->collectionFactory = $categoryCollectionFactory;
@@ -108,7 +116,8 @@ class Index extends AbstractAction
             $logger, 
             $moduleList, 
             $clerk_logger,
-            $product_metadata
+            $product_metadata,
+            $request_api
         );
     }
 
