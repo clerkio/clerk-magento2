@@ -33,7 +33,7 @@ class Api
     /**
      * @var string
      */
-    protected $baseurl = 'http://api.clerk.io/v2/';
+    protected $baseurl = 'https://api.clerk.io/v2/';
 
     /**
      * @var RequestInterface

@@ -342,7 +342,7 @@ class ClerkLogger
 
                 if ($this->Log_to == 'collect') {
 
-                    $Endpoint = 'http://api.clerk.io/v2/log/debug';
+                    $Endpoint = 'https://api.clerk.io/v2/log/debug';
 
                     $data_string = json_encode([
                         'key' =>$this->Key,
@@ -416,7 +416,7 @@ class ClerkLogger
 
             if ($this->Log_to == 'collect') {
 
-                $Endpoint = 'http://api.clerk.io/v2/log/debug';
+                $Endpoint = 'https://api.clerk.io/v2/log/debug';
 
                 $data_string = json_encode([
                     'debug' => '1',
@@ -495,7 +495,7 @@ class ClerkLogger
 
                 if ($this->Log_to == 'collect') {
 
-                    $Endpoint = 'http://api.clerk.io/v2/log/debug';
+                    $Endpoint = 'https://api.clerk.io/v2/log/debug';
 
                     $data_string = json_encode([
                         'debug' => '1',
