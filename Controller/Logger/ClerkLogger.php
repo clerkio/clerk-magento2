@@ -315,7 +315,7 @@ class ClerkLogger
 
         } elseif (isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
 
-            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $Metadata['uri'] = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
         }
 
@@ -393,7 +393,7 @@ class ClerkLogger
 
         } elseif (isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
 
-            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $Metadata['uri'] = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
         }
 
@@ -467,7 +467,7 @@ class ClerkLogger
 
         } elseif (isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
 
-            $Metadata['uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $Metadata['uri'] = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
         }
 
