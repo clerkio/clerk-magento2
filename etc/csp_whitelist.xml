@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="clerkioapi-script" type="host">https://api.clerk.io</value>
+                <value id="clerkiocdn-script" type="host">https://cdn.clerk.io</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="clerkiocdn-img" type="host">https://cdn.clerk.io</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="clerkioapi-style" type="host">https://api.clerk.io</value>
+                <value id="clerkiocdn-style" type="host">https://cdn.clerk.io</value>
+            </values>
+        </policy>
+        <policy id="frame-ancestors">
+            <values>
+                <value id="clerkioapi-frame-ancestors" type="host">https://api.clerk.io</value>
+                <value id="clerkiocdn-frame-ancestors" type="host">https://cdn.clerk.io</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
