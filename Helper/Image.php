@@ -84,12 +84,6 @@ class Image
                 $imageUrl = $helper->getDefaultPlaceholderUrl('small_image');
             } else {
                 $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
-                /***
-                 * Fix malformed image url's.
-                 */
-                if (-1 === strpos($imageUrl, 'catalog/product/')) {
-                    $imageUrl = str_replace('catalog/product', 'catalog/product/', $imageUrl);
-                }
             }
         }
 

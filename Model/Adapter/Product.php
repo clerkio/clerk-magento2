@@ -361,6 +361,14 @@ class Product extends AbstractAdapter
           //Add image fieldhandler
             $this->addFieldHandler('image', function ($item) {
                 $imageUrl = $this->imageHelper->getUrl($item);
+
+                /***
+                 * Fix malformed image url's.
+                 */
+                if (-1 === strpos($imageUrl, 'catalog/product/')) {
+                    $imageUrl = str_replace('catalog/product', 'catalog/product/', $imageUrl);
+                }
+
                 return $imageUrl;
             });
 
