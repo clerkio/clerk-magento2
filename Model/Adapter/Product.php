@@ -365,11 +365,15 @@ class Product extends AbstractAdapter
                 /***
                  * Fix malformed image url's.
                  */
-                if (-1 === strpos($imageUrl, 'catalog/product/')) {
+                $valid_path = strpos($url, 'catalog/product/');
+                if ($valid_path > -1) {
+                    return $imageUrl;
+                } else {
                     $imageUrl = str_replace('catalog/product', 'catalog/product/', $imageUrl);
+                    return $imageUrl;
                 }
 
-                return $imageUrl;
+                
             });
 
             //Add url fieldhandler
