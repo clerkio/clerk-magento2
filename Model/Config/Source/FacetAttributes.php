@@ -65,14 +65,10 @@ class FacetAttributes implements ArrayInterface
      */
     private function getFacetAttributes()
     {
-        $attributesResponse = $this->api->getFacetAttributes();
+        $attributes = $this->api->getFacetAttributes();
 
-        if ($attributesResponse) {
-            $attributes = json_decode($attributesResponse->getBody());
-
-            if (isset($attributes->facets)) {
-                return $attributes->facets;
-            }
+        if ($attributes && isset($attributes->facets)) {
+            return $attributes->facets;
         }
 
         return [];

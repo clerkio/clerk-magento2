@@ -3,7 +3,6 @@
 namespace Clerk\Clerk\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\HTTP\ZendClientFactory;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Magento\Store\Model\ScopeInterface;
@@ -26,11 +25,6 @@ class Api
     protected $scopeConfig;
 
     /**
-     * @var \Magento\Framework\HTTP\ZendClientFactory
-     */
-    protected $httpClientFactory;
-
-    /**
      * @var string
      */
     protected $baseurl = 'https://api.clerk.io/v2/';
@@ -49,14 +43,12 @@ class Api
     public function __construct(
         LoggerInterface $logger,
         ScopeConfigInterface $scopeConfig,
-        ZendClientFactory $httpClientFactory,
         ClerkLogger $Clerklogger,
         \Magento\Framework\App\RequestInterface $requestInterface
     ) {
         $this->clerk_logger = $Clerklogger;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
-        $this->httpClientFactory = $httpClientFactory;
         $this->requestInterface = $requestInterface;
     }
 
@@ -85,7 +77,7 @@ class Api
      *
      * @param string $endpoint
      * @param array $params
-     * @throws \Zend_Http_Client_Exception
+     * @throws \Exception
      */
     private function post($endpoint, $params = [], $store_id = null)
     {
@@ -93,12 +85,11 @@ class Api
 
             $params = array_merge($this->getDefaultParams($store_id), $params);
 
-            /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
-            $httpClient = $this->httpClientFactory->create();
-            $httpClient->setUri($this->baseurl . $endpoint);
-            $httpClient->setRawData(json_encode($params), 'application/json');
+            $url = $this->baseurl . $endpoint;
 
-            $result = $httpClient->request('POST');
+            $response = $this->_curl_post($url, $params);
+
+            return $response;
 
         } catch (\Exception $e) {
 
@@ -109,15 +100,15 @@ class Api
 
     private function getDefaultParams($store_id = null)
     {
-        if(null === $store_id){
+        if (null === $store_id) {
             $_params = $this->requestInterface->getParams();
             $scope_id = '0';
             $scope = 'default';
-            if (array_key_exists('website', $_params)){
+            if (array_key_exists('website', $_params)) {
                 $scope = 'website';
                 $scope_id = $_params[$scope];
             }
-            if (array_key_exists('store', $_params)){
+            if (array_key_exists('store', $_params)) {
                 $scope = 'store';
                 $scope_id = $_params[$scope];
             }
@@ -136,7 +127,7 @@ class Api
      * Remove product
      *
      * @param $productId
-     * @throws \Zend_Http_Client_Exception
+     * @throws \Exception
      */
     public function removeProduct($productId, $store_id = null)
     {
@@ -156,13 +147,54 @@ class Api
         }
     }
 
+    private function _curl_get($url, $params = [])
+    {
+        try {
+
+            if (!empty($params)) {
+                $params = is_array($params) ? http_build_query($params) : $params;
+                $url = $url . '?' . $params;
+            }
+            $curl = curl_init($url);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($curl);
+            curl_close($curl);
+            return $response;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('GET Request Error', ['error' => $e->getMessage()]);
+
+        }
+    }
+
+    private function _curl_post($url, $params = [])
+    {
+        try {
+
+            $curl = curl_init($url);
+            curl_setopt($curl, CURLOPT_POST, true);
+            if (!empty($params)) {
+                curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($params));
+            }
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($curl);
+            curl_close($curl);
+            return $response;
+
+        } catch (\Exception $e) {
+
+            $this->clerk_logger->error('POST Request Error', ['error' => $e->getMessage()]);
+
+        }
+    }
+
     /**
      * Perform a GET request
      *
      * @param string $endpoint
      * @param array $params
-     * @return \Zend_Http_Response
-     * @throws \Zend_Http_Client_Exception
+     * @throws \Exception
      */
     private function get($endpoint, $params = [], $store_id = null)
     {
@@ -170,11 +202,9 @@ class Api
 
             $params = array_merge($this->getDefaultParams($store_id), $params);
 
-            /** @var \Magento\Framework\HTTP\ZendClient $httpClient */
-            $httpClient = $this->httpClientFactory->create();
-            $httpClient->setUri($this->baseurl . $endpoint);
-            $httpClient->setParameterGet($params);
-            $response = $httpClient->request('GET');
+            $url = $this->baseurl . $endpoint;
+
+            $response = $this->_curl_get($url, $params);
 
             return $response;
 
@@ -191,7 +221,7 @@ class Api
      * @param $publicKey
      * @param $privateKey
      * @return string
-     * @throws \Zend_Http_Client_Exception
+     * @throws \Exception
      */
     public function keysValid($publicKey, $privateKey)
     {
@@ -202,7 +232,7 @@ class Api
                 'private_key' => $privateKey,
             ];
 
-            return $this->get('client/account/info', $params)->getBody();
+            return $this->get('client/account/info', $params);
 
         } catch (\Exception $e) {
 
@@ -214,14 +244,16 @@ class Api
     /**
      * Get available facet attributes
      *
-     * @return \Zend_Http_Response
-     * @throws \Zend_Http_Client_Exception
+     * @throws \Exception
      */
     public function getFacetAttributes()
     {
         try {
 
-            return $this->get('product/facets');
+            $facetAttributesResponse = $this->get('product/facets');
+            if ($facetAttributesResponse) {
+                return json_decode($facetAttributesResponse);
+            }
 
         } catch (\Exception $e) {
 
@@ -264,9 +296,9 @@ class Api
     /**
      * Get Clerk Content
      *
-     * @param null $storeId
+     * @param int $storeId
      * @return string
-     * @throws \Zend_Http_Client_Exception
+     * @throws \Exception
      */
     public function getContent($storeId = null)
     {
@@ -287,7 +319,7 @@ class Api
                 'private_key' => $this->scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, $scope, $scope_id),
             ];
 
-            return $this->get('client/account/content/list', $params)->getBody();
+            return $this->get('client/account/content/list', $params);
 
         } catch (\Exception $e) {
 
@@ -380,4 +412,5 @@ class Api
 
         return false;
     }
+
 }
