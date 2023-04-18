@@ -241,7 +241,7 @@ class Product extends AbstractAdapter
                             $parentInstance = $item->getTypeInstance();
                             $childProducts = $parentInstance->getUsedProducts($item);
                             foreach ($childProducts as $child) {
-                                $childPrices[] = is_numeric($child->getPrice()) ? $child->getPrice() : 0;
+                                $childPrices[] = (is_numeric($child->getFinalPrice()) && $child->getFinalPrice() > 0)  ? $child->getFinalPrice() : 0;
                             }
                             $price = min($childPrices) > 0 ? min($childPrices) : $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
                             break;
@@ -286,7 +286,7 @@ class Product extends AbstractAdapter
                             $parentInstance = $item->getTypeInstance();
                             $childProducts = $parentInstance->getUsedProducts($item);
                             foreach ($childProducts as $child) {
-                                $childPrices[] = is_numeric($child->getPrice()) ? $child->getPrice() : 0;
+                                $childPrices[] = (is_numeric($child->getPrice()) && $child->getPrice() > 0)  ? $child->getPrice() : 0;
                             }
                             $price = min($childPrices) > 0 ? min($childPrices) : $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
                             break;
