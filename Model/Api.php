@@ -428,7 +428,7 @@ class Api
             return $endpointMap[$endpoint];
         }
 
-        return false;
+        return ['limit'];
     }
 
 }
