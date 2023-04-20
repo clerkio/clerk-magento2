@@ -357,10 +357,16 @@ class Api
             'recommendations/trending' => [
                 'limit'
             ],
+            'recommendations/new' => [
+                'limit'
+            ],
+            'recommendations/specific' => [
+                'limit'
+            ],
             'recommendations/currently_watched' => [
                 'limit'
             ],
-            'recommendations/popular' => [
+            'recommendations/recently_bought' => [
                 'limit'
             ],
             'recommendations/keywords' => [
@@ -375,11 +381,23 @@ class Api
                 'limit',
                 'products'
             ],
+            'recommendations/bundle' => [
+                'limit',
+                'products'
+            ],
             'recommendations/category/popular' => [
                 'limit',
                 'category'
             ],
             'recommendations/category/trending' => [
+                'limit',
+                'category'
+            ],
+            'recommendations/category/new' => [
+                'limit',
+                'category'
+            ],
+            'recommendations/category/popular_subcategories' => [
                 'limit',
                 'category'
             ],
