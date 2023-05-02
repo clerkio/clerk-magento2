@@ -243,7 +243,11 @@ class Product extends AbstractAdapter
                             foreach ($childProducts as $child) {
                                 $childPrices[] = (is_numeric($child->getFinalPrice()) && $child->getFinalPrice() > 0)  ? $child->getFinalPrice() : 0;
                             }
-                            $price = min($childPrices) > 0 ? min($childPrices) : $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+                            if(!empty($childPrices)) {
+                                $price = min($childPrices) > 0 ? min($childPrices) : $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+                            } else {
+                                $price = $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+                            }
                             break;
                         case Grouped::TYPE_CODE:
                             $associatedProducts = $item->getTypeInstance()->getAssociatedProducts($item);
@@ -288,7 +292,11 @@ class Product extends AbstractAdapter
                             foreach ($childProducts as $child) {
                                 $childPrices[] = (is_numeric($child->getPrice()) && $child->getPrice() > 0)  ? $child->getPrice() : 0;
                             }
-                            $price = min($childPrices) > 0 ? min($childPrices) : $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
+                            if(!empty($childPrices)) {
+                                $price = min($childPrices) > 0 ? min($childPrices) : $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
+                            } else {
+                                $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
+                            }
                             break;
                         case Grouped::TYPE_CODE:
                             $associatedProducts = $item->getTypeInstance()->getAssociatedProducts($item);
