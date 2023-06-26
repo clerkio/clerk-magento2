@@ -31,7 +31,7 @@ class Config
      */
     const XML_PATH_CUSTOMER_SYNCHRONIZATION_ENABLED = 'clerk/customer_synchronization/enabled';
     const XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES = 'clerk/customer_synchronization/extra_attributes';
-
+    const XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED = 'clerk/customer_synchronization/sync_subscribers';
     /**
      * Search configuration
      */
