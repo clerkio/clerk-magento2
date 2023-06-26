@@ -117,7 +117,6 @@ class Index extends AbstractAction
         $store = $this->_storeManager->getStore($storeid);
         $collection = $this->collectionFactory->create();
         $collection->addFilter('store_id', $store->getId());
-        $collection->addStoreFilter($store);
         $collection->setPageSize($limit);
         $collection->setCurPage($page);
         return $collection;
