@@ -80,11 +80,11 @@ class Index extends AbstractAction
         $this->config_writer = $configWriter;
         $this->_cacheType = $cacheType;
         parent::__construct(
-            $context, 
-            $storeManager, 
-            $ScopeConfigInterface, 
-            $logger, 
-            $moduleList, 
+            $context,
+            $storeManager,
+            $ScopeConfigInterface,
+            $logger,
+            $moduleList,
             $clerk_logger,
             $product_metadata,
             $request_api
@@ -159,7 +159,10 @@ class Index extends AbstractAction
                     }
 
                     //customer
-
+                    if ($key == "SUBSCRIBER_SYNCHRONIZATION_ENABLED") {
+                        $this->config_writer->save(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $value, $scope, $scopeId);
+                        $count++;
+                    }
                     if ($key == "CUSTOMER_SYNCHRONIZATION_ENABLED") {
                         $this->config_writer->save(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_ENABLED, $value, $scope, $scopeId);
                         $count++;

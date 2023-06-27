@@ -115,6 +115,7 @@ class Index extends AbstractAction
                 'PRODUCT_SYNCHRONIZATION_ENABLE_ORDER_RETURN_SYNCHRONIZATION' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ENABLE_ORDER_RETURN_SYNCHRONIZATION, $scope, $scopeID),
                 'PRODUCT_SYNCHRONIZATION_IMAGE_TYPE' => $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_IMAGE_TYPE, $scope, $scopeID),
 
+                'SUBSCRIBER_SYNCHRONIZATION_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $scope, $scopeID),
                 'CUSTOMER_SYNCHRONIZATION_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_ENABLED, $scope, $scopeID),
                 'CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES' => $this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_EXTRA_ATTRIBUTES, $scope, $scopeID),
 
