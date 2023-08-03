@@ -193,10 +193,12 @@ class Product extends AbstractAdapter
 
             $attribute = $resourceItem->getResource()->getAttribute($field);
 
-            if ($attribute->usesSource()) {
-                $source = $attribute->getSource();
-                if ($source) {
-                    return $source->getOptionText($resourceItem[$field]);
+            if ( is_object( $attribute ) ) {
+                if ($attribute->usesSource()) {
+                    $source = $attribute->getSource();
+                    if ($source) {
+                        return $source->getOptionText($resourceItem[$field]);
+                    }
                 }
             }
 
