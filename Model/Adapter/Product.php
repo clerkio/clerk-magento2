@@ -225,8 +225,8 @@ class Product extends AbstractAdapter
             });
 
             $this->addFieldHandler('description', function ($item) {
-                $description = $this->getAttributeValue($item, 'description') ? str_replace(array("\r", "\n"), ' ', strip_tags($this->getAttributeValue($item, 'description'))) : '';
-                return html_entity_decode($description);
+                $description = $this->getAttributeValue($item, 'description') ? str_replace(array("\r", "\n"), ' ', strip_tags( html_entity_decode( $this->getAttributeValue($item, 'description') ) ) ) : '';
+                return $description;
             });
 
             //Add price fieldhandler
