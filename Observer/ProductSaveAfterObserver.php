@@ -158,8 +158,10 @@ class ProductSaveAfterObserver implements ObserverInterface
             if ($product->getId()) {
 
                 //Cancel if product visibility is not as defined
-                if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
-                    return;
+                if( 'any' != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId) ) {
+                    if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
+                        return;
+                    }
                 }
 
                 //Cancel if product is not saleable

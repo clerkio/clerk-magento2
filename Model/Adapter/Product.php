@@ -162,6 +162,9 @@ class Product extends AbstractAdapter
                 case Visibility::VISIBILITY_BOTH:
                     $collection->setVisibility([Visibility::VISIBILITY_BOTH]);
                     break;
+                case 'any':
+                    $collection->addAttributeToFilter('visibility', ['in' => [Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH]]);
+                    break;
             }
 
             $collection->setPageSize($limit)->setCurPage($page)->addOrder($orderBy, $order);
@@ -227,6 +230,10 @@ class Product extends AbstractAdapter
             $this->addFieldHandler('description', function ($item) {
                 $description = $this->getAttributeValue($item, 'description') ? str_replace(array("\r", "\n"), ' ', strip_tags( html_entity_decode( $this->getAttributeValue($item, 'description') ) ) ) : '';
                 return $description;
+            });
+
+            $this->addFieldHandler('visibility', function ($item) {
+                return $item->getAttributeText('visibility');
             });
 
             //Add price fieldhandler

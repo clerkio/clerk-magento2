@@ -33,7 +33,8 @@ class Visibility implements ArrayInterface
         return [
             BaseVisibility::VISIBILITY_IN_CATALOG => __('Catalog'),
             BaseVisibility::VISIBILITY_IN_SEARCH => __('Search'),
-            BaseVisibility::VISIBILITY_BOTH => __('Catalog, Search')
+            BaseVisibility::VISIBILITY_BOTH => __('Catalog, Search'),
+            'any' => __('Any')
         ];
     }
 }
