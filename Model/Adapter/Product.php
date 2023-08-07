@@ -226,7 +226,7 @@ class Product extends AbstractAdapter
 
             $this->addFieldHandler('description', function ($item) {
                 $description = $this->getAttributeValue($item, 'description') ? str_replace(array("\r", "\n"), ' ', strip_tags($this->getAttributeValue($item, 'description'))) : '';
-                return $description;
+                return html_entity_decode($description);
             });
 
             //Add price fieldhandler
@@ -369,7 +369,7 @@ class Product extends AbstractAdapter
                     return $imageUrl;
                 }
 
-                
+
             });
 
             //Add url fieldhandler
