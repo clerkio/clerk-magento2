@@ -119,6 +119,11 @@ abstract class AbstractAction extends Action
      */
     protected $_product_metadata;
 
+    private $privateKey;
+    private $publicKey;
+    private $scopeid;
+    private $scope;
+
     /**
      * AbstractAction constructor.
      * @param Context $context
