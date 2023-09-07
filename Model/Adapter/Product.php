@@ -196,7 +196,7 @@ class Product extends AbstractAdapter
 
             $attribute = $resourceItem->getResource()->getAttribute($field);
 
-            if ( is_object( $attribute ) ) {
+            if ( isset($attribute) && !is_bool( $attribute ) && is_object( $attribute )  ) {
                 if ($attribute->usesSource()) {
                     $source = $attribute->getSource();
                     if ($source) {
