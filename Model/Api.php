@@ -397,6 +397,11 @@ class Api
                 'limit',
                 'category'
             ],
+            'recommendations/category/complementary' => [
+                'limit',
+                'category'
+            ],
+
             'recommendations/visitor/history' => [
                 'limit',
             ],
