@@ -642,6 +642,29 @@ class Product extends AbstractAdapter
                 }
             });
 
+            //Add on_sale fieldhandler
+            $this->addFieldHandler('final_price', function ($item) {
+                try {
+                    $finalPrice = $item->getFinalPrice();
+                    //Fix for configurable products
+                    if ($item->getTypeId() === Configurable::TYPE_CODE) {
+                        $finalPrice = $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+                    }
+
+                    if ($item->getTypeId() === Bundle::TYPE_CODE) {
+                        $finalPrice = $item
+                            ->getPriceInfo()
+                            ->getPrice('final_price')
+                            ->getMinimalPrice()
+                            ->getValue();
+                    }
+
+                    return $finalPrice;
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+
         } catch (\Exception $e) {
 
             $this->clerk_logger->error('Getting Field Handlers Error', ['error' => $e->getMessage()]);
