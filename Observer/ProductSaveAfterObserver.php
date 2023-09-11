@@ -10,11 +10,13 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
 use Clerk\Clerk\Model\Adapter\Product as ProductAdapter;
 use Psr\Log\LoggerInterface;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable as ProductModelConfigurable;
 use Magento\GroupedProduct\Model\Product\Type\Grouped as ProductModelGrouped;
@@ -73,6 +75,16 @@ class ProductSaveAfterObserver implements ObserverInterface
     protected $productAdapter;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * ProductSaveAfterObserver constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param ManagerInterface $eventManager
@@ -95,7 +107,9 @@ class ProductSaveAfterObserver implements ObserverInterface
         ProductAdapter $productAdapter,
         ProductModelConfigurable $productModelConfigurable,
         ProductModelGrouped $productModelGrouped,
-        ProductModel $productModel
+        ProductModel $productModel,
+        ProductRepositoryInterface $productRepository,
+        LoggerInterface $logger
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
@@ -104,6 +118,8 @@ class ProductSaveAfterObserver implements ObserverInterface
         $this->storeManager = $storeManager;
         $this->api = $api;
         $this->productAdapter = $productAdapter;
+        $this->productRepository = $productRepository;
+        $this->logger = $logger;
         $this->_productModelConfigurable = $productModelConfigurable;
         $this->_productModelGrouped = $productModelGrouped;
         $this->_productModel = $productModel;
@@ -129,10 +145,12 @@ class ProductSaveAfterObserver implements ObserverInterface
             //Update all stores the product is connected to
             $productstoreIds = $product->getStoreIds();
             foreach ($productstoreIds as $productstoreId) {
-
+                $product = $this->productRepository->getById($product->getId(), false, $productstoreId);
                 if ($this->storeManager->getStore($productstoreId)->isActive() == true) {
                     try {
                         $this->updateStore($product, $productstoreId);
+                    } catch (NoSuchEntityException $e) {
+                        $this->logger->error('Updating Products Error', ['error' => $e->getMessage()]);
                     } finally {
                         $this->emulation->stopEnvironmentEmulation();
                     }
