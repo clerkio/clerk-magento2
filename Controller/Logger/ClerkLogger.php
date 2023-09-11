@@ -12,8 +12,16 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Module\ModuleList;
 use Magento\Store\Model\ScopeInterface;
 
+use Magento\Framework\App\ProductMetadataInterface;
+
 class ClerkLogger
 {
+
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
+
     /**
      * @var ScopeConfigInterface
      */
@@ -64,9 +72,17 @@ class ClerkLogger
      * @param LoggerInterface $logger
      * @param TimezoneInterface $date
      * @param ConfigInterface $configWriter
+     * @param ProductMetadataInterface $product_metadata
      * @throws \Magento\Framework\Exception\FileSystemException
      */
-    function __construct(ScopeConfigInterface $scopeConfig, DirectoryList $dir, TimezoneInterface $date, ConfigInterface $configWriter, ModuleList $moduleList)
+    function __construct(
+        ScopeConfigInterface $scopeConfig,
+        DirectoryList $dir,
+        TimezoneInterface $date,
+        ConfigInterface $configWriter,
+        ModuleList $moduleList,
+        ProductMetadataInterface $product_metadata
+        )
     {
 
         $this->configWriter = $configWriter;
@@ -80,6 +96,7 @@ class ClerkLogger
         $this->Log_to = $this->scopeConfig->getValue(Config::XML_PATH_LOG_TO, ScopeInterface::SCOPE_STORE);
         $this->Enabled = $this->scopeConfig->getValue(Config::XML_PATH_LOG_ENABLED, ScopeInterface::SCOPE_STORE);
         $this->moduleList = $moduleList;
+        $this->_product_metadata = $product_metadata;
         $this->InitializeSearchPowerstep();
     }
 
@@ -290,9 +307,7 @@ class ClerkLogger
      */
     public function log($Message, $Metadata)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
-        $version = $productMetadata->getVersion();
+        $version = $this->_product_metadata->getVersion();
         header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
 
@@ -327,7 +342,7 @@ class ClerkLogger
 
                 if ($this->Log_to == 'collect') {
 
-                    $Endpoint = 'http://api.clerk.io/v2/log/debug';
+                    $Endpoint = 'https://api.clerk.io/v2/log/debug';
 
                     $data_string = json_encode([
                         'key' =>$this->Key,
@@ -370,9 +385,7 @@ class ClerkLogger
      */
     public function error($Message, $Metadata)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
-        $version = $productMetadata->getVersion();
+        $version = $this->_product_metadata->getVersion();
         header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
 
@@ -403,7 +416,7 @@ class ClerkLogger
 
             if ($this->Log_to == 'collect') {
 
-                $Endpoint = 'http://api.clerk.io/v2/log/debug';
+                $Endpoint = 'https://api.clerk.io/v2/log/debug';
 
                 $data_string = json_encode([
                     'debug' => '1',
@@ -446,9 +459,7 @@ class ClerkLogger
      */
     public function warn($Message, $Metadata)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
-        $version = $productMetadata->getVersion();
+        $version = $this->_product_metadata->getVersion();
         header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
 
@@ -484,7 +495,7 @@ class ClerkLogger
 
                 if ($this->Log_to == 'collect') {
 
-                    $Endpoint = 'http://api.clerk.io/v2/log/debug';
+                    $Endpoint = 'https://api.clerk.io/v2/log/debug';
 
                     $data_string = json_encode([
                         'debug' => '1',

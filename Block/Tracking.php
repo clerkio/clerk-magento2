@@ -5,18 +5,29 @@ namespace Clerk\Clerk\Block;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Directory\Model\Currency;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Tracking extends Template
 {
 
     protected $formKey;
 
+    protected $_currency;
+
+    protected $_storeManager;
+
     public function __construct(
         \Magento\Backend\Block\Widget\Context $context,
-        \Magento\Framework\Data\Form\FormKey $formKey
+        \Magento\Framework\Data\Form\FormKey $formKey,
+        Currency $_currency,
+        StoreManagerInterface $_storeManager
     ) {
         parent::__construct($context);
         $this->formKey = $formKey;
+        $this->_currency = $_currency;
+        $this->_storeManager = $_storeManager;
+
     }
     /**
      * Get public key
@@ -110,4 +121,102 @@ class Tracking extends Template
 
         return $this->formKey->getFormKey();
     }
+
+    /**
+     * Get store base currency code
+     *
+     * @return string
+     */
+    public function getBaseCurrencyCode()
+    {
+        return $this->_storeManager->getStore()->getBaseCurrencyCode();
+    }
+
+    /**
+     * Get current store currency code
+     *
+     * @return string
+     */
+    public function getCurrentCurrencyCode()
+    {
+        return $this->_storeManager->getStore()->getCurrentCurrencyCode();
+    }
+
+    /**
+     * Get default store currency code
+     *
+     * @return string
+     */
+    public function getDefaultCurrencyCode()
+    {
+        return $this->_storeManager->getStore()->getDefaultCurrencyCode();
+    }
+
+    /**
+     * Get allowed store currency codes
+     *
+     * If base currency is not allowed in current website config scope,
+     * then it can be disabled with $skipBaseNotAllowed
+     *
+     * @param bool $skipBaseNotAllowed
+     * @return array
+     */
+    public function getAvailableCurrencyCodes($skipBaseNotAllowed = false)
+    {
+        return $this->_storeManager->getStore()->getAvailableCurrencyCodes($skipBaseNotAllowed);
+    }
+
+    /**
+     * Get array of installed currencies for the scope
+     *
+     * @return array
+     */
+    public function getAllowedCurrencies()
+    {
+        return $this->_storeManager->getStore()->getAllowedCurrencies();
+    }
+
+    /**
+     * Get current currency rate
+     *
+     * @return float
+     */
+    public function getCurrentCurrencyRate()
+    {
+        return $this->_storeManager->getStore()->getCurrentCurrencyRate();
+    }
+
+    /**
+     * Get currency symbol for current locale and currency code
+     *
+     * @return string
+     */
+    public function getCurrentCurrencySymbol()
+    {
+        return $this->_currency->getCurrencySymbol();
+    }
+
+    /**
+     * Get currency rate for current locale from currency code
+     *
+     * @return float
+     */
+
+    public function getCurrencyRateFromIso($currencyIso = null) {
+        if( ! $currencyIso ) {
+            return 1.0;
+        } else {
+            return $this->_storeManager->getStore()->getBaseCurrency()->getRate($currencyIso);
+        }
+    }
+
+    public function getAllCurrencyRates() {
+        $currency_codes = $this->getAllowedCurrencies();
+        $currency_rates_array = array();
+        foreach($currency_codes as $key => $code){
+            $currency_rates_array[$code] = $this->getCurrencyRateFromIso($code);
+        }
+        return $currency_rates_array;
+    }
+
 }

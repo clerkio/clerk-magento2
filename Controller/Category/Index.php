@@ -12,11 +12,15 @@ use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFact
 use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Catalog\Model\CategoryFactory;
+use Magento\Catalog\Api\CategoryRepositoryInterface;
 
 class Index extends AbstractAction
 {
     /**
-     * @var
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
@@ -48,9 +52,20 @@ class Index extends AbstractAction
      */
     protected $storeManager;
 
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
 
+    /**
+     * @var CategoryFactory
+     */
     protected $categoryFactory;
+
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
 
     /**
      * Category controller constructor.
@@ -62,27 +77,31 @@ class Index extends AbstractAction
      * @param PageCollectionFactory $pageCollectionFactory
      * @param Page $pageHelper
      * @param StoreManagerInterface $storeManager
-     * @param Magento\Catalog\Api\CategoryRepositoryInterface $categoryRepository
-     * @param Magento\Catalog\Model\CategoryFactory $categoryFactory,
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param CategoryFactory $categoryFactory
+     * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         CollectionFactory $categoryCollectionFactory,
-        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        CategoryFactory $categoryFactory,
         LoggerInterface $logger,
         PageCollectionFactory $pageCollectionFactory,
         Page $pageHelper,
-        ClerkLogger $ClerkLogger,
-        ModuleList $moduleList
+        ClerkLogger $clerk_logger,
+        ModuleList $moduleList,
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
     ) {
         $this->moduleList = $moduleList;
         $this->collectionFactory = $categoryCollectionFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
         $this->pageHelper = $pageHelper;
         $this->storeManager = $storeManager;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->categoryFactory = $categoryFactory;
         $this->fields = [
             "entity_id",
@@ -90,7 +109,16 @@ class Index extends AbstractAction
         ];
         $this->addFieldHandlers();
 
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct(
+            $context, 
+            $storeManager, 
+            $scopeConfig, 
+            $logger, 
+            $moduleList, 
+            $clerk_logger,
+            $product_metadata,
+            $request_api
+        );
     }
 
     /**

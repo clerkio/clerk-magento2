@@ -9,16 +9,46 @@ use Magento\Framework\App\Action\Context;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
+use Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory as SubscriberCollectionFactory;
+use Magento\Newsletter\Model\SubscriberFactory as SubscriberFactory;
 use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\CustomerMetadataInterface;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Framework\App\ProductMetadataInterface;
 
 class Index extends AbstractAction
 {
 
+    /**
+     * @var SubscriberFactory
+     */
+    protected $_subscriberFactory;
+
+    /**
+     * @var SubscriberCollectionFactory
+     */
+    protected $_subscriberCollectionFactory;
+
+    /**
+     * @var CollectionFactory
+     */
     protected $collectionFactory;
+
+    /**
+     * @var ClerkLogger
+     */
     protected $clerk_logger;
+
+    /**
+     * @var CustomerMetadataInterface
+     */
     protected $_customerMetadata;
+
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
 
     /**
      * @var string
@@ -31,15 +61,41 @@ class Index extends AbstractAction
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $customerCollectionFactory
+     * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $customerCollectionFactory, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger, CustomerMetadataInterface $customerMetadata)
+    public function __construct(
+        Context $context,
+        StoreManagerInterface $storeManager,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $customerCollectionFactory,
+        LoggerInterface $logger,
+        ModuleList $moduleList,
+        ClerkLogger $clerk_logger,
+        CustomerMetadataInterface $customerMetadata,
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api,
+        SubscriberFactory $subscriberFactory,
+        SubscriberCollectionFactory $subscriberCollectionFactory
+        )
     {
         $this->collectionFactory = $customerCollectionFactory;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->_customerMetadata = $customerMetadata;
         $this->_storeManager = $storeManager;
+        $this->_subscriberFactory = $subscriberFactory;
+        $this->_subscriberCollectionFactory = $subscriberCollectionFactory;
 
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct(
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $clerk_logger,
+            $product_metadata,
+            $request_api
+        );
     }
 
     public function execute()
@@ -63,14 +119,17 @@ class Index extends AbstractAction
 
                 }
 
-                    $response = $this->getCustomerCollection($this->page, $this->limit, $this->scopeid);
+                $response = $this->getCustomerCollection($this->page, $this->limit, $this->scopeid);
+
+                $subscriberInstance = $this->_subscriberFactory->create();
 
                 foreach ($response->getData() as $customer) {
 
-                    $_customer = [];
+                    $_customer = array();
                     $_customer['id'] = $customer['entity_id'];
                     $_customer['name'] = $customer['firstname'] . " " . (!is_null($customer['middlename']) ? $customer['middlename'] . " " : "") . $customer['lastname'];
                     $_customer['email'] = $customer['email'];
+
 
                     foreach ($Fields as $Field) {
                         if (isset($customer[$Field])) {
@@ -87,7 +146,33 @@ class Index extends AbstractAction
                         }
                     }
 
+                    if($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
+                        $sub_state = $subscriberInstance->loadByEmail($customer['email']);
+                        if($sub_state->getId()) {
+                            $_customer['subscribed'] = (bool) $sub_state->getSubscriberStatus();
+                        } else {
+                            $_customer['subscribed'] = false;
+                        }
+                    }
+
                     $Customers[] = $_customer;
+                }
+
+                if($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
+
+                    $subscribersOnlyResponse = $this->getSubscriberCollection($this->page, $this->limit, $this->scopeid);
+
+                    foreach ($subscribersOnlyResponse->getData() as $subscriber) {
+                        if (isset($subscriber['subscriber_id'])) {
+                            $_sub = array();
+                            $_sub['id'] = 'SUB' . $subscriber['subscriber_id'];
+                            $_sub['email'] = $subscriber['subscriber_email'];
+                            $_sub['subscribed'] = (bool) $subscriber['subscriber_status'];
+                            $_sub['name'] = "";
+                            $_sub['firstname'] = "";
+                            $Customers[] = $_sub;
+                        }
+                    }
                 }
 
                 if ($this->debug) {
@@ -121,6 +206,16 @@ class Index extends AbstractAction
         $customerCollection->setPageSize($limit);
         $customerCollection->setCurPage($page);
         return $customerCollection;
+    }
+
+    public function getSubscriberCollection($page, $limit, $storeid)
+    {
+        $subscriberCollection = $this->_subscriberCollectionFactory->create();
+        $subscriberCollection->addFilter('store_id', $storeid);
+        $subscriberCollection->addFilter('customer_id', 0);
+        $subscriberCollection->setPageSize($limit);
+        $subscriberCollection->setCurPage($page);
+        return $subscriberCollection;
     }
 
     public function getCustomerGender($GenderCode)

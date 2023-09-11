@@ -9,10 +9,16 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
+use Magento\Bundle\Model\Product\Type as Bundle;
 
 abstract class AbstractAdapter
 {
+
+    const PRODUCT_TYPE_SIMPLE = 'simple';
+
     /**
      * @var ScopeConfigInterface
      */
@@ -66,14 +72,13 @@ abstract class AbstractAdapter
         ManagerInterface $eventManager,
         StoreManagerInterface $storeManager,
         CollectionFactory $collectionFactory,
-        ClerkLogger $clerkLogger
+        ClerkLogger $clerk_logger
     ) {
-        $this->clerk_logger = $clerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
         $this->storeManager = $storeManager;
         $this->collectionFactory = $collectionFactory;
-
         $this->addFieldHandlers();
     }
 
@@ -177,7 +182,7 @@ abstract class AbstractAdapter
 
                     }
 
-                    if ($resourceItem->getTypeId() === "grouped") {
+                    if ($resourceItem->getTypeId() === Grouped::TYPE_CODE) {
 
                         $groupedList=[];
                         $entityField = 'entity_'.$field;

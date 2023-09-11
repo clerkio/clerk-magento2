@@ -3,9 +3,26 @@
 namespace Clerk\Clerk\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Locale\Resolver;
 
 class Language implements ArrayInterface
 {
+    /**
+     * @var Resolver
+     */
+    protected $_store;
+
+    /**
+     * Language model constructor.
+     *
+     * @param Resolver $localeResolver
+     */
+    public function __construct(
+        Resolver $localeResolver
+        )
+    {
+        $this->_store = $localeResolver;
+    }
 
     /**
      * Options getter
@@ -15,8 +32,7 @@ class Language implements ArrayInterface
     public function toOptionArray()
     {
 
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $store = $objectManager->get('Magento\Framework\Locale\Resolver');
+        $store = $this->_store;
 
         $Langs = [
             ['value' => 'danish', 'label' => 'Danish'],

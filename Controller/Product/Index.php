@@ -16,11 +16,13 @@ use Magento\Framework\Module\ModuleList;
 use Magento\Catalog\Helper\Data;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Framework\App\ProductMetadataInterface;
 
 class Index extends AbstractAction
 {
     /**
-     * @var
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
@@ -29,7 +31,20 @@ class Index extends AbstractAction
      */
     protected $productAdapter;
 
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
+
+    /**
+     * @var Data
+     */
+    protected $taxHelper;
+
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
 
     /**
      * Index constructor.
@@ -38,22 +53,35 @@ class Index extends AbstractAction
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      * @param Product $productAdapter
+     * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         ProductAdapter $productAdapter,
-        ClerkLogger $ClerkLogger,
+        ClerkLogger $clerk_logger,
         LoggerInterface $logger,
         Data $taxHelper,
-        ModuleList $moduleList
+        ModuleList $moduleList,
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
     ) {
         $this->taxHelper = $taxHelper;
         $this->moduleList = $moduleList;
         $this->productAdapter = $productAdapter;
-        $this->clerk_logger = $ClerkLogger;
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        $this->clerk_logger = $clerk_logger;
+        parent::__construct(
+            $context, 
+            $storeManager, 
+            $scopeConfig, 
+            $logger, 
+            $moduleList, 
+            $clerk_logger,
+            $product_metadata,
+            $request_api
+        );
     }
 
     /**

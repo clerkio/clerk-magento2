@@ -11,12 +11,37 @@ use Magento\Framework\Data\FormFactory;
 use Magento\Framework\Option\ArrayPool;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 
+use Magento\Framework\Data\Form\Element\Select as FormSelect;
+use Magento\Backend\Block\Widget\Form\Renderer\Fieldset\Element as FieldElement;
+use Magento\Backend\Block\Widget\Form\Renderer\Fieldset as FieldSet;
+use Magento\Catalog\Block\Adminhtml\Product\Widget\Chooser as WidgetChooser;
+
 class Index extends Action
 {
     /**
      * @var
      */
     protected $clerk_logger;
+
+    /**
+     * @var FieldSet
+     */
+    protected $_fieldSet;
+
+    /**
+     * @var WidgetChooser
+     */
+    protected $_widgetChooser;
+
+    /**
+     * @var FieldElement
+     */
+    protected $_fieldElement;
+
+    /**
+     * @var FormSelect
+     */
+    protected $_formSelect;
 
     /**
      * @var Api
@@ -40,13 +65,31 @@ class Index extends Action
      * @param Api $api
      * @param FormFactory $formFactory
      * @param ArrayPool $sourceModelPool
+     * @param FormSelect $formSelect
+     * @param FieldElement $fieldElement
+     * @param FieldSet $fieldSet
+     * @param WidgetChooser $widgetChooser
      */
-    public function __construct(Action\Context $context, Api $api, FormFactory $formFactory, ArrayPool $sourceModelPool, ClerkLogger $clerkLogger)
+    public function __construct(
+        Action\Context $context,
+        Api $api,
+        FormFactory $formFactory,
+        FormSelect $formSelect,
+        FieldElement $fieldElement,
+        FieldSet $fieldSet,
+        WidgetChooser $widgetChooser,
+        ArrayPool $sourceModelPool,
+        ClerkLogger $clerk_logger
+        )
     {
         $this->api = $api;
         $this->formFactory = $formFactory;
         $this->sourceModelPool = $sourceModelPool;
-        $this->clerk_logger = $clerkLogger;
+        $this->clerk_logger = $clerk_logger;
+        $this->_formSelect = $formSelect;
+        $this->_fieldElement = $fieldElement;
+        $this->_fieldSet = $fieldSet;
+        $this->_widgetChooser = $widgetChooser;
 
         parent::__construct($context);
     }
@@ -83,9 +126,7 @@ class Index extends Action
         try {
             /** @var Form $form */
             $form = $this->formFactory->create();
-
-            /** @var \Magento\Framework\Data\Form\Element\Select $select */
-            $select = $this->_objectManager->create('Magento\Framework\Data\Form\Element\Select');
+            $select = $this->_formSelect;
             $select->setHtmlId('clerk_widget_content');
             $select->setId('clerk_widget_content');
             $select->setCssClass('clerk_content_select');
@@ -94,7 +135,7 @@ class Index extends Action
             $select->setLabel(__('Content'));
             $select->setForm($form);
 
-            $renderer = $this->_objectManager->create('Magento\Backend\Block\Widget\Form\Renderer\Fieldset\Element');
+            $renderer = $this->_fieldElement;
 
             $this->getResponse()
                 ->setHttpResponseCode(200)
@@ -127,9 +168,7 @@ class Index extends Action
             if (!!array_intersect(['products', 'category'], $parameters)) {
                 /** @var Form $form */
                 $form = $this->formFactory->create();
-                $form->setFieldsetRenderer($this->_objectManager->create(
-                    'Magento\Backend\Block\Widget\Form\Renderer\Fieldset'
-                ));
+                $form->setFieldsetRenderer($this->_fieldSet);
                 $form->setUseContainer(false);
 
                 $fieldset = $form->addFieldset('clerk_widget_options', [
@@ -144,7 +183,7 @@ class Index extends Action
                         'label' => __('Product')
                     ]);
 
-                    $chooser = $this->_objectManager->create('\Magento\Catalog\Block\Adminhtml\Product\Widget\Chooser');
+                    $chooser = $this->_widgetChooser;
                     $chooser->setHtmlId('clerk_widget_content');
                     $chooser->setConfig([
                         'button' => [
@@ -169,7 +208,7 @@ class Index extends Action
                         'label' => __('Category')
                     ]);
 
-                    $chooser = $this->_objectManager->create('\Magento\Catalog\Block\Adminhtml\Category\Widget\Chooser');
+                    $chooser = $this->_widgetChooser;
                     $chooser->setHtmlId('clerk_widget_content');
                     $chooser->setConfig([
                         'button' => [

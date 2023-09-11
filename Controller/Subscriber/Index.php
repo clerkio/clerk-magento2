@@ -11,9 +11,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory;
 use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Framework\App\ProductMetadataInterface;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var ClerkLogger
+     */
     protected $clerk_logger;
 
     /**
@@ -22,14 +27,35 @@ class Index extends AbstractAction
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $suscriberCollectionFactory
+     * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
-    public function __construct(Context $context, StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig, CollectionFactory $suscriberCollectionFactory, LoggerInterface $logger, ModuleList $moduleList, ClerkLogger $ClerkLogger)
+    public function __construct(
+        Context $context,
+        StoreManagerInterface $storeManager,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $suscriberCollectionFactory,
+        LoggerInterface $logger,
+        ModuleList $moduleList,
+        ClerkLogger $clerk_logger,
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
+        )
     {
         $this->collectionFactory = $suscriberCollectionFactory;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->_storeManager = $storeManager;
 
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct(
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $clerk_logger,
+            $product_metadata,
+            $request_api
+        );
     }
 
     public function execute()
@@ -91,7 +117,6 @@ class Index extends AbstractAction
         $store = $this->_storeManager->getStore($storeid);
         $collection = $this->collectionFactory->create();
         $collection->addFilter('store_id', $store->getId());
-        $collection->addStoreFilter($store);
         $collection->setPageSize($limit);
         $collection->setCurPage($page);
         return $collection;

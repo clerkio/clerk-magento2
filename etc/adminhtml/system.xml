@@ -89,6 +89,10 @@
                     <label>Extra Customer Attributes</label>
                     <comment>A comma separated list of customer attributes</comment>
                 </field>
+                <field id="sync_subscribers" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sync Subscribers</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <group id="search" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Search Settings</label>

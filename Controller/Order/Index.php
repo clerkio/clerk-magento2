@@ -13,11 +13,13 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 
 class Index extends AbstractAction
 {
     /**
-     * @var
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
@@ -33,6 +35,9 @@ class Index extends AbstractAction
      */
     protected $eventPrefix = 'clerk_order';
 
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
 
     /**
@@ -41,6 +46,8 @@ class Index extends AbstractAction
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $orderCollectionFactory
+     * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
     public function __construct(
         Context $context,
@@ -49,14 +56,25 @@ class Index extends AbstractAction
         StoreManagerInterface $storeManager,
         LoggerInterface $logger,
         ModuleList $moduleList,
-        ClerkLogger $ClerkLogger
+        ClerkLogger $clerk_logger,
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
     ) {
         $this->collectionFactory = $orderCollectionFactory;
-        $this->clerk_logger = $ClerkLogger;
+        $this->clerk_logger = $clerk_logger;
         $this->moduleList = $moduleList;
         $this->addFieldHandlers();
 
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        parent::__construct(
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $clerk_logger,
+            $product_metadata,
+            $request_api
+        );
     }
 
     /**

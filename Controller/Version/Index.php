@@ -9,11 +9,19 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Framework\App\ProductMetadataInterface;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var ClerkLogger
+     */
     protected $clerk_logger;
 
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
 
     /**
@@ -22,18 +30,44 @@ class Index extends AbstractAction
     protected $storeManager;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    protected $_product_metadata;
+
+    /**
      * Version controller constructor.
      *
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
+     * @param ProductMetadataInterface $product_metadata
+     * @param RequestApi $request_api
      */
-    public function __construct(Context $context, ScopeConfigInterface $scopeConfig, LoggerInterface $logger, ModuleList $moduleList, StoreManagerInterface $storeManager, ClerkLogger $ClerkLogger)
+    public function __construct(
+        Context $context,
+        ScopeConfigInterface $scopeConfig,
+        LoggerInterface $logger,
+        ModuleList $moduleList,
+        StoreManagerInterface $storeManager,
+        ClerkLogger $clerk_logger,
+        ProductMetadataInterface $product_metadata,
+        RequestApi $request_api
+        )
     {
         $this->moduleList = $moduleList;
-        $this->clerk_logger = $ClerkLogger;
-        parent::__construct($context, $storeManager, $scopeConfig, $logger, $moduleList, $ClerkLogger);
+        $this->clerk_logger = $clerk_logger;
+        $this->_product_metadata = $product_metadata;
+        parent::__construct(
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $clerk_logger,
+            $product_metadata,
+            $request_api
+        );
     }
 
     /**
@@ -42,9 +76,7 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
-            $version = $productMetadata->getVersion();
+            $version = $this->_product_metadata->getVersion();
 
             $this->getResponse()
                 ->setHttpResponseCode(200)
