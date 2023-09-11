@@ -397,10 +397,6 @@ class Api
                 'limit',
                 'category'
             ],
-            'recommendations/category/popular_subcategories' => [
-                'limit',
-                'category'
-            ],
             'recommendations/visitor/history' => [
                 'limit',
             ],
