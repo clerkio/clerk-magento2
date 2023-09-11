@@ -121,8 +121,8 @@ abstract class AbstractAction extends Action
 
     private $privateKey;
     private $publicKey;
-    private $scopeid;
-    private $scope;
+    protected $scopeid;
+    protected $scope;
 
     /**
      * AbstractAction constructor.

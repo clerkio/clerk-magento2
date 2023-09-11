@@ -66,7 +66,7 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
         $modules = $this->moduleList->getAll();
 
         $modules_for_warning = [
-            //'Clerk_Clerk' => ['message' => 'This module can interfear with how we inject our instant search.', 'link' => 'https://clerk.io']
+            'Clerk_Clerk' => ['message' => 'This module can interfere with how we inject our instant search.', 'link' => 'https://clerk.io']
         ];
 
         foreach ($modules as $name => $module) {
@@ -80,8 +80,7 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
 
         //Get installed module version
         $moduleInfo = $this->moduleList->getOne('Clerk_Clerk');
-        $installedVersion = $moduleInfo['setup_version'];
 
-        return $installedVersion;
+        return $moduleInfo['setup_version'];
     }
 }
