@@ -78,6 +78,12 @@ class Product extends AbstractAdapter
      * @var ProductMetadataInterface
      */
     protected $ProductMetadataInterface;
+
+    /**
+     * @var \Magento\Framework\App\RequestInterface
+     */
+    protected $getProductSalableQtyInterface;
+
     /**
      * Product constructor.
      *
@@ -99,7 +105,8 @@ class Product extends AbstractAdapter
         Data $taxHelper,
         StockStateInterface $StockStateInterface,
         ProductMetadataInterface $ProductMetadataInterface,
-        \Magento\Framework\App\RequestInterface $requestInterface
+        \Magento\Framework\App\RequestInterface $requestInterface,
+        \Magento\InventorySalesApi\Api\GetProductSalableQtyInterface $getProductSalableQtyInterface
     ) {
         $this->taxHelper = $taxHelper;
         $this->_stockFilter = $stockFilter;
@@ -109,6 +116,7 @@ class Product extends AbstractAdapter
         $this->StockStateInterface = $StockStateInterface;
         $this->ProductMetadataInterface = $ProductMetadataInterface;
         $this->requestInterface = $requestInterface;
+        $this->getProductSalableQtyInterface = $getProductSalableQtyInterface;
         parent::__construct(
             $scopeConfig,
             $eventManager,
@@ -542,7 +550,8 @@ class Product extends AbstractAdapter
                             }
                         break;
                     case 'simple':
-                            $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
+                            // $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
+                            $total_stock = $this->getProductSalableQtyInterface->execute($item->getSku(), $item->getStore()->getWebsiteId());
                         break;
                     case 'bundle':
                         // Get the inventory qty of each child item
