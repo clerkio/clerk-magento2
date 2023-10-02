@@ -209,12 +209,7 @@ abstract class AbstractAdapter
                 //21-10-2021 KKY Additional Fields for Configurable and grouped Products - end
 
                 if (isset($this->fieldHandlers[$field])) {
-                    if (in_array($this->getFieldName($field), ['price','list_price'])) {
-                            $price = str_replace(',', '', $this->fieldHandlers[$field]($resourceItem));
-                            $info[$this->getFieldName($field)] = (float)$price;
-                    } else {
-                        $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
-                    }
+                    $info[$this->getFieldName($field)] = $this->fieldHandlers[$field]($resourceItem);
                 }
 
                 if (array_key_exists($this->getFieldName($field), $info) != true) {

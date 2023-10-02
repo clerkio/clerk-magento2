@@ -282,7 +282,7 @@ class Product extends AbstractAdapter
                             $price = $this->taxHelper->getTaxPrice($item, $item->getFinalPrice(), true);
                             break;
                     }
-                    return (float) number_format( (float) $price, 2 );
+                    return (float) number_format( (float) $price, 2, ".", "" );
                 } catch (\Exception $e) {
                     return 0;
                 }
@@ -333,7 +333,7 @@ class Product extends AbstractAdapter
                             $price = $this->taxHelper->getTaxPrice($item, $item->getFinalPrice(), false);
                             break;
                     }
-                    return (float) number_format( (float) $price, 2 );
+                    return (float) number_format( (float) $price, 2, ".", "" );
                 } catch (\Exception $e) {
                     return 0;
                 }
@@ -385,8 +385,7 @@ class Product extends AbstractAdapter
                             $price = $this->taxHelper->getTaxPrice($item, $item->getPrice(), true);
                             break;
                     }
-
-                    return (float) number_format((float)$price, 2);
+                    return (float) number_format( (float) $price, 2, ".", "" );
                 } catch (\Exception $e) {
                     return 0;
                 }
@@ -437,8 +436,7 @@ class Product extends AbstractAdapter
                             $price = $this->taxHelper->getTaxPrice($item, $item->getPrice(), false);
                             break;
                     }
-
-                    return (float) number_format((float)$price, 2);
+                    return (float) number_format( (float) $price, 2, ".", "" );
                 } catch (\Exception $e) {
                     return 0;
                 }
