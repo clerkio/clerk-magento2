@@ -216,7 +216,9 @@ abstract class AbstractAdapter
                     $info[$this->getFieldName($field)] = "";
                 }
             }
-
+            if(isset($info['price']) && isset($info['list_price'])){
+                $info['on_sale'] = (bool) ($info['price'] < $info['list_price']);
+            }
             return $info;
         } catch (\Exception $e) {
 

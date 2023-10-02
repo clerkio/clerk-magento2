@@ -609,35 +609,9 @@ class Product extends AbstractAdapter
                 return $brand;
             });
 
-        //Add on_sale fieldhandler
+            //Add on_sale fieldhandler
             $this->addFieldHandler('on_sale', function ($item) {
-                try {
-                    $price = $item->getPrice();
-                    $finalPrice = $item->getFinalPrice();
-            //Fix for configurable products
-                    if ($item->getTypeId() === Configurable::TYPE_CODE) {
-                            $price = $item->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
-                            $finalPrice = $item->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
-                    }
-
-                    if ($item->getTypeId() === Bundle::TYPE_CODE) {
-                        $price = $item
-                                ->getPriceInfo()
-                                ->getPrice('regular_price')
-                                ->getMinimalPrice()
-                                ->getValue();
-
-                        $finalPrice = $item
-                                    ->getPriceInfo()
-                                    ->getPrice('final_price')
-                                    ->getMinimalPrice()
-                                    ->getValue();
-                    }
-
-                    return $finalPrice < $price;
-                } catch (\Exception $e) {
-                    return false;
-                }
+                return false; 
             });
 
         } catch (\Exception $e) {
