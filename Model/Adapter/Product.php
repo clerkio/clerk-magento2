@@ -13,6 +13,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Helper\Data;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogInventory\Api\StockStateInterface;
+use Magento\CatalogInventory\Model\Stock\StockItemRepository;
 use Magento\Framework\App\ProductMetadataInterface;
 
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
@@ -75,6 +76,11 @@ class Product extends AbstractAdapter
     protected $StockStateInterface;
 
     /**
+     * @var StockItemRepository
+     */
+    protected $stockItemRepository;
+
+    /**
      * @var ProductMetadataInterface
      */
     protected $ProductMetadataInterface;
@@ -86,6 +92,7 @@ class Product extends AbstractAdapter
      * @param CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManager
      * @param StockStateInterface $StockStateInterface
+     * @param StockItemRepository $stockItemRepository
      * @param ProductMetadataInterface $ProductMetadataInterface
      */
     public function __construct(
@@ -98,6 +105,7 @@ class Product extends AbstractAdapter
         \Magento\CatalogInventory\Helper\Stock $stockFilter,
         Data $taxHelper,
         StockStateInterface $StockStateInterface,
+        StockItemRepository $stockItemRepository,
         ProductMetadataInterface $ProductMetadataInterface,
         \Magento\Framework\App\RequestInterface $requestInterface
     ) {
@@ -107,6 +115,7 @@ class Product extends AbstractAdapter
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;
         $this->StockStateInterface = $StockStateInterface;
+        $this->stockItemRepository = $stockItemRepository;
         $this->ProductMetadataInterface = $ProductMetadataInterface;
         $this->requestInterface = $requestInterface;
         parent::__construct(
@@ -504,57 +513,62 @@ class Product extends AbstractAdapter
 
             $this->addFieldHandler('child_stocks', function ($item) {
                 $productType = $item->getTypeID();
-                $StockState = $this->StockStateInterface;
+                $productTypeInstance = $item->getTypeInstance();
                 $stock_list = [];
                 switch ($productType) {
                     case 'configurable':
-                            $productTypeInstance = $item->getTypeInstance();
                             $usedProducts = $productTypeInstance->getUsedProducts($item);
                         foreach ($usedProducts as $simple) {
-                            $stock_list[] = $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+                            $stock_list[] = $this->getProductStockStateQty($simple);
                         }
                         break;
                     case 'grouped':
-                            $productTypeInstance = $item->getTypeInstance();
                             $usedProducts = $productTypeInstance->getAssociatedProducts($item);
                         foreach ($usedProducts as $simple) {
-                            $stock_list[] = $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+                            $stock_list[] = $this->getProductStockStateQty($simple);
                         }
                         break;
                 }
                 return $stock_list;
             });
 
-          //Add stock fieldhandler
             $this->addFieldHandler('stock', function ($item) {
                 $productType = $item->getTypeID();
-                $StockState = $this->StockStateInterface;
-                $total_stock = 0;
+                $productTypeInstance = $item->getTypeInstance();
+                $productStock = 0;
 
                 switch ($productType) {
                     case 'configurable':
-                            $productTypeInstance = $item->getTypeInstance();
-                            $usedProducts = $productTypeInstance->getUsedProducts($item);
-                            foreach ($usedProducts as $simple) {
-                                $total_stock += $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+                        $sub_items = $productTypeInstance->getUsedProducts($item);
+                        foreach ($sub_items as $sub_item) {
+                            $productStock += $this->getProductStockStateQty($sub_item);
+                        }
+                        // If stock was 0, try to get it without looking at the scope.
+                        if($productStock == 0){
+                            foreach ($sub_items as $sub_item) {
+                                $productStock += $this->getProductStockQty($sub_item);
                             }
+                        }
                         break;
                     case 'simple':
-                            $total_stock = $StockState->getStockQty($item->getId(), $item->getStore()->getWebsiteId());
+                        $productStock = $this->getProductStockStateQty($item);
+                        // If stock was 0, try to get it without looking at the scope.
+                        if($productStock == 0){
+                            $productStock = $this->getProductStockQty($item);
+                        }
                         break;
                     case 'bundle':
-                        // Get the inventory qty of each child item
+                        // Not sure if this is still correct, with the deprecation of stock reguistry.
                         $productsArray = [];
-                        $selectionCollection = $item->getTypeInstance(true)
-                                    ->getSelectionsCollection(
-                                        $item->getTypeInstance(true)->getOptionsIds($item),
-                                        $item
-                                    );
+                        $selectionCollection = $item->getTypeInstance(true)->getSelectionsCollection(
+                            $item->getTypeInstance(true)->getOptionsIds($item),
+                            $item
+                        );
 
                         foreach ($selectionCollection as $proselection) {
                             $selectionArray = [];
                             $selectionArray['min_qty'] = $proselection->getSelectionQty();
-                            $selectionArray['stock'] = $StockState->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
+                            $selectionArray['stock'] = $this->StockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
                             $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
                         }
 
@@ -571,21 +585,26 @@ class Product extends AbstractAdapter
                             $bundle_stock = ($bundle_stock < $bundle_option_min_stock) ? $bundle_option_min_stock : $bundle_stock;
                         }
 
-                        $total_stock = $bundle_stock;
+                        $productStock = $bundle_stock;
                         break;
                     case 'grouped':
-                        $productTypeInstance = $item->getTypeInstance();
-                        $usedProducts = $productTypeInstance->getAssociatedProducts($item);
-                        foreach ($usedProducts as $simple) {
-                            $total_stock += $StockState->getStockQty($simple->getId(), $simple->getStore()->getWebsiteId());
+                        $sub_items = $productTypeInstance->getAssociatedProducts($item);
+                        foreach ($sub_items as $sub_item) {
+                            $productStock += $this->getProductStockStateQty($sub_item);
+                        }
+                        // If stock was 0, try to get it without looking at the scope.
+                        if($productStock == 0){
+                            foreach ($sub_items as $sub_item) {
+                                $productStock += $this->getProductStockQty($sub_item);
+                            }
                         }
                         break;
                 }
 
-                return $total_stock;
+                return $productStock;
             });
 
-          //Add age fieldhandler
+            //Add age fieldhandler
             $this->addFieldHandler('age', function ($item) {
                 $createdAt = strtotime($item->getCreatedAt());
                 $now = time();
@@ -593,7 +612,7 @@ class Product extends AbstractAdapter
                 return floor($diff / (60 * 60 * 24));
             });
 
-          //Add created_at fieldhandler
+            //Add created_at fieldhandler
             $this->addFieldHandler('created_at', function ($item) {
                 $createdAt = strtotime($item->getCreatedAt());
                 return $createdAt;
@@ -618,6 +637,31 @@ class Product extends AbstractAdapter
 
             $this->clerk_logger->error('Getting Field Handlers Error', ['error' => $e->getMessage()]);
 
+        }
+    }
+
+    /**
+     * Get Product stock from item repository
+     */
+
+     protected function getProductStockQty($product){
+        $stock_info = $this->stockItemRepository->get($product->getId());
+        if(!empty($stock_info)){
+            return $stock_info->getQty();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Get Product stock from interface
+     */
+    protected function getProductStockStateQty($product){
+        $product_stock = $this->StockStateInterface->getStockQty($product->getId(), $product->getStore()->getWebsiteId());
+        if(isset($product_stock)){
+            return $product_stock;
+        } else {
+            return 0;
         }
     }
 
