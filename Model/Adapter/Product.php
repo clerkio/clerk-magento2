@@ -19,11 +19,17 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Bundle\Model\Product\Type as Bundle;
 use Magento\CatalogInventory\Helper\Stock as StockFilter;
+use Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku as ItemSource;
 
 class Product extends AbstractAdapter
 {
 
     const PRODUCT_TYPE_SIMPLE = 'simple';
+
+    /**
+     * @var ItemSource
+     */
+    protected $itemSource;
 
     /**
      * @var StockFilter
@@ -113,7 +119,8 @@ class Product extends AbstractAdapter
         StockStateInterface $stockStateInterface,
         ProductMetadataInterface $productMetadataInterface,
         RequestInterface $requestInterface,
-        GetSalableQuantityDataBySku $getSalableQuantityDataBySku
+        GetSalableQuantityDataBySku $getSalableQuantityDataBySku,
+        ItemSource $itemSource
     ) {
         $this->taxHelper = $taxHelper;
         $this->stockFilter = $stockFilter;
@@ -124,6 +131,7 @@ class Product extends AbstractAdapter
         $this->productMetadataInterface = $productMetadataInterface;
         $this->requestInterface = $requestInterface;
         $this->getSalableQuantityDataBySku = $getSalableQuantityDataBySku;
+        $this->itemSource = $itemSource;
         parent::__construct(
             $scopeConfig,
             $eventManager,
@@ -542,7 +550,6 @@ class Product extends AbstractAdapter
                 $productType = $item->getTypeID();
                 $productTypeInstance = $item->getTypeInstance();
                 $productStock = 0;
-
                 switch ($productType) {
                     case 'configurable':
                         $sub_items = $productTypeInstance->getUsedProducts($item);
@@ -610,6 +617,61 @@ class Product extends AbstractAdapter
                 return $productStock;
             });
 
+            $this->addFieldHandler('multi_source_stock', function ($item) {
+                $productType = $item->getTypeID();
+                $productTypeInstance = $item->getTypeInstance();
+                $productStock = 0;
+                switch ($productType) {
+                    case 'configurable':
+                        $sub_items = $productTypeInstance->getUsedProducts($item);
+                        foreach ($sub_items as $sub_item) {
+                            $productStock += $this->getSourceStockBySku($sub_item->getSku());
+                        }
+                        break;
+                    case 'simple':
+                        $productStock = $this->getSourceStockBySku($item->getSku());
+                        break;
+                    case 'bundle':
+                        // Not sure if this is still correct, with the deprecation of stock reguistry.
+                        $productsArray = [];
+                        $selectionCollection = $item->getTypeInstance(true)->getSelectionsCollection(
+                            $item->getTypeInstance(true)->getOptionsIds($item),
+                            $item
+                        );
+
+                        foreach ($selectionCollection as $proselection) {
+                            $selectionArray = [];
+                            $selectionArray['min_qty'] = $proselection->getSelectionQty();
+                            $selectionArray['stock'] = $this->stockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
+                            $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
+                        }
+
+                        $bundle_stock = 0;
+                        foreach ($productsArray as $_ => $bundle_item) {
+                            $bundle_option_min_stock = 0;
+                            foreach ($bundle_item as $__ => $bundle_option) {
+                                if ((integer)$bundle_option['min_qty'] <= $bundle_option['stock']) {
+                                    $bundle_option_min_stock = ($bundle_option_min_stock == 0) ? $bundle_option['stock'] : $bundle_option_min_stock;
+                                    $bundle_option_min_stock = ($bundle_option_min_stock < $bundle_option['stock']) ? $bundle_option['stock'] : $bundle_option_min_stock;
+                                }
+                            }
+                            $bundle_stock = ($bundle_stock == 0) ? $bundle_option_min_stock : $bundle_stock;
+                            $bundle_stock = ($bundle_stock < $bundle_option_min_stock) ? $bundle_option_min_stock : $bundle_stock;
+                        }
+
+                        $productStock = $bundle_stock;
+                        break;
+                    case 'grouped':
+                        $sub_items = $productTypeInstance->getAssociatedProducts($item);
+                        foreach ($sub_items as $sub_item) {
+                            $productStock += $this->getSourceStockBySku($sub_item->getSku());
+                        }
+                        break;
+                }
+
+                return $productStock;
+            });
+
             //Add age fieldhandler
             $this->addFieldHandler('age', function ($item) {
                 $createdAt = strtotime($item->getCreatedAt());
@@ -644,6 +706,20 @@ class Product extends AbstractAdapter
             $this->clerk_logger->error('Getting Field Handlers Error', ['error' => $e->getMessage()]);
 
         }
+    }
+
+    /**
+     * Get source stock from SKU
+     * @param string|int $sku
+     * @return int
+     */
+    protected function getSourceStockBySku($sku){
+        $sourceItems = $this->itemSource->execute($sku);
+        $stockTotal = 0;
+        foreach($sourceItems as $id => $sourceItem){
+            $stockTotal += $sourceItem->getQuantity();
+        }
+        return $stockTotal;
     }
 
 
