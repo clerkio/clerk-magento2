@@ -7,23 +7,33 @@ use Clerk\Clerk\Model\Config;
 use Clerk\Clerk\Helper\Image;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Helper\Data;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogInventory\Api\StockStateInterface;
-use Magento\CatalogInventory\Model\Stock\StockItemRepository;
 use Magento\Framework\App\ProductMetadataInterface;
-
+use Magento\Framework\App\RequestInterface;
+use Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Bundle\Model\Product\Type as Bundle;
+use Magento\CatalogInventory\Helper\Stock as StockFilter;
 
 class Product extends AbstractAdapter
 {
 
     const PRODUCT_TYPE_SIMPLE = 'simple';
+
+    /**
+     * @var StockFilter
+     */
+    protected $stockFilter;
+
+    /**
+     * @var GetSalableQuantityDataBySku
+     */
+    protected $getSalableQuantityDataBySku;
 
     /**
     * @var LoggerInterface
@@ -45,21 +55,27 @@ class Product extends AbstractAdapter
     protected $imageHelper;
 
     /**
+     * @var StockStateInterface
+     */
+    protected $stockStateInterface;
+
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $productMetadataInterface;
+
+    /**
      * @var string
      */
     protected $eventPrefix = 'product';
-    /**
-     * @var
-     */
-    protected $_stockFilter;
 
     /**
-     * @var
+     * @var StoreManagerInterface
      */
     protected $storeManager;
 
     /**
-     * @var
+     * @var Data
      */
     protected $taxHelper;
 
@@ -71,29 +87,19 @@ class Product extends AbstractAdapter
     ];
 
     /**
-     * @var StockStateInterface
-     */
-    protected $StockStateInterface;
-
-    /**
-     * @var StockItemRepository
-     */
-    protected $stockItemRepository;
-
-    /**
-     * @var ProductMetadataInterface
-     */
-    protected $ProductMetadataInterface;
-    /**
-     * Product constructor.
-     *
-     * @param ScopeConfigInterface $scopeConfig
-     * @param ManagerInterface $eventManager
-     * @param CollectionFactory $collectionFactory
-     * @param StoreManagerInterface $storeManager
-     * @param StockStateInterface $StockStateInterface
-     * @param StockItemRepository $stockItemRepository
-     * @param ProductMetadataInterface $ProductMetadataInterface
+     * Summary of __construct
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Clerk\Clerk\Helper\Image $imageHelper
+     * @param \Clerk\Clerk\Controller\Logger\ClerkLogger $clerkLogger
+     * @param \Magento\CatalogInventory\Helper\Stock $stockFilter
+     * @param \Magento\Catalog\Helper\Data $taxHelper
+     * @param \Magento\CatalogInventory\Api\StockStateInterface $stockStateInterface
+     * @param \Magento\Framework\App\ProductMetadataInterface $productMetadataInterface
+     * @param \Magento\Framework\App\RequestInterface $requestInterface
+     * @param \Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku $getSalableQuantityDataBySku
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -101,29 +107,29 @@ class Product extends AbstractAdapter
         CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManager,
         Image $imageHelper,
-        ClerkLogger $Clerklogger,
-        \Magento\CatalogInventory\Helper\Stock $stockFilter,
+        ClerkLogger $clerkLogger,
+        StockFilter $stockFilter,
         Data $taxHelper,
-        StockStateInterface $StockStateInterface,
-        StockItemRepository $stockItemRepository,
-        ProductMetadataInterface $ProductMetadataInterface,
-        \Magento\Framework\App\RequestInterface $requestInterface
+        StockStateInterface $stockStateInterface,
+        ProductMetadataInterface $productMetadataInterface,
+        RequestInterface $requestInterface,
+        GetSalableQuantityDataBySku $getSalableQuantityDataBySku
     ) {
         $this->taxHelper = $taxHelper;
-        $this->_stockFilter = $stockFilter;
-        $this->clerk_logger = $Clerklogger;
+        $this->stockFilter = $stockFilter;
+        $this->clerk_logger = $clerkLogger;
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;
-        $this->StockStateInterface = $StockStateInterface;
-        $this->stockItemRepository = $stockItemRepository;
-        $this->ProductMetadataInterface = $ProductMetadataInterface;
+        $this->stockStateInterface = $stockStateInterface;
+        $this->productMetadataInterface = $productMetadataInterface;
         $this->requestInterface = $requestInterface;
+        $this->getSalableQuantityDataBySku = $getSalableQuantityDataBySku;
         parent::__construct(
             $scopeConfig,
             $eventManager,
             $storeManager,
             $collectionFactory,
-            $Clerklogger
+            $clerkLogger
         );
     }
 
@@ -140,14 +146,14 @@ class Product extends AbstractAdapter
 
             $collection->addFieldToSelect('*');
             $collection->addStoreFilter($scopeid);
-            $productMetadata = $this->ProductMetadataInterface;
+            $productMetadata = $this->productMetadataInterface;
             $version = $productMetadata->getVersion();
 
             if (!$version >= '2.3.3') {
 
                 //Filter on is_saleable if defined
                 if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, $scope, $scopeid)) {
-                    $this->_stockFilter->addInStockFilterToCollection($collection);
+                    $this->stockFilter->addInStockFilterToCollection($collection);
                 }
 
 
@@ -546,7 +552,7 @@ class Product extends AbstractAdapter
                         // If stock was 0, try to get it without looking at the scope.
                         if($productStock == 0){
                             foreach ($sub_items as $sub_item) {
-                                $productStock += $this->getProductStockQty($sub_item);
+                                $productStock += $this->getSaleableStockBySku($sub_item->getSku());
                             }
                         }
                         break;
@@ -554,7 +560,7 @@ class Product extends AbstractAdapter
                         $productStock = $this->getProductStockStateQty($item);
                         // If stock was 0, try to get it without looking at the scope.
                         if($productStock == 0){
-                            $productStock = $this->getProductStockQty($item);
+                            $productStock = $this->getSaleableStockBySku($item->getSku());
                         }
                         break;
                     case 'bundle':
@@ -568,7 +574,7 @@ class Product extends AbstractAdapter
                         foreach ($selectionCollection as $proselection) {
                             $selectionArray = [];
                             $selectionArray['min_qty'] = $proselection->getSelectionQty();
-                            $selectionArray['stock'] = $this->StockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
+                            $selectionArray['stock'] = $this->stockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
                             $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
                         }
 
@@ -595,7 +601,7 @@ class Product extends AbstractAdapter
                         // If stock was 0, try to get it without looking at the scope.
                         if($productStock == 0){
                             foreach ($sub_items as $sub_item) {
-                                $productStock += $this->getProductStockQty($sub_item);
+                                $productStock += $this->getSaleableStockBySku($sub_item->getSku());
                             }
                         }
                         break;
@@ -640,30 +646,39 @@ class Product extends AbstractAdapter
         }
     }
 
-    /**
-     * Get Product stock from item repository
-     */
-
-     protected function getProductStockQty($product){
-        $stock_info = $this->stockItemRepository->get($product->getId());
-        if(!empty($stock_info)){
-            return $stock_info->getQty();
-        } else {
-            return 0;
-        }
-    }
 
     /**
      * Get Product stock from interface
      */
     protected function getProductStockStateQty($product){
-        $product_stock = $this->StockStateInterface->getStockQty($product->getId(), $product->getStore()->getWebsiteId());
+        $product_stock = $this->stockStateInterface->getStockQty($product->getId(), $product->getStore()->getWebsiteId());
         if(isset($product_stock)){
             return $product_stock;
         } else {
             return 0;
         }
     }
+
+
+    /**
+     * Get Global Stock
+     * @param string|int $sku
+     * @return int
+     */
+
+    protected function getSaleableStockBySku($sku){
+        $stockInfo = $this->getSalableQuantityDataBySku->execute($sku);
+        $stockQuantity = 0;
+        if(!empty($stockInfo)){
+            foreach($stockInfo as $i => $stockEntity){
+                if(array_key_exists('qty', $stockEntity)){
+                    $stockQuantity += $stockEntity['qty'];
+                }
+            }
+        }
+        return $stockQuantity;
+    }
+
 
     /**
      * Get Product price with contextual taxes
