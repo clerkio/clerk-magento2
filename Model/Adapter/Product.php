@@ -252,6 +252,24 @@ class Product extends AbstractAdapter
 
     try {
 
+      //Add age fieldhandler
+      $this->addFieldHandler('age', function ($item) {
+        return floor( ( time() - strtotime( $item->getCreatedAt() ) ) / (60 * 60 * 24) );
+      });
+
+      //Add created_at fieldhandler
+      $this->addFieldHandler('created_at', function ($item) {
+        return strtotime($item->getCreatedAt());
+      });
+
+      $this->addFieldHandler('product_type', function ($item) {
+        return $item->getTypeId();
+      });
+
+      $this->addFieldHandler('manufacturer', function ($item) {
+        return $this->getAttributeValue($item, 'manufacturer');
+      });
+
       $this->addFieldHandler('description_html', function ($item) {
         return $this->getAttributeValue($item, 'description') ? htmlentities($this->getAttributeValue($item, 'description'), ENT_QUOTES) : '';
       });
@@ -264,7 +282,6 @@ class Product extends AbstractAdapter
         return $item->getattributetext('visibility');
       });
 
-      //Add price fieldhandler
       $this->addFieldHandler('price', function ($item) {
         try {
 
@@ -535,10 +552,48 @@ class Product extends AbstractAdapter
         return $stockValues;
       });
 
+      $this->addFieldHandler('child_prices', function ($item) {
+        $productType = $item->getTypeID();
+        $productTypeInstance = $item->getTypeInstance();
+        $childPrices = array();
+        if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
+          $usedProducts = $productTypeInstance->getUsedProducts($item);
+          foreach($usedProducts as $usedProduct){
+            $childPrices[] = $this->formatPrice( $this->getProductTaxPrice( $usedProduct, $usedProduct->getFinalPrice(), true ) );
+          }
+        }
+        if($productType == self::PRODUCT_TYPE_GROUPED){
+          $associatedProducts = $productTypeInstance->getAssociatedProducts($item);
+          foreach($associatedProducts as $associatedProduct){
+            $childPrices[] = $this->formatPrice( $this->getProductTaxPrice( $associatedProduct, $associatedProduct->getFinalPrice(), true ) );
+          }
+        }
+        return $childPrices;
+      });
+
+      $this->addFieldHandler('child_list_prices', function ($item) {
+        $productType = $item->getTypeID();
+        $productTypeInstance = $item->getTypeInstance();
+        $childPrices = array();
+        if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
+          $usedProducts = $productTypeInstance->getUsedProducts($item);
+          foreach($usedProducts as $usedProduct){
+            $childPrices[] = $this->formatPrice( $this->getProductTaxPrice( $usedProduct, $usedProduct->getPrice(), true ) );
+          }
+        }
+        if($productType == self::PRODUCT_TYPE_GROUPED){
+          $associatedProducts = $productTypeInstance->getAssociatedProducts($item);
+          foreach($associatedProducts as $associatedProduct){
+            $childPrices[] = $this->formatPrice( $this->getProductTaxPrice( $associatedProduct, $associatedProduct->getPrice(), true ) );
+          }
+        }
+        return $childPrices;
+      });
+
       $this->addFieldHandler('child_images', function ($item) {
         $productType = $item->getTypeID();
         $productTypeInstance = $item->getTypeInstance();
-        $childImages = [];
+        $childImages = array();
         if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
           $usedProducts = $productTypeInstance->getUsedProducts($item);
           foreach($usedProducts as $usedProduct){
@@ -590,14 +645,14 @@ class Product extends AbstractAdapter
           }
         }
         if($productType == self::PRODUCT_TYPE_BUNDLE){
-          $productsArray = [];
+          $productsArray = array();
           $selectionCollection = $item->getTypeInstance(true)->getSelectionsCollection(
             $item->getTypeInstance(true)->getOptionsIds($item),
             $item
           );
 
           foreach ($selectionCollection as $proselection) {
-            $selectionArray = [];
+            $selectionArray = array();
             $selectionArray['min_qty'] = $proselection->getSelectionQty();
             $selectionArray['stock'] = $this->stockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
             $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
@@ -641,14 +696,14 @@ class Product extends AbstractAdapter
           }
         }
         if( $productType == self::PRODUCT_TYPE_BUNDLE ){
-          $productsArray = [];
+          $productsArray = array();
           $selectionCollection = $item->getTypeInstance(true)->getSelectionsCollection(
             $item->getTypeInstance(true)->getOptionsIds($item),
             $item
           );
 
           foreach ($selectionCollection as $proselection) {
-            $selectionArray = [];
+            $selectionArray = array();
             $selectionArray['min_qty'] = $proselection->getSelectionQty();
             $selectionArray['stock'] = $this->stockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
             $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
@@ -670,24 +725,6 @@ class Product extends AbstractAdapter
           $productStock = $bundle_stock;
         }
         return $productStock;
-      });
-
-      //Add age fieldhandler
-      $this->addFieldHandler('age', function ($item) {
-        return floor( ( time() - strtotime( $item->getCreatedAt() ) ) / (60 * 60 * 24) );
-      });
-
-      //Add created_at fieldhandler
-      $this->addFieldHandler('created_at', function ($item) {
-        return strtotime($item->getCreatedAt());
-      });
-
-      $this->addFieldHandler('product_type', function ($item) {
-        return $item->getTypeId();
-      });
-
-      $this->addFieldHandler('manufacturer', function ($item) {
-        return $this->getAttributeValue($item, 'manufacturer');
       });
 
     } catch (\Exception $e) {
@@ -820,7 +857,9 @@ class Product extends AbstractAdapter
         'tier_price_values',
         'tier_price_quantities',
         'child_stocks',
-        'child_images'
+        'child_images',
+        'child_prices',
+        'child_list_prices'
       ];
 
       $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);
