@@ -491,7 +491,7 @@ class Product extends AbstractAdapter
                 return $holderArray;
             });
 
-          //Add image fieldhandler
+            //Add image fieldhandler
             $this->addFieldHandler('image', function ($item) {
                 $imageUrl = $this->imageHelper->getUrl($item);
 
