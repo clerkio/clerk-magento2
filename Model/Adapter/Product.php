@@ -224,14 +224,29 @@ class Product extends AbstractAdapter
   {
     try {
 
-      $attribute = $resourceItem->getResource()->getAttribute($field);
+      $attributeResource = $resourceItem->getResource();
 
-      if ( isset($attribute) && !is_bool( $attribute ) && is_object( $attribute )  ) {
+      if( ! $attributeResource ) {
+        return parent::getAttributeValue($resourceItem, $field);
+      }
+
+      $attribute = $attributeResource->getAttribute($field);
+
+      if ( !is_bool( $attribute ) && is_object( $attribute )  ) {
         if ($attribute->usesSource()) {
           $source = $attribute->getSource();
           if ($source) {
             return $source->getOptionText($resourceItem[$field]);
           }
+        }
+      }
+
+      if(in_array($resourceItem->getTypeId(), self::PRODUCT_TYPES)){
+        $attributeResource->load($resourceItem, $resourceItem->getId(), [$field]);
+
+        $customAttribute = $resourceItem->getCustomAttribute($field);
+        if($customAttribute){
+          return $customAttribute->getValue();
         }
       }
 
