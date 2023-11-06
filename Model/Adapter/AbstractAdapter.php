@@ -164,8 +164,15 @@ abstract class AbstractAdapter
         }
 
         if (isset($resourceItem[$field]) && !array_key_exists($field, $info)) {
-          $info[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
+          $attributeValue = $this->getAttributeValue($resourceItem, $field);
+          if(!isset($attributeValue)) {
+            $info[$this->getFieldName($field)] = $this->getAttributeValueHeavy($resourceItem, $field);
+          } else {
+            $info[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
+          }
         }
+
+
 
         if ($resourceItemTypeId === self::PRODUCT_TYPE_CONFIGURABLE) {
           $usedProductsAttributeValues = array();
@@ -177,6 +184,12 @@ abstract class AbstractAdapter
                 $usedProductsAttributeValues[] = $this->getAttributeValue($usedProduct, $field);
               } elseif (isset($usedProduct[$entityField])) {
                 $usedProductsAttributeValues[] = $this->getAttributeValue($usedProduct, $entityField);
+              }
+              if(empty($usedProductsAttributeValues)) {
+                $attributeValue = $this->getAttributeValueHeavy($usedProduct, $field);
+                if(isset($attributeValue)){
+                  $usedProductsAttributeValues[] = $attributeValue;
+                }
               }
             }
           }
@@ -196,6 +209,13 @@ abstract class AbstractAdapter
                 $associatedProductsAttributeValues[] = $this->getAttributeValue($associatedProduct, $field);
               } elseif (isset($associatedProduct[$entityField])) {
                 $associatedProductsAttributeValues[] = $this->getAttributeValue($associatedProduct, $entityField);
+              }
+              if(empty($associatedProductsAttributeValues)) {
+                $attributeValue = $this->getAttributeValueHeavy($associatedProduct, $field);
+                if(isset($attributeValue)){
+                  $associatedProductsAttributeValues[] = $attributeValue;
+                }
+
               }
             }
           }
@@ -294,6 +314,35 @@ abstract class AbstractAdapter
       $return[] = $a;
     });
     return $return;
+  }
+
+  /**
+   * Get attribute value for product by simulating resource
+   *
+   * @param $resourceItem
+   * @param $field
+   * @return mixed
+   */
+  public function getAttributeValueHeavy($resourceItem, $field)
+  {
+    try {
+
+      $attributeResource = $resourceItem->getResource();
+
+      if(in_array($resourceItem->getTypeId(), self::PRODUCT_TYPES)){
+        $attributeResource->load($resourceItem, $resourceItem->getId(), [$field]);
+
+        $customAttribute = $resourceItem->getCustomAttribute($field);
+        if($customAttribute){
+          return $customAttribute->getValue();
+        }
+      }
+
+    } catch (\Exception $e) {
+
+      $this->clerk_logger->error('Getting Attribute Value Error', ['error' => $e->getMessage()]);
+
+    }
   }
 
   /**
