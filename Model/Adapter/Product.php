@@ -241,15 +241,6 @@ class Product extends AbstractAdapter
         }
       }
 
-      if(in_array($resourceItem->getTypeId(), self::PRODUCT_TYPES)){
-        $attributeResource->load($resourceItem, $resourceItem->getId(), [$field]);
-
-        $customAttribute = $resourceItem->getCustomAttribute($field);
-        if($customAttribute){
-          return $customAttribute->getValue();
-        }
-      }
-
       return parent::getAttributeValue($resourceItem, $field);
 
     } catch (\Exception $e) {
@@ -627,7 +618,7 @@ class Product extends AbstractAdapter
       $this->addFieldHandler('stock', function ($item) {
         $productType = $item->getTypeID();
         $productTypeInstance = $item->getTypeInstance();
-        
+
         $productStock = 0;
 
         if($productType == self::PRODUCT_TYPE_SIMPLE || !in_array($productType, self::PRODUCT_TYPES)){
@@ -636,7 +627,7 @@ class Product extends AbstractAdapter
           if($productStock == 0){
             $productStock = $this->getSaleableStockBySku($item->getSku());
           }
-        }       
+        }
         if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
           $usedProducts = $productTypeInstance->getUsedProducts($item);
           foreach($usedProducts as $usedProduct){
