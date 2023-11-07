@@ -57,6 +57,10 @@
                     <label>Additional Fields</label>
                     <comment>A comma separated list of additional fields to sync to Clerk.io</comment>
                 </field>
+                <field id="additional_fields_heavy_query" translate="label" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Non-Indexed Attributes</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="saleable_only" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Only synchronize saleable products</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

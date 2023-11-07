@@ -141,6 +141,10 @@ class Index extends AbstractAction
                         $this->config_writer->save(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $value, $scope, $scopeId);
                         $count++;
                     }
+                    if ($key == "PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY") {
+                        $this->config_writer->save(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY, $value, $scope, $scopeId);
+                        $count++;
+                    }
                     if ($key == "PRODUCT_SYNCHRONIZATION_SALABLE_ONLY") {
                         $this->config_writer->save(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, $value, $scope, $scopeId);
                         $count++;

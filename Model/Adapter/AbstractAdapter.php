@@ -152,6 +152,7 @@ abstract class AbstractAdapter
 
       $info = array();
       $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);
+      $heavyAttributeQuery = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY, $scope, $scopeid);
       $customFields = is_string($additionalFields) ? str_replace(' ', '', explode(',', $additionalFields)) : [];
       $resourceItemTypeId = $resourceItem->getTypeId();
       $resourceItemTypeInstance = $resourceItem->getTypeInstance();
@@ -165,7 +166,7 @@ abstract class AbstractAdapter
 
         if (isset($resourceItem[$field]) && !array_key_exists($field, $info)) {
           $attributeValue = $this->getAttributeValue($resourceItem, $field);
-          if(!isset($attributeValue)) {
+          if(!isset($attributeValue) && $heavyAttributeQuery) {
             $info[$this->getFieldName($field)] = $this->getAttributeValueHeavy($resourceItem, $field);
           } else {
             $info[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
@@ -185,7 +186,7 @@ abstract class AbstractAdapter
               } elseif (isset($usedProduct[$entityField])) {
                 $usedProductsAttributeValues[] = $this->getAttributeValue($usedProduct, $entityField);
               }
-              if(empty($usedProductsAttributeValues)) {
+              if(empty($usedProductsAttributeValues && $heavyAttributeQuery)) {
                 $attributeValue = $this->getAttributeValueHeavy($usedProduct, $field);
                 if(isset($attributeValue)){
                   $usedProductsAttributeValues[] = $attributeValue;
@@ -210,7 +211,7 @@ abstract class AbstractAdapter
               } elseif (isset($associatedProduct[$entityField])) {
                 $associatedProductsAttributeValues[] = $this->getAttributeValue($associatedProduct, $entityField);
               }
-              if(empty($associatedProductsAttributeValues)) {
+              if(empty($associatedProductsAttributeValues && $heavyAttributeQuery)) {
                 $attributeValue = $this->getAttributeValueHeavy($associatedProduct, $field);
                 if(isset($attributeValue)){
                   $associatedProductsAttributeValues[] = $attributeValue;
