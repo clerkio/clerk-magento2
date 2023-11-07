@@ -167,10 +167,9 @@ abstract class AbstractAdapter
         if (isset($resourceItem[$field]) && !array_key_exists($field, $info)) {
           $attributeValue = $this->getAttributeValue($resourceItem, $field);
           if(!isset($attributeValue) && $heavyAttributeQuery) {
-            $info[$this->getFieldName($field)] = $this->getAttributeValueHeavy($resourceItem, $field);
-          } else {
-            $info[$this->getFieldName($field)] = $this->getAttributeValue($resourceItem, $field);
+            $attributeValue = $this->getAttributeValueHeavy($resourceItem, $field);
           }
+          $info[$this->getFieldName($field)] = $attributeValue;
         }
 
 
