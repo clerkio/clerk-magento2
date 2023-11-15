@@ -17,6 +17,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku;
 use Magento\CatalogInventory\Helper\Stock as StockFilter;
 use Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku as ItemSource;
+use Magento\Tax\Model\Calculation\Rate as TaxRate;
 
 class Product extends AbstractAdapter
 {
@@ -32,6 +33,11 @@ class Product extends AbstractAdapter
     self::PRODUCT_TYPE_BUNDLE
   ];
 
+
+  /**
+   * @var TaxRate;
+   */
+  protected $taxRate;
 
   /**
    * @var ItemSource
@@ -113,6 +119,7 @@ class Product extends AbstractAdapter
    * @param \Magento\Framework\App\ProductMetadataInterface $productMetadataInterface
    * @param \Magento\Framework\App\RequestInterface $requestInterface
    * @param \Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku $getSalableQuantityDataBySku
+   * @param \Magento\Tax\Model\Calculation\Rate $taxRate
    */
   public function __construct(
     ScopeConfigInterface $scopeConfig,
@@ -127,7 +134,8 @@ class Product extends AbstractAdapter
     ProductMetadataInterface $productMetadataInterface,
     RequestInterface $requestInterface,
     GetSalableQuantityDataBySku $getSalableQuantityDataBySku,
-    ItemSource $itemSource
+    ItemSource $itemSource,
+    TaxRate $taxRate
   ) {
     $this->taxHelper = $taxHelper;
     $this->stockFilter = $stockFilter;
@@ -139,6 +147,7 @@ class Product extends AbstractAdapter
     $this->requestInterface = $requestInterface;
     $this->getSalableQuantityDataBySku = $getSalableQuantityDataBySku;
     $this->itemSource = $itemSource;
+    $this->taxRate = $taxRate;
     parent::__construct(
       $scopeConfig,
       $eventManager,
@@ -286,6 +295,16 @@ class Product extends AbstractAdapter
 
       $this->addfieldhandler('visibility', function ($item) {
         return $item->getattributetext('visibility');
+      });
+
+      $this->addFieldHandler('tax_rate', function ($item) {
+        $taxRates = $this->taxRate->getCollection()->getData();
+        $productTaxClass = $item->getTaxClassId();
+        foreach( $taxRates as $tax ){
+          if ( $productTaxClass == $tax->getTaxCalculationRateId() ){
+            return $tax;
+          }
+        }
       });
 
       $this->addFieldHandler('price', function ($item) {
