@@ -231,6 +231,17 @@ abstract class AbstractAdapter
       if(isset($info['price']) && isset($info['list_price'])){
         $info['on_sale'] = (bool) ($info['price'] < $info['list_price']);
       }
+
+      // Fix for bundle products not reliably having implicit tax.
+      if(isset($info['tax_rate']) && $info['product_type'] == self::PRODUCT_TYPE_BUNDLE){
+          if($info['price'] === $info['price_excl_tax']){
+            $info['price_excl_tax'] = $info['price'] / (1 + ($info['tax_rate'] / 100) )
+          }
+          if($info['list_price'] === $info['list_price_excl_tax']){
+            $info['list_price_excl_tax'] = $info['list_price'] / (1 + ($info['tax_rate'] / 100) )
+          }
+      }
+
       return $info;
     } catch (\Exception $e) {
 

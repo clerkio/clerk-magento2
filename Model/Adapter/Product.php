@@ -39,6 +39,12 @@ class Product extends AbstractAdapter
    */
   protected $taxRate;
 
+
+  /**
+   * @var null
+   */
+  protected $productTaxRates;
+
   /**
    * @var ItemSource
    */
@@ -148,6 +154,7 @@ class Product extends AbstractAdapter
     $this->getSalableQuantityDataBySku = $getSalableQuantityDataBySku;
     $this->itemSource = $itemSource;
     $this->taxRate = $taxRate;
+    $this->productTaxRates = $this->taxRate->getCollection()->getData();
     parent::__construct(
       $scopeConfig,
       $eventManager,
@@ -298,13 +305,12 @@ class Product extends AbstractAdapter
       });
 
       $this->addFieldHandler('tax_rate', function ($item) {
-        $taxRates = $this->taxRate->getCollection()->getData();
-        $productTaxClass = $item->getTaxClassId();
-        foreach( $taxRates as $tax ){
-          if ( $productTaxClass == $tax->getTaxCalculationRateId() ){
-            return $tax;
+        foreach( $this->productTaxRates as $tax ){
+          if ( array_key_exists( 'tax_calculation_rate_id', $tax ) && $item->getTaxClassId() == $tax['tax_calculation_rate_id'] ){
+            return (float) $tax['rate'];
           }
         }
+        return 0;
       });
 
       $this->addFieldHandler('price', function ($item) {
@@ -337,7 +343,7 @@ class Product extends AbstractAdapter
           }
 
           if($productType == self::PRODUCT_TYPE_BUNDLE){
-            return $this->formatPrice( $this->getProductTaxPrice($item, $item->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue(), true) );
+            return $this->formatPrice( $item->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue() );
           }
           if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
             $childPrices = array();
@@ -390,7 +396,7 @@ class Product extends AbstractAdapter
           }
 
           if($productType == self::PRODUCT_TYPE_BUNDLE){
-            return $this->formatPrice( $this->getProductTaxPrice($item, $item->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue(), false) );
+            return $this->formatPrice( $item->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue() );
           }
           if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
             $childPrices = array();
@@ -442,7 +448,7 @@ class Product extends AbstractAdapter
           }
 
           if($productType == self::PRODUCT_TYPE_BUNDLE){
-            return $this->formatPrice( $this->getProductTaxPrice($item, $item->getPriceInfo()->getPrice('regular_price')->getMinimalPrice()->getValue(), true) );
+            return $this->formatPrice( $item->getPriceInfo()->getPrice('regular_price')->getMinimalPrice()->getValue() );
           }
           if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
             $childPrices = array();
@@ -493,7 +499,7 @@ class Product extends AbstractAdapter
           }
 
           if($productType == self::PRODUCT_TYPE_BUNDLE){
-            return $this->formatPrice( $this->getProductTaxPrice($item, $item->getPriceInfo()->getPrice('regular_price')->getMinimalPrice()->getValue(), false) );
+            return $this->formatPrice( $item->getPriceInfo()->getPrice('regular_price')->getMinimalPrice()->getValue() );
           }
           if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
             $childPrices = array();
@@ -884,7 +890,8 @@ class Product extends AbstractAdapter
         'child_stocks',
         'child_images',
         'child_prices',
-        'child_list_prices'
+        'child_list_prices',
+        'tax_rate'
       ];
 
       $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);
