@@ -318,7 +318,13 @@ abstract class AbstractAdapter
     $this->fieldHandlers[$field] = $handler;
   }
 
-  public function flattenArray(array $array)
+  /**
+   * Flatten array
+   *
+   * @param array $array
+   * @return arrray $array
+   */
+  public function flattenArray($array)
   {
     $return = [];
     array_walk_recursive($array, function ($a) use (&$return) {
@@ -358,6 +364,9 @@ abstract class AbstractAdapter
 
   /**
    * Get default fields
+   *
+   * @param string $scope
+   * @param int|string $scopeid
    * @return array
    */
   abstract protected function getDefaultFields($scope, $scopeid);

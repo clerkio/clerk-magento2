@@ -257,7 +257,7 @@ abstract class AbstractAction extends Action
     /**
      * Verify public & private key
      *
-     * @return bool
+     * @return bool|int
      */
     private function verifyKeys()
     {
