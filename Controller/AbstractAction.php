@@ -476,11 +476,11 @@ abstract class AbstractAction extends Action
     {
         try {
 
-            $this->debug = (bool)$request->getParam('debug', false);
-            $this->start_date = date('Y-m-d', $request->getParam('start_date', strtotime('today - 200 years')));
-            $this->end_date = date('Y-m-d', $request->getParam('end_date', strtotime('today + 1 day')));
-            $this->limit = (int)$request->getParam('limit', 0);
-            $this->page = (int)$request->getParam('page', 0);
+            $this->debug = (bool) $request->getParam('debug', false);
+            $this->start_date = date('Y-m-d', strtotime($request->getParam('start_date', 'today - 200 years')));
+            $this->end_date = date('Y-m-d', strtotime($request->getParam('end_date', 'today + 1 day')));
+            $this->limit = (int) $request->getParam('limit', 0);
+            $this->page = (int) $request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
             $this->scope = $request->getParam('scope');
             $this->scopeid = $request->getParam('scope_id');
