@@ -477,8 +477,30 @@ abstract class AbstractAction extends Action
         try {
 
             $this->debug = (bool)$request->getParam('debug', false);
-            $this->start_date = date('Y-m-d', $request->getParam('start_date', strtotime('today - 200 years')));
-            $this->end_date = date('Y-m-d', $request->getParam('end_date', strtotime('today + 1 day')));
+            $startDate = strtotime('today - 200 years');
+            $startDateParam = $request->getParam('start_date');
+            if(!empty($startDateParam)) {
+              if(is_int($startDateParam)){
+                $startDate = $startDateParam;
+              } else {
+                $startDate = strtotime($startDateParam);
+              }
+            }
+            $endDate = strtotime('today + 1 day');
+            $endDateParam = $request->getParam('end_date');
+            if(!empty($endDateParam)) {
+              if(is_int($endDateParam)){
+                $endDate = $endDateParam;
+              } else {
+                $endDate = strtotime($endDateParam);
+              }
+            }
+            $this->start_date = date('Y-m-d', $startDate);
+            $this->end_date = date('Y-m-d', $endDate);
+            $this->limit = (int)$request->getParam('limit', 0);
+            $this->page = (int)$request->getParam('page', 0);
+            $this->orderBy = $request->getParam('orderby', 'entity_id');
+            $this->order = $request->getParam('order', 'asc');
             $this->limit = (int)$request->getParam('limit', 0);
             $this->page = (int)$request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
