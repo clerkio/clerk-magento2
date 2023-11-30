@@ -15,7 +15,7 @@
 if(typeof Clerk === 'function'){
     Clerk('on', 'response', function(content, data){
         res_len = (data?.product_data.length) ? data?.product_data.length : 0;
-        if(res_len){
+        if(res_len === 0 || ! res_len){
             document.getElementById('clerk-search-no-results').style.display = 'block';
         }
     });
