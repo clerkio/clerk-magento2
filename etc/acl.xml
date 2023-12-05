@@ -6,7 +6,7 @@
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
-                            <resource id="Clerk_Clerk::config" title="Clerk configuration"/>
+                            <resource id="Clerk_Clerk::config" title="Clerk Configuration" translate="title" />
                         </resource>
                     </resource>
                 </resource>
