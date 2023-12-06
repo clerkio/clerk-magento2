@@ -300,7 +300,7 @@ class Product extends AbstractAdapter
         return $this->getAttributeValue($item, 'description') ? str_replace(array("\r", "\n"), ' ', strip_tags( html_entity_decode( $this->getAttributeValue($item, 'description') ) ) ) : '';
       });
 
-      $this->addfieldhandler('visibility', function ($item) {
+      $this->addFieldhandler('visibility', function ($item) {
         return $item->getattributetext('visibility');
       });
 
@@ -552,6 +552,8 @@ class Product extends AbstractAdapter
       $this->addFieldHandler('image', function ($item) {
         return $this->fixImagePath($this->imageHelper->getUrl($item));
       });
+
+
 
       //Add url fieldhandler
       $this->addFieldHandler('url', function ($item) {
