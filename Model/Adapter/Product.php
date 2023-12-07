@@ -18,6 +18,7 @@ use Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku;
 use Magento\CatalogInventory\Helper\Stock as StockFilter;
 use Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku as ItemSource;
 use Magento\Tax\Model\Calculation\Rate as TaxRate;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 
 class Product extends AbstractAdapter
 {
@@ -32,6 +33,12 @@ class Product extends AbstractAdapter
     self::PRODUCT_TYPE_GROUPED,
     self::PRODUCT_TYPE_BUNDLE
   ];
+
+
+  /**
+   * @var ProductRepositoryInterface;
+   */
+  protected $_productRepository;
 
 
   /**
@@ -126,6 +133,7 @@ class Product extends AbstractAdapter
    * @param \Magento\Framework\App\RequestInterface $requestInterface
    * @param \Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku $getSalableQuantityDataBySku
    * @param \Magento\Tax\Model\Calculation\Rate $taxRate
+   * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
    */
   public function __construct(
     ScopeConfigInterface $scopeConfig,
@@ -141,7 +149,8 @@ class Product extends AbstractAdapter
     RequestInterface $requestInterface,
     GetSalableQuantityDataBySku $getSalableQuantityDataBySku,
     ItemSource $itemSource,
-    TaxRate $taxRate
+    TaxRate $taxRate,
+    ProductRepositoryInterface $productRepository
   ) {
     $this->taxHelper = $taxHelper;
     $this->stockFilter = $stockFilter;
@@ -155,6 +164,7 @@ class Product extends AbstractAdapter
     $this->itemSource = $itemSource;
     $this->taxRate = $taxRate;
     $this->productTaxRates = $this->taxRate->getCollection()->getData();
+    $this->_productRepository = $productRepository;
     parent::__construct(
       $scopeConfig,
       $eventManager,
@@ -553,8 +563,6 @@ class Product extends AbstractAdapter
         return $this->fixImagePath($this->imageHelper->getUrl($item));
       });
 
-
-
       //Add url fieldhandler
       $this->addFieldHandler('url', function ($item) {
         $storeId = $this->getStoreIdFromContext();
@@ -624,13 +632,30 @@ class Product extends AbstractAdapter
       });
 
       $this->addFieldHandler('child_images', function ($item) {
+        $heavyAttributeQuery = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY, 'store', $this->getStoreIdFromContext());
         $productType = $item->getTypeID();
         $productTypeInstance = $item->getTypeInstance();
         $childImages = array();
         if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
-          $usedProducts = $productTypeInstance->getUsedProducts($item);
-          foreach($usedProducts as $usedProduct){
-            $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($usedProduct));
+          if($heavyAttributeQuery){
+            $childIdsRaw = $productTypeInstance->getChildrenIds($item->getId());
+            if(!empty($childIdsRaw)){
+              if(isset($childIdsRaw[0]) && is_array($childIdsRaw[0])){
+                $childIds = $childIdsRaw[0];
+              } else {
+                $childIds = $childIdsRaw;
+              }
+            }
+            foreach($childIds as $childId){
+              // Emulate product even if disabled
+              $childProduct = $this->_productRepository->getById($childId);
+              $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($childProduct));
+            }
+          } else {
+            $usedProducts = $productTypeInstance->getUsedProducts($item);
+            foreach($usedProducts as $usedProduct){
+              $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($usedProduct));
+            }
           }
         }
         if($productType == self::PRODUCT_TYPE_GROUPED){
