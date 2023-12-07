@@ -18,6 +18,7 @@ use Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku;
 use Magento\CatalogInventory\Helper\Stock as StockFilter;
 use Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku as ItemSource;
 use Magento\Tax\Model\Calculation\Rate as TaxRate;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 
 class Product extends AbstractAdapter
 {
@@ -32,6 +33,12 @@ class Product extends AbstractAdapter
     self::PRODUCT_TYPE_GROUPED,
     self::PRODUCT_TYPE_BUNDLE
   ];
+
+
+  /**
+   * @var ProductRepositoryInterface;
+   */
+  protected $_productRepository;
 
 
   /**
@@ -126,6 +133,7 @@ class Product extends AbstractAdapter
    * @param \Magento\Framework\App\RequestInterface $requestInterface
    * @param \Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku $getSalableQuantityDataBySku
    * @param \Magento\Tax\Model\Calculation\Rate $taxRate
+   * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
    */
   public function __construct(
     ScopeConfigInterface $scopeConfig,
@@ -141,7 +149,8 @@ class Product extends AbstractAdapter
     RequestInterface $requestInterface,
     GetSalableQuantityDataBySku $getSalableQuantityDataBySku,
     ItemSource $itemSource,
-    TaxRate $taxRate
+    TaxRate $taxRate,
+    ProductRepositoryInterface $productRepository
   ) {
     $this->taxHelper = $taxHelper;
     $this->stockFilter = $stockFilter;
@@ -155,6 +164,7 @@ class Product extends AbstractAdapter
     $this->itemSource = $itemSource;
     $this->taxRate = $taxRate;
     $this->productTaxRates = $this->taxRate->getCollection()->getData();
+    $this->_productRepository = $productRepository;
     parent::__construct(
       $scopeConfig,
       $eventManager,
@@ -273,6 +283,30 @@ class Product extends AbstractAdapter
   {
 
     try {
+
+      //Add age fieldhandler
+      $this->addFieldHandler('child_ids', function ($item) {
+          $productType = $item->getTypeId();
+          $productTypeInstance = $item->getTypeInstance();
+          $childIds = array();
+          $childImages = array();
+          if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
+            $childIdsRaw = $productTypeInstance->getChildrenIds($item->getId());
+            if(!empty($childIdsRaw)){
+              if(isset($childIdsRaw[0]) && is_array($childIdsRaw[0])){
+                $childIds = $childIdsRaw[0];
+              } else {
+                $childIds = $childIdsRaw;
+              }
+            }
+          }
+          foreach($childIds as $childId){
+            $childProduct = $this->_productRepository->create()->getById($childId);
+            $childImages[] = $this->imageHelper->getUrl($childProduct);
+          }
+          return $childImages;
+      });
+
 
       //Add age fieldhandler
       $this->addFieldHandler('age', function ($item) {
@@ -874,10 +908,10 @@ class Product extends AbstractAdapter
       $fields = [
         'name',
         'description',
-        'price',
-        'price_excl_tax',
-        'list_price',
-        'list_price_excl_tax',
+        /* 'price', */
+        /* 'price_excl_tax', */
+        /* 'list_price', */
+        /* 'list_price_excl_tax', */
         'image',
         'url',
         'categories',
@@ -885,14 +919,15 @@ class Product extends AbstractAdapter
         'sku',
         'age',
         'created_at',
-        'stock',
+        /* 'stock', */
         'product_type',
-        'tier_price_values',
-        'tier_price_quantities',
-        'child_stocks',
-        'child_images',
-        'child_prices',
-        'child_list_prices',
+        /* 'tier_price_values', */
+        /* 'tier_price_quantities', */
+        'child_ids',
+        /* 'child_stocks', */
+        /* 'child_images', */
+        /* 'child_prices', */
+        /* 'child_list_prices', */
         'tax_rate'
       ];
 
