@@ -285,30 +285,6 @@ class Product extends AbstractAdapter
     try {
 
       //Add age fieldhandler
-      $this->addFieldHandler('child_ids', function ($item) {
-          $productType = $item->getTypeId();
-          $productTypeInstance = $item->getTypeInstance();
-          $childIds = array();
-          $childImages = array();
-          if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
-            $childIdsRaw = $productTypeInstance->getChildrenIds($item->getId());
-            if(!empty($childIdsRaw)){
-              if(isset($childIdsRaw[0]) && is_array($childIdsRaw[0])){
-                $childIds = $childIdsRaw[0];
-              } else {
-                $childIds = $childIdsRaw;
-              }
-            }
-          }
-          foreach($childIds as $childId){
-            $childProduct = $this->_productRepository->getById($childId);
-            $childImages[] = $this->imageHelper->getUrl($childProduct);
-          }
-          return $childImages;
-      });
-
-
-      //Add age fieldhandler
       $this->addFieldHandler('age', function ($item) {
         return floor( ( time() - strtotime( $item->getCreatedAt() ) ) / (60 * 60 * 24) );
       });
@@ -587,8 +563,6 @@ class Product extends AbstractAdapter
         return $this->fixImagePath($this->imageHelper->getUrl($item));
       });
 
-
-
       //Add url fieldhandler
       $this->addFieldHandler('url', function ($item) {
         $storeId = $this->getStoreIdFromContext();
@@ -658,13 +632,30 @@ class Product extends AbstractAdapter
       });
 
       $this->addFieldHandler('child_images', function ($item) {
+        $heavyAttributeQuery = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY, 'store', $this->getStoreIdFromContext());
         $productType = $item->getTypeID();
         $productTypeInstance = $item->getTypeInstance();
         $childImages = array();
         if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
-          $usedProducts = $productTypeInstance->getUsedProducts($item);
-          foreach($usedProducts as $usedProduct){
-            $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($usedProduct));
+          if($heavyAttributeQuery){
+            $childIdsRaw = $productTypeInstance->getChildrenIds($item->getId());
+            if(!empty($childIdsRaw)){
+              if(isset($childIdsRaw[0]) && is_array($childIdsRaw[0])){
+                $childIds = $childIdsRaw[0];
+              } else {
+                $childIds = $childIdsRaw;
+              }
+            }
+            foreach($childIds as $childId){
+              // Emulate product even if disabled
+              $childProduct = $this->_productRepository->getById($childId);
+              $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($childProduct));
+            }
+          } else {
+            $usedProducts = $productTypeInstance->getUsedProducts($item);
+            foreach($usedProducts as $usedProduct){
+              $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($usedProduct));
+            }
           }
         }
         if($productType == self::PRODUCT_TYPE_GROUPED){
@@ -908,10 +899,10 @@ class Product extends AbstractAdapter
       $fields = [
         'name',
         'description',
-        /* 'price', */
-        /* 'price_excl_tax', */
-        /* 'list_price', */
-        /* 'list_price_excl_tax', */
+        'price',
+        'price_excl_tax',
+        'list_price',
+        'list_price_excl_tax',
         'image',
         'url',
         'categories',
@@ -919,15 +910,14 @@ class Product extends AbstractAdapter
         'sku',
         'age',
         'created_at',
-        /* 'stock', */
+        'stock',
         'product_type',
-        /* 'tier_price_values', */
-        /* 'tier_price_quantities', */
-        'child_ids',
-        /* 'child_stocks', */
-        /* 'child_images', */
-        /* 'child_prices', */
-        /* 'child_list_prices', */
+        'tier_price_values',
+        'tier_price_quantities',
+        'child_stocks',
+        'child_images',
+        'child_prices',
+        'child_list_prices',
         'tax_rate'
       ];
 
