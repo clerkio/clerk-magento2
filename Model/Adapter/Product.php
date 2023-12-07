@@ -301,7 +301,7 @@ class Product extends AbstractAdapter
             }
           }
           foreach($childIds as $childId){
-            $childProduct = $this->_productRepository->create()->getById($childId);
+            $childProduct = $this->_productRepository->getById($childId);
             $childImages[] = $this->imageHelper->getUrl($childProduct);
           }
           return $childImages;
