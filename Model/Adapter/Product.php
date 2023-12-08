@@ -676,31 +676,31 @@ class Product extends AbstractAdapter
         if($productType == self::PRODUCT_TYPE_SIMPLE || !in_array($productType, self::PRODUCT_TYPES)){
           $productStock = $this->getProductStockStateQty($item);
           // If stock was 0, try to get it without looking at the scope.
-          if($productStock == 0){
-            $productStock = $this->getSaleableStockBySku($item->getSku());
-          }
+          //if($productStock == 0){
+          //  $productStock = $this->getSaleableStockBySku($item->getSku());
+          //}
         }
         if($productType == self::PRODUCT_TYPE_CONFIGURABLE){
           $usedProducts = $productTypeInstance->getUsedProducts($item);
           foreach($usedProducts as $usedProduct){
             $productStock += $this->getProductStockStateQty($usedProduct);
           }
-          if($productStock == 0){
-            foreach ($usedProducts as $usedProduct) {
-              $productStock += $this->getSaleableStockBySku($usedProduct->getSku());
-            }
-          }
+          //if($productStock == 0){
+          //  foreach ($usedProducts as $usedProduct) {
+          //    $productStock += $this->getSaleableStockBySku($usedProduct->getSku());
+          //  }
+          //}
         }
         if($productType == self::PRODUCT_TYPE_GROUPED){
           $associatedProducts = $productTypeInstance->getAssociatedProducts($item);
           foreach($associatedProducts as $associatedProduct){
             $productStock += $this->getProductStockStateQty($associatedProduct);
           }
-          if($productStock == 0){
-            foreach($associatedProducts as $associatedProduct){
-              $productStock += $this->getSaleableStockBySku($associatedProduct->getSku());
-            }
-          }
+          //if($productStock == 0){
+          //  foreach($associatedProducts as $associatedProduct){
+          //    $productStock += $this->getSaleableStockBySku($associatedProduct->getSku());
+          //  }
+          //}
         }
         if($productType == self::PRODUCT_TYPE_BUNDLE){
           $productsArray = array();
