@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller\Plugin;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -36,9 +37,9 @@ class Index extends AbstractAction
         ModuleList $moduleList,
         ClerkLogger $clerk_logger,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api
-        )
-    {
+        RequestApi $request_api,
+        Api $api
+    ) {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $clerk_logger;
         parent::__construct(
@@ -49,7 +50,8 @@ class Index extends AbstractAction
             $moduleList,
             $clerk_logger,
             $product_metadata,
-            $request_api
+            $request_api,
+            $api
         );
     }
 

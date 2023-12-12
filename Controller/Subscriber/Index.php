@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller\Subscriber;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Clerk\Clerk\Model\Config;
@@ -29,6 +30,7 @@ class Index extends AbstractAction
      * @param CollectionFactory $suscriberCollectionFactory
      * @param ProductMetadataInterface $product_metadata
      * @param RequestApi $request_api
+     * @param Api $api
      */
     public function __construct(
         Context $context,
@@ -39,9 +41,9 @@ class Index extends AbstractAction
         ModuleList $moduleList,
         ClerkLogger $clerk_logger,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api
-        )
-    {
+        RequestApi $request_api,
+        Api $api
+    ) {
         $this->collectionFactory = $suscriberCollectionFactory;
         $this->clerk_logger = $clerk_logger;
         $this->_storeManager = $storeManager;
@@ -54,7 +56,8 @@ class Index extends AbstractAction
             $moduleList,
             $clerk_logger,
             $product_metadata,
-            $request_api
+            $request_api,
+            $api
         );
     }
 
@@ -78,7 +81,7 @@ class Index extends AbstractAction
 
                 }
 
-                    $response = $this->getSubscriberCollection($this->page, $this->limit, $this->scopeid);
+                $response = $this->getSubscriberCollection($this->page, $this->limit, $this->scopeid);
 
                 foreach ($response->getData() as $subscriber) {
                     $_subscriber = [];

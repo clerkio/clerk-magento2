@@ -328,6 +328,37 @@ class Api
         }
     }
 
+    /**
+     * Validate token with Clerk
+     *
+     * @param string $token_string
+     * @param string $publicKey
+     * @throws \Exception
+     */
+    public function verifyToken($token_string = null, $publicKey = null)
+    {
+        if (!$token_string || !$publicKey) {
+            return false;
+        }
+
+        try {
+            $query_params = array(
+                'token' => $token_string,
+                'key' => $publicKey,
+            );
+
+            $url = $this->baseurl . 'token/verify';
+            $response = $this->_curl_get($url, $query_params);
+
+            return $response;
+
+        } catch (\Exception $e) {
+
+            $this->logger->error(' Communicator "postTokenVerification"', ['error' => $e->getMessage()]);
+
+        }
+    }
+
     public function getParametersForEndpoint($endpoint)
     {
         $endpointMap = [

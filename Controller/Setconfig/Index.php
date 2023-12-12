@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller\Setconfig;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -63,6 +64,7 @@ class Index extends AbstractAction
      * @param ProductMetadataInterface $product_metadata
      * @param CacheType $cacheType
      * @param RequestApi $request_api
+     * @param Api $api
      */
     public function __construct(
         Context $context,
@@ -74,7 +76,8 @@ class Index extends AbstractAction
         WriterInterface $configWriter,
         ProductMetadataInterface $product_metadata,
         CacheType $cacheType,
-        RequestApi $request_api
+        RequestApi $request_api,
+        Api $api
     ) {
         $this->clerk_logger = $clerk_logger;
         $this->config_writer = $configWriter;
@@ -87,7 +90,8 @@ class Index extends AbstractAction
             $moduleList,
             $clerk_logger,
             $product_metadata,
-            $request_api
+            $request_api,
+            $api
         );
     }
 
@@ -352,7 +356,7 @@ class Index extends AbstractAction
                         $count++;
                     }
 
-                   // log
+                    // log
 
                     if ($key == "LOG_LEVEL") {
                         $this->config_writer->save(Config::XML_PATH_LOG_LEVEL, $value, $scope, $scopeId);
@@ -369,7 +373,7 @@ class Index extends AbstractAction
 
                 } // foreach
 
-                if ($count !=0) {
+                if ($count != 0) {
                     $this->_cacheType->cleanType('config');
                 }
             } // if post

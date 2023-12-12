@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller\Category;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
 use Magento\Cms\Helper\Page;
 use Magento\Framework\App\Action\Context;
@@ -81,6 +82,7 @@ class Index extends AbstractAction
      * @param CategoryFactory $categoryFactory
      * @param ProductMetadataInterface $product_metadata
      * @param RequestApi $request_api
+     * @param Api $api
      */
     public function __construct(
         Context $context,
@@ -94,7 +96,8 @@ class Index extends AbstractAction
         ClerkLogger $clerk_logger,
         ModuleList $moduleList,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api
+        RequestApi $request_api,
+        Api $api
     ) {
         $this->moduleList = $moduleList;
         $this->collectionFactory = $categoryCollectionFactory;
@@ -110,14 +113,15 @@ class Index extends AbstractAction
         $this->addFieldHandlers();
 
         parent::__construct(
-            $context, 
-            $storeManager, 
-            $scopeConfig, 
-            $logger, 
-            $moduleList, 
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
             $clerk_logger,
             $product_metadata,
-            $request_api
+            $request_api,
+            $api
         );
     }
 
@@ -205,10 +209,10 @@ class Index extends AbstractAction
 
             if ($this->debug) {
                 $this->getResponse()->setBody(json_encode($response, JSON_PRETTY_PRINT));
-                $this->clerk_logger->log('Fetched '.$this->page.' with '.count($response).' Categories', ['response' => $response]);
+                $this->clerk_logger->log('Fetched ' . $this->page . ' with ' . count($response) . ' Categories', ['response' => $response]);
             } else {
                 $this->getResponse()->setBody(json_encode($response));
-                $this->clerk_logger->log('Fetched page '.$this->page.' with '.count($response).' Categories', ['response' => $response]);
+                $this->clerk_logger->log('Fetched page ' . $this->page . ' with ' . count($response) . ' Categories', ['response' => $response]);
             }
         } catch (\Exception $e) {
             $this->getResponse()
@@ -246,7 +250,7 @@ class Index extends AbstractAction
             $collection->addAttributeToFilter('level', ['gteq' => 2]);
             $collection->addAttributeToFilter('name', ['neq' => null]);
             $collection->addPathsFilter('1/' . $rootCategory . '/%');
-            $collection->addFieldToFilter('is_active', ["in"=>['1']]);
+            $collection->addFieldToFilter('is_active', ["in" => ['1']]);
 
 
             $collection->setCurPage($this->page)->setPageSize($this->limit);

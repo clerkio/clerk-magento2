@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
@@ -19,6 +20,11 @@ use Magento\Framework\App\ProductMetadataInterface;
 
 abstract class AbstractAction extends Action
 {
+    /**
+     * @var Api
+     */
+    protected $_api;
+
     /**
      * @var RequestApi
      */
@@ -134,6 +140,7 @@ abstract class AbstractAction extends Action
      * @param ClerkLogger $clerk_logger
      * @param ProductMetadataInterface $product_metadata
      * @param RequestApi $request_api
+     * @param Api $api
      */
     public function __construct(
         Context $context,
@@ -143,9 +150,9 @@ abstract class AbstractAction extends Action
         ModuleList $moduleList,
         ClerkLogger $clerk_logger,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api
-        )
-    {
+        RequestApi $request_api,
+        Api $api
+    ) {
         $this->moduleList = $moduleList;
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
@@ -153,6 +160,7 @@ abstract class AbstractAction extends Action
         $this->clerk_logger = $clerk_logger;
         $this->_product_metadata = $product_metadata;
         $this->_request_api = $request_api;
+        $this->_api = $api;
         parent::__construct($context);
     }
 
@@ -173,11 +181,15 @@ abstract class AbstractAction extends Action
             $version = $this->_product_metadata->getVersion();
             header('User-Agent: ClerkExtensionBot Magento 2/v' . $version . ' clerk/v' . $this->moduleList->getOne('Clerk_Clerk')['setup_version'] . ' PHP/v' . phpversion());
 
-            $this->privateKey = $this->getRequestBodyParam('private_key');
             $this->publicKey = $this->getRequestBodyParam('key');
+            $headerToken = $this->getHeaderToken();
 
-            //Validate supplied keys
-            if (($this->verifyKeys() === -1 && $this->verifyWebsiteKeys() === -1 && $this->verifyDefaultKeys() === -1) || !$this->privateKey || !$this->publicKey) {
+            // check Header Token
+            $authorized = (bool) $this->validateJwt($headerToken);
+            // Check API Key Identification at least one scope
+            $identified = (bool) ($this->verifyKeys() !== -1 || $this->verifyWebsiteKeys() !== -1 || $this->verifyDefaultKeys() !== -1);
+
+            if (!$identified || !$authorized) {
                 $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
                 $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
 
@@ -188,7 +200,7 @@ abstract class AbstractAction extends Action
                         json_encode([
                             'error' => [
                                 'code' => 403,
-                                'message' => __(' Invalid Authentification, please provide valid credentials.'),
+                                'message' => __(' Invalid Authentication, please provide valid credentials.'),
                             ]
                         ])
                     );
@@ -198,13 +210,13 @@ abstract class AbstractAction extends Action
                 return parent::dispatch($request);
             }
 
-            if ($this->verifyWebsiteKeys() !==-1) {
+            if ($this->verifyWebsiteKeys() !== -1) {
                 $scopeID = $this->verifyWebsiteKeys();
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'website']);
             }
 
-            if ($this->verifyKeys() !==-1) {
+            if ($this->verifyKeys() !== -1) {
                 $scopeID = $this->verifyKeys();
                 $request->setParams(['scope_id' => $scopeID]);
                 $request->setParams(['scope' => 'store']);
@@ -238,10 +250,9 @@ abstract class AbstractAction extends Action
 
         try {
 
-            $privateKey = $this->getRequestBodyParam('private_key');
             $publicKey = $this->getRequestBodyParam('key');
             $scopeID = $this->_storeManager->getDefaultStoreView()->getId();
-            if ($this->timingSafeEquals($this->getPrivateDefaultKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicDefaultKey($scopeID), $publicKey)) {
+            if ($this->timingSafeEquals($this->getPublicDefaultKey($scopeID), $publicKey)) {
                 return $scopeID;
             }
 
@@ -264,11 +275,10 @@ abstract class AbstractAction extends Action
 
         try {
 
-            $privateKey = $this->getRequestBodyParam('private_key');
             $publicKey = $this->getRequestBodyParam('key');
             $storeids = $this->getStores();
             foreach ($storeids as $scopeID) {
-                if ($this->timingSafeEquals($this->getPrivateKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicKey($scopeID), $publicKey)) {
+                if ($this->timingSafeEquals($this->getPublicKey($scopeID), $publicKey)) {
                     return $scopeID;
                 }
             }
@@ -292,11 +302,10 @@ abstract class AbstractAction extends Action
 
         try {
 
-            $privateKey = $this->getRequestBodyParam('private_key');
             $publicKey = $this->getRequestBodyParam('key');
             $websiteids = $this->getWebsites();
             foreach ($websiteids as $scopeID) {
-                if ($this->timingSafeEquals($this->getPrivateWebsiteKey($scopeID), $privateKey) && $this->timingSafeEquals($this->getPublicWebsiteKey($scopeID), $publicKey)) {
+                if ($this->timingSafeEquals($this->getPublicWebsiteKey($scopeID), $publicKey)) {
                     return $scopeID;
                 }
             }
@@ -422,6 +431,35 @@ abstract class AbstractAction extends Action
         }
     }
 
+    /**
+     * Get Token from Request Header
+     * @return string
+     */
+    private function getHeaderToken()
+    {
+        try {
+
+            $token = '';
+            $auth_header = $this->_request_api->getHeader('X-Clerk-Authorization');
+
+            if (null == $auth_header && !is_string($auth_header)) {
+                return "";
+            }
+
+            $auth_header_array = explode(' ', $auth_header);
+            if (count($auth_header_array) !== 2 || $auth_header_array[0] !== 'Bearer') {
+                return "";
+            }
+
+            $token = $auth_header_array[1];
+            return $token;
+
+        } catch (\Exception $e) {
+
+            $this->logger->error('getHeaderToken ERROR', ['error' => $e->getMessage()]);
+
+        }
+    }
 
     /**
      * Get public website key
@@ -476,33 +514,33 @@ abstract class AbstractAction extends Action
     {
         try {
 
-            $this->debug = (bool)$request->getParam('debug', false);
+            $this->debug = (bool) $request->getParam('debug', false);
             $startDate = strtotime('today - 200 years');
             $startDateParam = $request->getParam('start_date');
-            if(!empty($startDateParam)) {
-              if(is_int($startDateParam)){
-                $startDate = $startDateParam;
-              } else {
-                $startDate = strtotime($startDateParam);
-              }
+            if (!empty($startDateParam)) {
+                if (is_int($startDateParam)) {
+                    $startDate = $startDateParam;
+                } else {
+                    $startDate = strtotime($startDateParam);
+                }
             }
             $endDate = strtotime('today + 1 day');
             $endDateParam = $request->getParam('end_date');
-            if(!empty($endDateParam)) {
-              if(is_int($endDateParam)){
-                $endDate = $endDateParam;
-              } else {
-                $endDate = strtotime($endDateParam);
-              }
+            if (!empty($endDateParam)) {
+                if (is_int($endDateParam)) {
+                    $endDate = $endDateParam;
+                } else {
+                    $endDate = strtotime($endDateParam);
+                }
             }
             $this->start_date = date('Y-m-d', $startDate);
             $this->end_date = date('Y-m-d', $endDate);
-            $this->limit = (int)$request->getParam('limit', 0);
-            $this->page = (int)$request->getParam('page', 0);
+            $this->limit = (int) $request->getParam('limit', 0);
+            $this->page = (int) $request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
             $this->order = $request->getParam('order', 'asc');
-            $this->limit = (int)$request->getParam('limit', 0);
-            $this->page = (int)$request->getParam('page', 0);
+            $this->limit = (int) $request->getParam('limit', 0);
+            $this->page = (int) $request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
             $this->scope = $request->getParam('scope');
             $this->scopeid = $request->getParam('scope_id');
@@ -590,10 +628,10 @@ abstract class AbstractAction extends Action
                 ->setHeader('Content-Type', 'application/json', true);
 
             if ($this->debug) {
-                $this->clerk_logger->log('Fetched page '.$this->page.' with '.count($response).' Orders', ['response' => $response]);
+                $this->clerk_logger->log('Fetched page ' . $this->page . ' with ' . count($response) . ' Orders', ['response' => $response]);
                 $this->getResponse()->setBody(json_encode($response, JSON_PRETTY_PRINT));
             } else {
-                $this->clerk_logger->log('Fetched page '.$this->page.' with '.count($response).' Orders', ['response' => $response]);
+                $this->clerk_logger->log('Fetched page ' . $this->page . ' with ' . count($response) . ' Orders', ['response' => $response]);
                 $this->getResponse()->setBody(json_encode($response));
             }
         } catch (\Exception $e) {
@@ -631,7 +669,7 @@ abstract class AbstractAction extends Action
 
                 $collection->setPageSize($this->limit)
                     ->setCurPage($this->page)
-                    ->addAttributeToFilter('created_at', ['from'=>$this->start_date, 'to'=>$this->end_date])
+                    ->addAttributeToFilter('created_at', ['from' => $this->start_date, 'to' => $this->end_date])
                     ->addOrder($this->orderBy, $this->order);
             } else {
 
@@ -719,9 +757,9 @@ abstract class AbstractAction extends Action
         try {
 
             $body = $this->_request_api->getBodyParams();
-            if($body){
-                if(gettype($body) === 'array'){
-                    if(array_key_exists($key, $body)){
+            if ($body) {
+                if (gettype($body) === 'array') {
+                    if (array_key_exists($key, $body)) {
                         return $body[$key];
                     }
                 }
@@ -733,6 +771,40 @@ abstract class AbstractAction extends Action
 
             $this->clerk_logger->error('Getting Request Body ERROR', ['error' => $e->getMessage()]);
 
+        }
+
+    }
+
+    /**
+     * Validate token with Clerk
+     *
+     * @param string
+     * @return bool
+     */
+    public function validateJwt($token_string = null)
+    {
+
+        if (!$token_string || !is_string($token_string)) {
+            return false;
+        }
+
+        $rsp_array = $this->_api->verifyToken($token_string, $this->publicKey);
+
+        if (!$rsp_array) {
+            return false;
+        }
+
+        try {
+
+            if (isset($rsp_array['status']) && $rsp_array['status'] == 'ok') {
+                return true;
+            }
+
+            return false;
+
+        } catch (\Exception $e) {
+            $this->logger->error('ERROR verify_token', array('error' => $e->getMessage()));
+            return false;
         }
 
     }

@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller\Order;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
@@ -48,6 +49,7 @@ class Index extends AbstractAction
      * @param CollectionFactory $orderCollectionFactory
      * @param ProductMetadataInterface $product_metadata
      * @param RequestApi $request_api
+     * @param Api $api
      */
     public function __construct(
         Context $context,
@@ -58,7 +60,8 @@ class Index extends AbstractAction
         ModuleList $moduleList,
         ClerkLogger $clerk_logger,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api
+        RequestApi $request_api,
+        Api $api
     ) {
         $this->collectionFactory = $orderCollectionFactory;
         $this->clerk_logger = $clerk_logger;
@@ -73,7 +76,8 @@ class Index extends AbstractAction
             $moduleList,
             $clerk_logger,
             $product_metadata,
-            $request_api
+            $request_api,
+            $api
         );
     }
 
@@ -110,8 +114,8 @@ class Index extends AbstractAction
                 foreach ($item->getAllVisibleItems() as $productItem) {
                     $products[] = [
                         'id' => $productItem->getProductId(),
-                        'quantity' => (int)$productItem->getQtyOrdered(),
-                        'price' => (float)$productItem->getPrice(),
+                        'quantity' => (int) $productItem->getQtyOrdered(),
+                        'price' => (float) $productItem->getPrice(),
                     ];
                 }
                 return $products;

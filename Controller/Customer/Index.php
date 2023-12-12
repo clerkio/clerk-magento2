@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller\Customer;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Clerk\Clerk\Model\Config;
@@ -63,6 +64,7 @@ class Index extends AbstractAction
      * @param CollectionFactory $customerCollectionFactory
      * @param ProductMetadataInterface $product_metadata
      * @param RequestApi $request_api
+     * @param Api $api
      */
     public function __construct(
         Context $context,
@@ -76,9 +78,9 @@ class Index extends AbstractAction
         ProductMetadataInterface $product_metadata,
         RequestApi $request_api,
         SubscriberFactory $subscriberFactory,
-        SubscriberCollectionFactory $subscriberCollectionFactory
-        )
-    {
+        SubscriberCollectionFactory $subscriberCollectionFactory,
+        Api $api
+    ) {
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $clerk_logger;
         $this->_customerMetadata = $customerMetadata;
@@ -94,7 +96,8 @@ class Index extends AbstractAction
             $moduleList,
             $clerk_logger,
             $product_metadata,
-            $request_api
+            $request_api,
+            $api
         );
     }
 
@@ -146,12 +149,12 @@ class Index extends AbstractAction
                         }
                     }
 
-                    if($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
+                    if ($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
                         $sub_state = $subscriberInstance->loadByEmail($customer['email']);
-                        if($sub_state->getId()) {
-                          $_customer['subscribed'] = (bool) $sub_state->getSubscriberStatus();
+                        if ($sub_state->getId()) {
+                            $_customer['subscribed'] = (bool) $sub_state->getSubscriberStatus();
                         } else {
-                          $_customer['subscribed'] = false;
+                            $_customer['subscribed'] = false;
                         }
                         $_customer['unsub_url'] = $sub_state->getUnsubscriptionLink();
                     }
@@ -159,7 +162,7 @@ class Index extends AbstractAction
                     $Customers[] = $_customer;
                 }
 
-                if($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
+                if ($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
 
                     $subscribersOnlyResponse = $this->getSubscriberCollection($this->page, $this->limit, $this->scopeid);
 
