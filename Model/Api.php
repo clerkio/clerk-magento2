@@ -334,6 +334,7 @@ class Api
      * @param string $token_string
      * @param string $publicKey
      * @throws \Exception
+     * @return array
      */
     public function verifyToken($token_string = null, $publicKey = null)
     {
@@ -350,7 +351,9 @@ class Api
             $url = $this->baseurl . 'token/verify';
             $response = $this->_curl_get($url, $query_params);
 
-            return $response;
+            $decodedResponse = json_decode($response, true);
+
+            return (array) $decodedResponse;
 
         } catch (\Exception $e) {
 
