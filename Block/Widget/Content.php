@@ -147,6 +147,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
 
             if ($productId) {
                 $spanAttributes['data-products'] = json_encode([$productId]);
+                $spanAttributes['data-product'] = $productId;
             }
             if ($filter_product) {
                 $unique_class = "clerk_" . (string)$product_contents;
@@ -231,6 +232,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
 
         if ($this->getType() === 'product') {
             $spanAttributes['data-products'] = json_encode([$this->getCurrentProduct()]);
+            $spanAttributes['data-product'] = $this->getCurrentProduct();
             $spanAttributes['data-template'] = '@' . $this->getProductContents();
             if ($filter_product) {
                 $unique_class = "clerk_" . (string)$product_contents;
@@ -391,6 +393,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
 
             if ($productId) {
                 $spanAttributes['data-products'] = json_encode([$productId]);
+                $spanAttributes['data-product'] = $productId;
             }
             if ($filter_product) {
                 $unique_class = "clerk_" . (string)$product_contents;
@@ -473,6 +476,7 @@ class Content extends \Magento\Framework\View\Element\Template implements \Magen
 
         if ($this->getType() === 'product') {
             $spanAttributes['data-products'] = json_encode([$this->getCurrentProduct()]);
+            $spanAttributes['data-product'] = $this->getCurrentProduct();
             if ($filter_product) {
                 $unique_class = "clerk_" . (string)$product_contents;
                 $spanAttributes['class'] = 'clerk ' . $unique_class;
