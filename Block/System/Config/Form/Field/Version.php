@@ -65,18 +65,18 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
     {
         $modules = $this->moduleList->getAll();
 
-        $modules_for_warning = [
-            'Clerk_Clerk' => ['message' => 'This module can interfere with how we inject our instant search.', 'link' => 'https://clerk.io']
-        ];
+        // $modules_for_warning = [
+        //     'Clerk_Clerk' => ['message' => 'This module can interfere with how we inject our instant search.', 'link' => 'https://clerk.io']
+        // ];
 
-        foreach ($modules as $name => $module) {
+        // foreach ($modules as $name => $module) {
 
-            if (array_key_exists($name, $modules_for_warning)) {
+        //     if (array_key_exists($name, $modules_for_warning)) {
 
-                $this->messageManager->addWarning(__('<strong style="color:#eb5e00">Warning: </strong>'.$name.' is installed. '.$modules_for_warning[$name]['message'].'.<a target="_blank" href="'.$modules_for_warning[$name]['link'].'"> Read more here</a>'));
+        //         $this->messageManager->addWarning(__('<strong style="color:#eb5e00">Warning: </strong>'.$name.' is installed. '.$modules_for_warning[$name]['message'].'.<a target="_blank" href="'.$modules_for_warning[$name]['link'].'"> Read more here</a>'));
 
-            }
-        }
+        //     }
+        // }
 
         //Get installed module version
         $moduleInfo = $this->moduleList->getOne('Clerk_Clerk');
