@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller\Product;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Adapter\Product as ProductAdapter;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Adapter\Product;
@@ -55,6 +56,7 @@ class Index extends AbstractAction
      * @param Product $productAdapter
      * @param ProductMetadataInterface $product_metadata
      * @param RequestApi $request_api
+     * @param Api $api
      */
     public function __construct(
         Context $context,
@@ -66,21 +68,23 @@ class Index extends AbstractAction
         Data $taxHelper,
         ModuleList $moduleList,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api
+        RequestApi $request_api,
+        Api $api
     ) {
         $this->taxHelper = $taxHelper;
         $this->moduleList = $moduleList;
         $this->productAdapter = $productAdapter;
         $this->clerk_logger = $clerk_logger;
         parent::__construct(
-            $context, 
-            $storeManager, 
-            $scopeConfig, 
-            $logger, 
-            $moduleList, 
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
             $clerk_logger,
             $product_metadata,
-            $request_api
+            $request_api,
+            $api
         );
     }
 
@@ -111,8 +115,8 @@ class Index extends AbstractAction
             }
 
             $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order, $this->scope, $this->scopeid);
-            
-            if(is_array($response)){
+
+            if (is_array($response)) {
                 $response = array_values(array_filter($response));
             }
 
@@ -135,9 +139,9 @@ class Index extends AbstractAction
     {
         try {
 
-            $this->debug = (bool)$request->getParam('debug', false);
-            $this->limit = (int)$request->getParam('limit', 0);
-            $this->page = (int)$request->getParam('page', 0);
+            $this->debug = (bool) $request->getParam('debug', false);
+            $this->limit = (int) $request->getParam('limit', 0);
+            $this->page = (int) $request->getParam('page', 0);
             $this->orderBy = $request->getParam('orderby', 'entity_id');
             $this->scopeid = $request->getParam('scope_id');
             $this->scope = $request->getParam('scope');

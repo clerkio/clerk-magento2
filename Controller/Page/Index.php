@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Controller\Page;
 
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Action\Context;
@@ -80,6 +81,7 @@ class Index extends AbstractAction
      * @param ProductMetadataInterface $product_metadata
      * @param PageFactory $pageFactory
      * @param RequestApi $request_api
+     * @param Api $api
      */
     public function __construct(
         Context $context,
@@ -94,7 +96,8 @@ class Index extends AbstractAction
         PageHelper $pageHelper,
         ProductMetadataInterface $product_metadata,
         PageFactory $pageFactory,
-        RequestApi $request_api
+        RequestApi $request_api,
+        Api $api
     ) {
         $this->_searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->_PageRepositoryInterface = $PageRepositoryInterface;
@@ -106,14 +109,15 @@ class Index extends AbstractAction
         $this->_pageHelper = $pageHelper;
         $this->_pageFactory = $pageFactory;
         parent::__construct(
-            $context, 
-            $storeManager, 
-            $scopeConfig, 
-            $logger, 
-            $moduleList, 
-            $clerk_logger, 
+            $context,
+            $storeManager,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $clerk_logger,
             $product_metadata,
-            $request_api
+            $request_api,
+            $api
         );
     }
 
