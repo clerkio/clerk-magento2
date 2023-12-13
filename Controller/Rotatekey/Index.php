@@ -16,9 +16,15 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\Cache\TypeListInterface as CacheType;
 use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 class Index extends AbstractAction
 {
+    /**
+     * @var EncryptorInterface
+     */
+    protected $encryptor;
+
     /**
      * @var ClerkLogger
      */
@@ -65,7 +71,7 @@ class Index extends AbstractAction
      * @param CacheType $cacheType
      * @param RequestApi $request_api
      * @param Api $api
-     * 
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
@@ -78,11 +84,13 @@ class Index extends AbstractAction
         ProductMetadataInterface $product_metadata,
         CacheType $cacheType,
         RequestApi $request_api,
-        Api $api
+        Api $api,
+        EncryptorInterface $encryptor,
     ) {
         $this->clerk_logger = $clerk_logger;
         $this->config_writer = $configWriter;
         $this->_cacheType = $cacheType;
+        $this->encryptor = $encryptor;
         parent::__construct(
             $context,
             $storeManager,
@@ -121,8 +129,10 @@ class Index extends AbstractAction
 
                 $body_array = json_decode($post, true) ? json_decode($post, true) : array();
 
-                if (array_key_exists('private_key', $body_array) && array_key_exists('new_private_key', $body_array)) {
-                    $this->config_writer->save(Config::XML_PATH_PRIVATE_KEY, $body_array['new_private_key'], $scope, $scopeId);
+                if (array_key_exists('clerk_private_key', $body_array)) {
+                    $encryptedValue = $this->encryptor->encrypt($body_array['clerk_private_key']);
+
+                    $this->config_writer->save(Config::XML_PATH_PRIVATE_KEY, $encryptedValue, $scope, $scopeId);
                     $this->_cacheType->cleanType('config');
 
                     $response = [
