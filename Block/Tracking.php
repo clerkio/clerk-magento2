@@ -1,4 +1,7 @@
 <?php
+/**
+ * Tracking Block for Clerk.io
+ */
 
 namespace Clerk\Clerk\Block;
 
@@ -158,7 +161,7 @@ class Tracking extends Template
      * If base currency is not allowed in current website config scope,
      * then it can be disabled with $skipBaseNotAllowed
      *
-     * @param bool $skipBaseNotAllowed
+     * @param  bool $skipBaseNotAllowed
      * @return array
      */
     public function getAvailableCurrencyCodes($skipBaseNotAllowed = false)
@@ -199,24 +202,39 @@ class Tracking extends Template
     /**
      * Get currency rate for current locale from currency code
      *
+     * @param string|null $currencyIso Currency ISO code
+     *
      * @return float
      */
-
-    public function getCurrencyRateFromIso($currencyIso = null) {
-        if( ! $currencyIso ) {
+    public function getCurrencyRateFromIso($currencyIso = null)
+    {
+        if(! $currencyIso) {
             return 1.0;
         } else {
             return $this->_storeManager->getStore()->getBaseCurrency()->getRate($currencyIso);
         }
     }
 
-    public function getAllCurrencyRates() {
+    public function getAllCurrencyRates()
+    {
         $currency_codes = $this->getAllowedCurrencies();
         $currency_rates_array = array();
-        foreach($currency_codes as $key => $code){
+        foreach($currency_codes as $key => $code) {
             $currency_rates_array[$code] = $this->getCurrencyRateFromIso($code);
         }
         return $currency_rates_array;
     }
 
+    public function getStoreNameSlug()
+    {
+        $storeName = $this->_storeManager->getStore()->getName();
+        $storeName = preg_replace('/[^a-z]/', '', strtolower($storeName));
+        return $storeName;
+    }
+
+    public function getClerkJSLink()
+    {
+      $storeName = $this->getStoreNameSlug() ?? 'clerk';
+      return '://custom.clerk.io/' . $storeName . '.js';
+    }
 }

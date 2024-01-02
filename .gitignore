@@ -3,3 +3,4 @@ composer.phar
 vendor/
 qodana.yaml
 .phpactor.json
+.github
