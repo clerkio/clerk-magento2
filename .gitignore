@@ -4,3 +4,4 @@ vendor/
 qodana.yaml
 .phpactor.json
 .github
+.php-cs-fixer.cache
