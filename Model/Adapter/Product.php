@@ -14,12 +14,11 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\RequestInterface;
-use Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku;
 use Magento\CatalogInventory\Helper\Stock as StockFilter;
-use Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku as ItemSource;
 use Magento\Tax\Model\Calculation\Rate as TaxRate;
+use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-
+use Magento\Framework\ObjectManagerInterface;
 class Product extends AbstractAdapter
 {
 
@@ -117,24 +116,36 @@ class Product extends AbstractAdapter
   protected $fieldMap = [
     'entity_id' => 'id',
   ];
-
-  /**
-   * Summary of __construct
-   * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-   * @param \Magento\Framework\Event\ManagerInterface $eventManager
-   * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory
-   * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-   * @param \Clerk\Clerk\Helper\Image $imageHelper
-   * @param \Clerk\Clerk\Controller\Logger\ClerkLogger $clerkLogger
-   * @param \Magento\CatalogInventory\Helper\Stock $stockFilter
-   * @param \Magento\Catalog\Helper\Data $taxHelper
-   * @param \Magento\CatalogInventory\Api\StockStateInterface $stockStateInterface
-   * @param \Magento\Framework\App\ProductMetadataInterface $productMetadataInterface
-   * @param \Magento\Framework\App\RequestInterface $requestInterface
-   * @param \Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku $getSalableQuantityDataBySku
-   * @param \Magento\Tax\Model\Calculation\Rate $taxRate
-   * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
-   */
+    /**
+     * @var ModuleManager
+     */
+    protected $moduleManager;
+    /**
+     * @var ObjectManagerInterface
+     */
+    protected $objectManager;
+    /**
+     * @var bool
+     */
+    protected $msiEnabled;
+    /**
+     * Summary of __construct
+     * @param ScopeConfigInterface $scopeConfig
+     * @param ManagerInterface $eventManager
+     * @param CollectionFactory $collectionFactory
+     * @param StoreManagerInterface $storeManager
+     * @param Image $imageHelper
+     * @param ClerkLogger $clerkLogger
+     * @param Stock $stockFilter
+     * @param Data $taxHelper
+     * @param StockStateInterface $stockStateInterface
+     * @param ProductMetadataInterface $productMetadataInterface
+     * @param RequestInterface $requestInterface
+     * @param GetSalableQuantityDataBySku $getSalableQuantityDataBySku
+     * @param ItemSource $itemSource
+     * @param Rate $taxRate
+     * @param ProductRepositoryInterface $productRepository
+     */
   public function __construct(
     ScopeConfigInterface $scopeConfig,
     ManagerInterface $eventManager,
@@ -147,24 +158,25 @@ class Product extends AbstractAdapter
     StockStateInterface $stockStateInterface,
     ProductMetadataInterface $productMetadataInterface,
     RequestInterface $requestInterface,
-    GetSalableQuantityDataBySku $getSalableQuantityDataBySku,
-    ItemSource $itemSource,
     TaxRate $taxRate,
-    ProductRepositoryInterface $productRepository
+    ProductRepositoryInterface $productRepository,
+    ModuleManager              $moduleManager,
+    ObjectManagerInterface     $objectManager
   ) {
     $this->taxHelper = $taxHelper;
     $this->stockFilter = $stockFilter;
     $this->clerk_logger = $clerkLogger;
     $this->imageHelper = $imageHelper;
     $this->storeManager = $storeManager;
+    $this->moduleManager = $moduleManager;
+    $this->objectManager = $objectManager;
     $this->stockStateInterface = $stockStateInterface;
     $this->productMetadataInterface = $productMetadataInterface;
     $this->requestInterface = $requestInterface;
-    $this->getSalableQuantityDataBySku = $getSalableQuantityDataBySku;
-    $this->itemSource = $itemSource;
     $this->taxRate = $taxRate;
     $this->productTaxRates = $this->taxRate->getCollection()->getData();
     $this->_productRepository = $productRepository;
+    $this->msiEnabled = $this->moduleManager->isEnabled('Magento_Inventory') && $this->moduleManager->isEnabled('Magento_InventoryAdminUi');
     parent::__construct(
       $scopeConfig,
       $eventManager,
@@ -796,10 +808,12 @@ class Product extends AbstractAdapter
    * @return int
    */
   protected function getSourceStockBySku($sku){
-    $sourceItems = $this->itemSource->execute($sku);
     $stockTotal = 0;
-    foreach($sourceItems as $sourceItem){
-      $stockTotal += $sourceItem->getQuantity();
+    if ($this->msiEnabled) {
+        $sourceItems = $this->objectManager->create('Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku')->execute($sku);
+        foreach ($sourceItems as $sourceItem) {
+            $stockTotal += $sourceItem->getQuantity();
+        }
     }
     return $stockTotal;
   }
@@ -809,11 +823,7 @@ class Product extends AbstractAdapter
    */
   protected function getProductStockStateQty($product){
     $product_stock = $this->stockStateInterface->getStockQty($product->getId(), $product->getStore()->getWebsiteId());
-    if(isset($product_stock)){
-      return $product_stock;
-    } else {
-      return 0;
-    }
+    return $product_stock ?? 0;
   }
 
 
@@ -824,14 +834,19 @@ class Product extends AbstractAdapter
    */
 
   protected function getSaleableStockBySku($sku){
-    $stockInfo = $this->getSalableQuantityDataBySku->execute($sku);
     $stockQuantity = 0;
-    if(!empty($stockInfo)){
-      foreach($stockInfo as $stockEntity){
-        if(array_key_exists('qty', $stockEntity)){
-          $stockQuantity += $stockEntity['qty'];
+    try {
+        if ($this->msiEnabled) {
+            $stockInfo = $this->objectManager->create('Magento\InventorySalesAdminUi\Model\GetSalableQuantityDataBySku')->execute($sku);
+            if (!empty($stockInfo)) {
+                foreach ($stockInfo as $stockEntity) {
+                    if (array_key_exists('qty', $stockEntity)) {
+                        $stockQuantity += $stockEntity['qty'];
+                    }
+                }
+            }
         }
-      }
+    } catch (Exception $e) {
     }
     return $stockQuantity;
   }

@@ -11,6 +11,7 @@ class Config
     const XML_PATH_PUBLIC_KEY = 'clerk/general/public_key';
     const XML_PATH_LANGUAGE = 'clerk/general/language';
     const XML_PATH_INCLUDE_PAGES = 'clerk/general/include_pages';
+    const XML_PATH_USE_LEGACY_AUTH = 'clerk/general/legacy_auth';
     const XML_PATH_PAGES_ADDITIONAL_FIELDS = 'clerk/general/pages_additional_fields';
 
 
