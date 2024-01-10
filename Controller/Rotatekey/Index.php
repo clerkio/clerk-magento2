@@ -85,7 +85,7 @@ class Index extends AbstractAction
         CacheType $cacheType,
         RequestApi $request_api,
         Api $api,
-        EncryptorInterface $encryptor,
+        EncryptorInterface $encryptor
     ) {
         $this->clerk_logger = $clerk_logger;
         $this->config_writer = $configWriter;
