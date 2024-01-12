@@ -2,21 +2,21 @@
 
 namespace Clerk\Clerk\Controller\Rotatekey;
 
-use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
-use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Module\ModuleList;
-use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
-use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\Store\Model\ScopeInterface;
-use Magento\Framework\App\ProductMetadataInterface;
+use Exception;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Cache\TypeListInterface as CacheType;
-use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Module\ModuleList;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
 {
@@ -59,14 +59,21 @@ class Index extends AbstractAction
      * @var CacheType
      */
     protected $_cacheType;
+    /**
+     * @var WriterInterface
+     */
+    protected $config_writer;
 
     /**
      * Version controller constructor.
      *
      * @param Context $context
-     * @param ScopeConfigInterface $scopeConfig
+     * @param ScopeConfigInterface $ScopeConfigInterface
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
+     * @param StoreManagerInterface $storeManager
+     * @param ClerkLogger $clerk_logger
+     * @param WriterInterface $configWriter
      * @param ProductMetadataInterface $product_metadata
      * @param CacheType $cacheType
      * @param RequestApi $request_api
@@ -74,19 +81,20 @@ class Index extends AbstractAction
      * @param EncryptorInterface $encryptor
      */
     public function __construct(
-        Context $context,
-        ScopeConfigInterface $ScopeConfigInterface,
-        LoggerInterface $logger,
-        ModuleList $moduleList,
-        StoreManagerInterface $storeManager,
-        ClerkLogger $clerk_logger,
-        WriterInterface $configWriter,
+        Context                  $context,
+        ScopeConfigInterface     $ScopeConfigInterface,
+        LoggerInterface          $logger,
+        ModuleList               $moduleList,
+        StoreManagerInterface    $storeManager,
+        ClerkLogger              $clerk_logger,
+        WriterInterface          $configWriter,
         ProductMetadataInterface $product_metadata,
-        CacheType $cacheType,
-        RequestApi $request_api,
-        Api $api,
-        EncryptorInterface $encryptor,
-    ) {
+        CacheType                $cacheType,
+        RequestApi               $request_api,
+        Api                      $api,
+        EncryptorInterface       $encryptor,
+    )
+    {
         $this->clerk_logger = $clerk_logger;
         $this->config_writer = $configWriter;
         $this->_cacheType = $cacheType;
@@ -158,7 +166,7 @@ class Index extends AbstractAction
             }
 
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Rotatekey execute ERROR', ['error' => $e->getMessage()]);
 
