@@ -84,7 +84,6 @@ class Index extends AbstractAction
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $clerk_logger;
         $this->_customerMetadata = $customerMetadata;
-        $this->_storeManager = $storeManager;
         $this->_subscriberFactory = $subscriberFactory;
         $this->_subscriberCollectionFactory = $subscriberCollectionFactory;
 
@@ -205,7 +204,7 @@ class Index extends AbstractAction
 
     public function getCustomerCollection($page, $limit, $storeid)
     {
-        $store = $this->_storeManager->getStore($storeid);
+        $store = $this->storeManager->getStore($storeid);
         $customerCollection = $this->collectionFactory->create();
         $customerCollection->setOrder('title', 'ASC');
         $customerCollection->addFilter('store_id', $store->getId());

@@ -7,6 +7,10 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class renderDefault extends \Magento\Config\Block\System\Config\Form\Field
 {
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $ScopeConfigInterface;
 
      /**
       * renderDefault field constructor.

@@ -28,11 +28,6 @@ class Index extends AbstractAction
     protected $moduleList;
 
     /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * Version controller constructor.
      *
      * @param Context $context
@@ -56,7 +51,6 @@ class Index extends AbstractAction
     ) {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $clerk_logger;
-        $this->store_manager = $storeManager;
         parent::__construct(
             $context,
             $storeManager,

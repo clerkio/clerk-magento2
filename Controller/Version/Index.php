@@ -26,11 +26,6 @@ class Index extends AbstractAction
     protected $moduleList;
 
     /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * @var ProductMetadataInterface
      */
     protected $_product_metadata;
@@ -85,12 +80,12 @@ class Index extends AbstractAction
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
 
-            if ($this->_storeManager->isSingleStoreMode()) {
+            if ($this->storeManager->isSingleStoreMode()) {
                 $scope = 'default';
                 $scope_id = '0';
             } else {
                 $scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-                $scope_id = $this->_storeManager->getStore()->getId();
+                $scope_id = $this->storeManager->getStore()->getId();
             }
 
             $response = [
