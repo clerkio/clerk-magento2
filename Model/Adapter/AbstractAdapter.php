@@ -185,7 +185,7 @@ abstract class AbstractAdapter
               } elseif (isset($usedProduct[$entityField])) {
                 $usedProductsAttributeValues[] = $this->getAttributeValue($usedProduct, $entityField);
               }
-              if(empty($usedProductsAttributeValues && $heavyAttributeQuery)) {
+              if(empty($usedProductsAttributeValues) && $heavyAttributeQuery) {
                 $attributeValue = $this->getAttributeValueHeavy($usedProduct, $field);
                 if(isset($attributeValue)){
                   $usedProductsAttributeValues[] = $attributeValue;
@@ -210,7 +210,7 @@ abstract class AbstractAdapter
               } elseif (isset($associatedProduct[$entityField])) {
                 $associatedProductsAttributeValues[] = $this->getAttributeValue($associatedProduct, $entityField);
               }
-              if(empty($associatedProductsAttributeValues && $heavyAttributeQuery)) {
+              if(empty($associatedProductsAttributeValues) && $heavyAttributeQuery) {
                 $attributeValue = $this->getAttributeValueHeavy($associatedProduct, $field);
                 if(isset($attributeValue)){
                   $associatedProductsAttributeValues[] = $attributeValue;
