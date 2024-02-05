@@ -152,7 +152,7 @@ class Index extends AbstractAction
                     if ($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
                         $sub_state = $subscriberInstance->loadByEmail($customer['email']);
                         if ($sub_state->getId()) {
-                            $_customer['subscribed'] = (bool) $sub_state->getSubscriberStatus();
+                            $_customer['subscribed'] = (bool) ($sub_state->getSubscriberStatus() == 1);
                         } else {
                             $_customer['subscribed'] = false;
                         }
@@ -172,7 +172,7 @@ class Index extends AbstractAction
                             $_sub = array();
                             $_sub['id'] = 'SUB' . $subscriber['subscriber_id'];
                             $_sub['email'] = $subscriber['subscriber_email'];
-                            $_sub['subscribed'] = (bool) $subscriber['subscriber_status'];
+                            $_sub['subscribed'] = (bool) ($subscriber['subscriber_status'] == 1);
                             $_sub['name'] = "";
                             $_sub['firstname'] = "";
                             $_sub['unsub_url'] = $sub_state->getUnsubscriptionLink();
