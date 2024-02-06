@@ -205,10 +205,9 @@ class Index extends AbstractAction
 
     public function getCustomerCollection($page, $limit, $storeid)
     {
-        $store = $this->_storeManager->getStore($storeid);
         $customerCollection = $this->collectionFactory->create();
         $customerCollection->setOrder('title', 'ASC');
-        $customerCollection->addFilter('store_id', $store->getId());
+        $customerCollection->addFilter('store_id', $storeid);
         $customerCollection->setPageSize($limit);
         $customerCollection->setCurPage($page);
         return $customerCollection;
