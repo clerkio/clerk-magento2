@@ -17,6 +17,11 @@ class SalesTracking extends Template
     protected $_checkoutSession;
 
     /**
+     * @var Grouped
+     */
+    private $_productGrouped;
+
+    /**
      * SalesTracking constructor.
      *
      * @param Context $context

@@ -26,11 +26,6 @@ class Index extends AbstractAction
     protected $moduleList;
 
     /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * @var ProductMetadataInterface
      */
     protected $_product_metadata;

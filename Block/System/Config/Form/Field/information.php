@@ -19,6 +19,10 @@ class information extends \Magento\Config\Block\System\Config\Form\Field
      */
     protected $messageManager;
 
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $ScopeConfigInterface;
 
     /**
      * Version field constructor.

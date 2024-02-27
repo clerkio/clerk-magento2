@@ -37,7 +37,7 @@ class Index extends AbstractAction
     /**
      * @var WriterInterface
      */
-    protected $configWriter;
+    protected $config_writer;
 
     /**
      * @var ScopeConfigInterface

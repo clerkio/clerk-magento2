@@ -84,7 +84,6 @@ class Index extends AbstractAction
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $clerk_logger;
         $this->_customerMetadata = $customerMetadata;
-        $this->_storeManager = $storeManager;
         $this->_subscriberFactory = $subscriberFactory;
         $this->_subscriberCollectionFactory = $subscriberCollectionFactory;
 
