@@ -30,7 +30,7 @@ class Dashboard extends Template
      */
     public function getEmbedUrl()
     {
-        if (! $this->getStoreId()) {
+        if (!$this->getStoreId()) {
             return false;
         }
 
@@ -56,13 +56,21 @@ class Dashboard extends Template
     }
 
     /**
-     * Get url for clerk system configuration
+     * Get Store ID
      *
-     * @return string
+     * @return mixed
      */
-    public function getConfigureUrl()
+    public function getStoreId()
     {
-        return $this->getUrl('adminhtml/system_config/edit/section/clerk');
+        return $this->getRequest()->getParam('store');
+    }
+
+    /**
+     * Get current store
+     */
+    public function getStore()
+    {
+        return $this->storeRepository->getById($this->getStoreId());
     }
 
     /**
@@ -77,20 +85,12 @@ class Dashboard extends Template
     }
 
     /**
-     * Get current store
-     */
-    public function getStore()
-    {
-        return $this->storeRepository->getById($this->getStoreId());
-    }
-
-    /**
-     * Get Store Id
+     * Get url for clerk system configuration
      *
-     * @return mixed
+     * @return string
      */
-    public function getStoreId()
+    public function getConfigureUrl()
     {
-        return $this->getRequest()->getParam('store');
+        return $this->getUrl('adminhtml/system_config/edit/section/clerk');
     }
 }
