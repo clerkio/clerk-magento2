@@ -62,9 +62,8 @@ if (!empty($block->getPublicKey())):
 
                                 var clerk_productids = [];
                                 if(response && response.hasOwnProperty('cart') && response.cart.hasOwnProperty('items') ){
-
                                     for (var i = 0, len = response.cart.items.length; i < len; i++) {
-                                        clerk_productids.push(response.cart.items[i].item_id);
+                                        clerk_productids.push(response.cart.items[i].product_id);
                                     }
                                 }
 

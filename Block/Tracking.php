@@ -121,7 +121,6 @@ class Tracking extends Template
 
     public function getFormKey()
     {
-
         return $this->formKey->getFormKey();
     }
 
