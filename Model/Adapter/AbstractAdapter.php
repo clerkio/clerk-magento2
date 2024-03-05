@@ -242,6 +242,20 @@ abstract class AbstractAdapter
           }
       }
 
+      // Fix for including a list of Bundle Products child skus.
+      if($resourceItemTypeId == self::PRODUCT_TYPE_BUNDLE){
+        $bundle_skus = [];
+        $selections = $resourceItem->getTypeInstance(true)->getSelectionsCollection($resourceItem->getTypeInstance(true)->getOptionsIds($resourceItem), $resourceItem);
+        if( !empty($selections) ){
+          foreach($selections as $selection){
+            if( is_object($selection) ){
+              $bundle_skus[] = $selection->getSku();
+            }
+          }
+        }
+        $info['bundle_skus'] = $bundle_skus;
+      }
+
       return $info;
     } catch (\Exception $e) {
 
