@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\CustomerMetadataInterface;
 use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Customer\Api\GroupRepositoryInterface;
 
 class Index extends AbstractAction
 {
@@ -57,6 +58,11 @@ class Index extends AbstractAction
     protected $eventPrefix = 'clerk_customer';
 
     /**
+     * @var GroupRepositoryInterface
+     */
+    protected $groupRepository;
+
+    /**
      * Customer controller constructor.
      *
      * @param Context $context
@@ -79,13 +85,15 @@ class Index extends AbstractAction
         RequestApi $request_api,
         SubscriberFactory $subscriberFactory,
         SubscriberCollectionFactory $subscriberCollectionFactory,
-        Api $api
+        Api $api,
+        GroupRepositoryInterface $groupRepository
     ) {
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $clerk_logger;
         $this->_customerMetadata = $customerMetadata;
         $this->_subscriberFactory = $subscriberFactory;
         $this->_subscriberCollectionFactory = $subscriberCollectionFactory;
+        $this->groupRepository = $groupRepository;
 
         parent::__construct(
             $context,
@@ -131,6 +139,8 @@ class Index extends AbstractAction
                     $_customer['id'] = $customer['entity_id'];
                     $_customer['name'] = $customer['firstname'] . " " . (!is_null($customer['middlename']) ? $customer['middlename'] . " " : "") . $customer['lastname'];
                     $_customer['email'] = $customer['email'];
+                    $_customer['group_id'] = $customer['group_id'];
+                    $_customer['group_name'] = $this->groupRepository->getById($customer['group_id'])->getCode();
 
 
                     foreach ($Fields as $Field) {
