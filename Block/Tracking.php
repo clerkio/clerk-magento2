@@ -121,7 +121,11 @@ class Tracking extends Template
 
     public function getFormKey()
     {
+      if(array_key_exists('form_key', $_COOKIE)){
+        return $_COOKIE['form_key'];
+      } else {
         return $this->formKey->getFormKey();
+      }
     }
 
     /**
