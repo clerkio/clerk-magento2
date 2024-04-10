@@ -336,7 +336,7 @@ abstract class AbstractAdapter
    * Flatten array
    *
    * @param array $array
-   * @return arrray $array
+   * @return array $array
    */
   public function flattenArray($array)
   {
