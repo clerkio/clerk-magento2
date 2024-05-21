@@ -6,9 +6,11 @@
 namespace Clerk\Clerk\Block;
 
 use Clerk\Clerk\Model\Config;
+use Magento\Backend\Block\Widget\Context;
+use Magento\Directory\Model\Currency;
+use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Directory\Model\Currency;
 use Magento\Store\Model\StoreManagerInterface;
 
 class Tracking extends Template
@@ -21,17 +23,19 @@ class Tracking extends Template
     protected $_storeManager;
 
     public function __construct(
-        \Magento\Backend\Block\Widget\Context $context,
-        \Magento\Framework\Data\Form\FormKey $formKey,
-        Currency $_currency,
+        Context               $context,
+        FormKey               $formKey,
+        Currency              $_currency,
         StoreManagerInterface $_storeManager
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->formKey = $formKey;
         $this->_currency = $_currency;
         $this->_storeManager = $_storeManager;
 
     }
+
     /**
      * Get public key
      *
@@ -121,6 +125,9 @@ class Tracking extends Template
 
     public function getFormKey()
     {
+        if (array_key_exists('form_key', $_COOKIE)) {
+            return $_COOKIE['form_key'];
+        }
         return $this->formKey->getFormKey();
     }
 
@@ -160,22 +167,12 @@ class Tracking extends Template
      * If base currency is not allowed in current website config scope,
      * then it can be disabled with $skipBaseNotAllowed
      *
-     * @param  bool $skipBaseNotAllowed
+     * @param bool $skipBaseNotAllowed
      * @return array
      */
     public function getAvailableCurrencyCodes($skipBaseNotAllowed = false)
     {
         return $this->_storeManager->getStore()->getAvailableCurrencyCodes($skipBaseNotAllowed);
-    }
-
-    /**
-     * Get array of installed currencies for the scope
-     *
-     * @return array
-     */
-    public function getAllowedCurrencies()
-    {
-        return $this->_storeManager->getStore()->getAllowedCurrencies();
     }
 
     /**
@@ -198,6 +195,26 @@ class Tracking extends Template
         return $this->_currency->getCurrencySymbol();
     }
 
+    public function getAllCurrencyRates()
+    {
+        $currency_codes = $this->getAllowedCurrencies();
+        $currency_rates_array = array();
+        foreach ($currency_codes as $key => $code) {
+            $currency_rates_array[$code] = $this->getCurrencyRateFromIso($code);
+        }
+        return $currency_rates_array;
+    }
+
+    /**
+     * Get array of installed currencies for the scope
+     *
+     * @return array
+     */
+    public function getAllowedCurrencies()
+    {
+        return $this->_storeManager->getStore()->getAllowedCurrencies();
+    }
+
     /**
      * Get currency rate for current locale from currency code
      *
@@ -207,21 +224,17 @@ class Tracking extends Template
      */
     public function getCurrencyRateFromIso($currencyIso = null)
     {
-        if(! $currencyIso) {
+        if (!$currencyIso) {
             return 1.0;
         } else {
             return $this->_storeManager->getStore()->getBaseCurrency()->getRate($currencyIso);
         }
     }
 
-    public function getAllCurrencyRates()
+    public function getClerkJSLink()
     {
-        $currency_codes = $this->getAllowedCurrencies();
-        $currency_rates_array = array();
-        foreach($currency_codes as $key => $code) {
-            $currency_rates_array[$code] = $this->getCurrencyRateFromIso($code);
-        }
-        return $currency_rates_array;
+        $storeName = $this->getStoreNameSlug() ?? 'clerk';
+        return '://custom.clerk.io/' . $storeName . '.js';
     }
 
     public function getStoreNameSlug()
@@ -229,11 +242,5 @@ class Tracking extends Template
         $storeName = $this->_storeManager->getStore()->getName();
         $storeName = preg_replace('/[^a-z]/', '', strtolower($storeName));
         return $storeName;
-    }
-
-    public function getClerkJSLink()
-    {
-      $storeName = $this->getStoreNameSlug() ?? 'clerk';
-      return '://custom.clerk.io/' . $storeName . '.js';
     }
 }
