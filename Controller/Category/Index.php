@@ -159,6 +159,10 @@ class Index extends AbstractAction
                 return $item->getName();
             });
 
+            $this->addFieldHandler('short_name', function ($item) {
+                return $item->getShortName();
+            });
+
         } catch (\Exception $e) {
 
             $this->clerk_logger->error('Category addFieldHandlers ERROR', ['error' => $e->getMessage()]);
