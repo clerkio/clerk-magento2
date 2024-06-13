@@ -6,7 +6,6 @@ use Magento\Catalog\Helper\Image;
 use Magento\Framework\Option\ArrayInterface;
 use Magento\Framework\View\ConfigInterface;
 use Magento\Theme\Model\ResourceModel\Theme\CollectionFactory;
-use mysql_xdevapi\Exception;
 
 class ImageType implements ArrayInterface
 {
