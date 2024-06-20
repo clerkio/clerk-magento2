@@ -1,6 +1,7 @@
 <?php
 /** @var \Clerk\Clerk\Block\PowerstepPopup $block */
 $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [];
+$productId = $block->getProduct() ? $block->getProduct()->getId() : '';
 ?>
 <?php if ($block->shouldShow()): ?>
 <div id="clerk_powerstep" class="clerk-popup">
@@ -20,7 +21,7 @@ $categoryIds = $block->getProduct() ? $block->getProduct()->getCategoryIds() : [
     $slider_count = 0;
     $spanAttributes = [];
     $spanAttributes['class'] = 'clerk';
-    $spanAttributes['products'] = $block->escapeHtmlAttr($block->getProduct()->getId());
+    $spanAttributes['products'] = $block->escapeHtmlAttr($productId);
     $spanAttributes['category'] = $block->escapeHtmlAttr(reset($categoryIds));
 
     foreach ($block->getTemplates() as $template):
