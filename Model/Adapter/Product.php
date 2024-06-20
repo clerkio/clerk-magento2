@@ -846,7 +846,7 @@ class Product extends AbstractAdapter
                 }
             }
         }
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
     }
     return $stockQuantity;
   }
