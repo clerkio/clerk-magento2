@@ -147,6 +147,28 @@ class Api
         }
     }
 
+
+    /**
+     * @param $orderIncrementId
+     * @param $product_id
+     * @param $quantity
+     * @return void
+     */
+    public function returnProduct($orderIncrementId, $product_id, $quantity, $store_id)
+    {
+        try {
+            $params = [
+                'product' => (string) $product_id,
+                'order' => (string) $orderIncrementId,
+                'quantity' => (int) $quantity
+            ];
+            $this->get('log/returned', $params, $store_id);
+            $this->clerk_logger->log('Returned Product', ['response' => $params]);
+        } catch (\Exception $e) {
+            $this->clerk_logger->error('Returning Products Error', ['error' => $e->getMessage()]);
+        }
+
+    }
     private function _curl_get($url, $params = [])
     {
         try {
@@ -465,5 +487,7 @@ class Api
 
         return ['limit'];
     }
+
+
 
 }

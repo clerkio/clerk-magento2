@@ -48,6 +48,7 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
             $order_id = $creditmemo->getOrderId();
             $order = $this->orderRepository->get($order_id);
             $orderIncrementId = $order->getIncrementId();
+            $store_id = $order->getStore()->getId();
 
             foreach ($creditmemo->getAllItems() as $item) {
 
@@ -55,7 +56,7 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
                 $quantity = $item->getQty();
 
                 if ($product_id && $orderIncrementId && $quantity !=0) {
-                    $this->api->returnProduct($orderIncrementId, $product_id, $quantity);
+                    $this->api->returnProduct($orderIncrementId, $product_id, $quantity, $store_id);
                 }
 
             }
