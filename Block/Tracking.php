@@ -7,8 +7,10 @@ namespace Clerk\Clerk\Block;
 
 use Clerk\Clerk\Model\Config;
 use Magento\Backend\Block\Widget\Context;
+use Magento\Customer\Model\Session;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Data\Form\FormKey;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -22,24 +24,43 @@ class Tracking extends Template
 
     protected $_storeManager;
 
+    protected $_customerSession;
+
     public function __construct(
         Context               $context,
         FormKey               $formKey,
         Currency              $_currency,
-        StoreManagerInterface $_storeManager
+        StoreManagerInterface $_storeManager,
+        Session               $_customerSession
     )
     {
         parent::__construct($context);
         $this->formKey = $formKey;
         $this->_currency = $_currency;
         $this->_storeManager = $_storeManager;
+        $this->_customerSession = $_customerSession;
+    }
 
+
+    /**
+     * @return string
+     */
+    public function getCustomerEmail()
+    {
+        $email = "";
+        try {
+            $customerData = $this->_customerSession->getCustomer();
+            $email = $customerData->getEmail();
+        } catch (Exception) {
+        }
+        return $email;
     }
 
     /**
      * Get public key
      *
      * @return mixed
+     * @throws NoSuchEntityException
      */
     public function getPublicKey()
     {
@@ -81,8 +102,9 @@ class Tracking extends Template
      * Get collect emails
      *
      * @return string
+     * @throws NoSuchEntityException
      */
-    public function getCollectionEmails()
+    public function getCollectionEmails($as_bool = false)
     {
 
         if ($this->_storeManager->isSingleStoreMode()) {
@@ -91,6 +113,14 @@ class Tracking extends Template
         } else {
             $scope = ScopeInterface::SCOPE_STORE;
             $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        if ($as_bool) {
+            return $this->_scopeConfig->isSetFlag(
+                Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS,
+                $scope,
+                $scope_id
+            );
         }
 
         return ($this->_scopeConfig->isSetFlag(
@@ -104,6 +134,7 @@ class Tracking extends Template
      * Get collect carts
      *
      * @return string
+     * @throws NoSuchEntityException
      */
     public function getCollectionBaskets()
     {
