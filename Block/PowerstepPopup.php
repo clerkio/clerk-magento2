@@ -111,11 +111,13 @@ class PowerstepPopup extends Template
      */
     public function getImageUrl()
     {
-        $product = $this->getProduct();
+        if ($product = $this->getProduct()) {
+            return $this->imageHelper->init($product, 'product_page_image_small')
+                ->setImageFile($product->getImage())
+                ->getUrl();
+        }
 
-        return $this->imageHelper->init($product, 'product_page_image_small')
-            ->setImageFile($product->getImage())
-            ->getUrl();
+        return '';
     }
 
     /**
