@@ -13,7 +13,6 @@ use Magento\Checkout\Helper\Cart;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
-use function GuzzleHttp\Psr7\str;
 
 class PowerstepPopup extends Template
 {
