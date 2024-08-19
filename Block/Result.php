@@ -2,39 +2,139 @@
 
 namespace Clerk\Clerk\Block;
 
-use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
-use Exception;
-use Magento\Catalog\Model\Layer\Resolver as LayerResolver;
 use Magento\CatalogSearch\Block\Result as BaseResult;
-use Magento\CatalogSearch\Helper\Data;
-use Magento\Framework\View\Element\Template\Context;
-use Magento\Search\Model\QueryFactory;
+use Magento\Store\Model\ScopeInterface;
 
 class Result extends BaseResult
 {
+
     const TARGET_ID = 'clerk-search-results';
 
-    public function __construct(
-        ConfigHelper  $configHelper,
-        Context       $context,
-        LayerResolver $layerResolver,
-        Data          $catalogSearchData,
-        QueryFactory  $queryFactory,
-        array         $data = []
-    )
+    /**
+     * Get search query
+     *
+     * @return string
+     */
+    public function getSearchQuery()
     {
-        parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
-        $this->configHelper = $configHelper;
+        return $this->catalogSearchData->getEscapedQueryText();
     }
 
     /**
+     * Get search template
+     *
      * @return mixed
      */
+    public function getSearchTemplate()
+    {
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_TEMPLATE, $scope, $scope_id);
+    }
+
+    /**
+     * Get facets template
+     *
+     * @return mixed
+     */
+    public function getFacetsDesign()
+    {
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_DESIGN, $scope, $scope_id);
+    }
+
+    /**
+     * Determine if we should include categories and pages in search results
+     *
+     * @return bool
+     *
+     */
+
+    public function shouldIncludeCategories()
+    {
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return ($this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_INCLUDE_CATEGORIES, $scope, $scope_id)) ? 'true' : 'false';
+    }
     public function getSuggestions()
     {
-        return $this->configHelper->getValue(Config::XML_PATH_SEARCH_SUGGESTIONS);
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_SUGGESTIONS, $scope, $scope_id);
     }
+
+    public function getCategories()
+    {
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_CATEGORIES, $scope, $scope_id);
+    }
+
+    public function getPages()
+    {
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_PAGES, $scope, $scope_id);
+    }
+
+    public function getPagesType()
+    {
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_PAGES_TYPE, $scope, $scope_id);
+    }
+
 
     /**
      * Get attributes for clerk span
@@ -45,7 +145,15 @@ class Result extends BaseResult
     {
         $output = '';
 
-        $span_attributes = [
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        $spanAttributes = [
             'id' => 'clerk-search',
             'class' => 'clerk',
             'data-template' => '@' . $this->getSearchTemplate(),
@@ -56,18 +164,18 @@ class Result extends BaseResult
         ];
 
         if ($this->shouldIncludeCategories()) {
-            $span_attributes['data-search-categories'] = $this->getCategories();
-            $span_attributes['data-search-pages'] = $this->getPages();
-            $span_attributes['data-search-pages-type'] = $this->getPagesType();
+            $spanAttributes['data-search-categories'] = $this->getCategories();
+            $spanAttributes['data-search-pages'] = $this->getPages();
+            $spanAttributes['data-search-pages-type'] = $this->getPagesType();
         }
 
 
-        if ($this->configHelper->getFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED)) {
+        if ($this->_scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED, $scope, $scope_id)) {
             try {
-                $span_attributes['data-facets-target'] = "#clerk-search-filters";
-                $span_attributes['data-facets-design'] = $this->getFacetsDesign();
+                $spanAttributes['data-facets-target'] = "#clerk-search-filters";
+                $spanAttributes['data-facets-design'] =  $this->getFacetsDesign();
 
-                if ($titles = $this->configHelper->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES)) {
+                if ($titles = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_TITLES, $scope, $scope_id)) {
                     $titles = json_decode($titles, true);
 
                     $titles_sorting = [];
@@ -79,19 +187,19 @@ class Result extends BaseResult
 
                     asort($titles_sorting);
 
-                    $span_attributes['data-facets-titles'] = json_encode(array_filter(array_combine(array_keys($titles), array_column($titles, 'label'))));
-                    $span_attributes['data-facets-attributes'] = json_encode(array_keys($titles_sorting));
+                    $spanAttributes['data-facets-titles'] = json_encode(array_filter(array_combine(array_keys($titles), array_column($titles, 'label'))));
+                    $spanAttributes['data-facets-attributes'] = json_encode(array_keys($titles_sorting));
 
-                    if ($multiselectAttributes = $this->configHelper->getValue(Config::XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES)) {
-                        $span_attributes['data-facets-multiselect-attributes'] = '["' . str_replace(',', '","', $multiselectAttributes) . '"]';
+                    if ($multiselectAttributes = $this->_scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES, $scope, $scope_id)) {
+                        $spanAttributes['data-facets-multiselect-attributes'] = '["' . str_replace(',', '","', $multiselectAttributes) . '"]';
                     }
                 }
-            } catch (Exception) {
-                $span_attributes['data-facets-attributes'] = '["price","categories"]';
+            } catch (\Exception $e) {
+                $spanAttributes['data-facets-attributes'] = '["price","categories"]';
             }
         }
 
-        foreach ($span_attributes as $attribute => $value) {
+        foreach ($spanAttributes as $attribute => $value) {
             $output .= ' ' . $attribute . '=\'' . $value . '\'';
         }
 
@@ -99,27 +207,7 @@ class Result extends BaseResult
     }
 
     /**
-     * Get search template
-     *
-     * @return mixed
-     */
-    public function getSearchTemplate()
-    {
-        return $this->configHelper->getValue(Config::XML_PATH_SEARCH_TEMPLATE);
-    }
-
-    /**
-     * Get the search query
-     *
-     * @return string
-     */
-    public function getSearchQuery()
-    {
-        return $this->catalogSearchData->getEscapedQueryText();
-    }
-
-    /**
-     * Get HTML id of target
+     * Get html id of target
      *
      * @return string
      */
@@ -129,58 +217,22 @@ class Result extends BaseResult
     }
 
     /**
-     * Determine if we should include categories and pages in search results
-     *
-     * @return string
-     *
-     */
-    public function shouldIncludeCategories()
-    {
-        return ($this->configHelper->getValue(Config::XML_PATH_SEARCH_INCLUDE_CATEGORIES)) ? 'true' : 'false';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCategories()
-    {
-        return $this->configHelper->getValue(Config::XML_PATH_SEARCH_CATEGORIES);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPages()
-    {
-        return $this->configHelper->getValue(Config::XML_PATH_SEARCH_PAGES);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPagesType()
-    {
-        return $this->configHelper->getValue(Config::XML_PATH_SEARCH_PAGES_TYPE);
-    }
-
-    /**
-     * Get facets template
-     *
-     * @return mixed
-     */
-    public function getFacetsDesign()
-    {
-        return $this->configHelper->getValue(Config::XML_PATH_FACETED_SEARCH_DESIGN);
-    }
-
-    /**
-     * Get no result text
+     * Get no results text
      *
      * @return mixed
      */
     public function getNoResultsText()
     {
-        return $this->configHelper->getValue(Config::XML_PATH_SEARCH_NO_RESULTS_TEXT);
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_NO_RESULTS_TEXT, $scope, $scope_id);
     }
 
     /**
@@ -190,6 +242,15 @@ class Result extends BaseResult
      */
     public function getLoadMoreText()
     {
-        return $this->configHelper->getValue(Config::XML_PATH_SEARCH_LOAD_MORE_TEXT);
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        return $this->_scopeConfig->getValue(Config::XML_PATH_SEARCH_LOAD_MORE_TEXT, $scope, $scope_id);
     }
 }

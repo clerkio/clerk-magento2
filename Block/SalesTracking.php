@@ -2,18 +2,17 @@
 
 namespace Clerk\Clerk\Block;
 
-use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
-use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Checkout\Model\Session;
+use Magento\Store\Model\ScopeInterface;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
-use Magento\Sales\Model\Order;
 
 class SalesTracking extends Template
 {
     /**
-     * @var Session
+     * @var \Magento\Checkout\Model\Session
      */
     protected $_checkoutSession;
 
@@ -25,24 +24,24 @@ class SalesTracking extends Template
     /**
      * SalesTracking constructor.
      *
-     * @param ConfigHelper $configHelper
      * @param Context $context
      * @param Session $checkoutSession
      * @param Grouped $productGrouped
      * @param array $data
      */
     public function __construct(
-        ConfigHelper $configHelper,
-        Context      $context,
-        Session      $checkoutSession,
-        Grouped      $productGrouped,
-        array        $data = []
-    )
+        Context $context,
+        Session $checkoutSession,
+        Grouped $productGrouped,
+        array $data = []
+        )
     {
-        parent::__construct($context, $data);
+        parent::__construct(
+            $context,
+            $data
+        );
         $this->_checkoutSession = $checkoutSession;
         $this->_productGrouped = $productGrouped;
-        $this->configHelper = $configHelper;
     }
 
     /**
@@ -56,31 +55,30 @@ class SalesTracking extends Template
     }
 
     /**
-     * Get last order from session
-     *
-     * @return Order
-     */
-    private function getOrder()
-    {
-        return $this->_checkoutSession->getLastRealOrder();
-    }
-
-    /**
      * Get customer email
      *
      * @return string
      */
     public function getCustomerEmail()
     {
-        $collect_emails = $this->configHelper->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS);
-        if (!$collect_emails) {
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        $collect_emails = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS, $scope, $scope_id);
+        if ($collect_emails == '1') {
+            return $this->getOrder()->getCustomerEmail();
+        } else {
             return "";
         }
-        return $this->getOrder()->getCustomerEmail();
     }
 
     /**
-     * Get all order products as JSON string
+     * Get all order products as json string
      *
      * @return string
      */
@@ -90,16 +88,38 @@ class SalesTracking extends Template
         $products = [];
 
         foreach ($order->getAllVisibleItems() as $item) {
-            $group_parent_id = $this->_productGrouped->getParentIdsByChild($item->getProductId());
-            $product_id = !empty($group_parent_id) ? $group_parent_id[0] : $item->getProductId();
-            $product = [
-                'id' => $product_id,
-                'quantity' => (int)$item->getQtyOrdered(),
-                'price' => (float)$item->getBasePrice(),
-            ];
+            $groupParentId = $this->_productGrouped->getParentIdsByChild($item->getProductId());
+
+            if (isset($groupParentId[0])) {
+
+                $product = [
+                    'id' => $groupParentId[0],
+                    'quantity' => (int)$item->getQtyOrdered(),
+                    'price' => (float)$item->getBasePrice(),
+                ];
+
+            } else {
+
+                $product = [
+                    'id'       => $item->getProductId(),
+                    'quantity' => (int) $item->getQtyOrdered(),
+                    'price'    => (float) $item->getBasePrice(),
+                ];
+            }
+
             $products[] = $product;
         }
 
         return json_encode($products);
+    }
+
+    /**
+     * Get last order from session
+     *
+     * @return \Magento\Sales\Model\Order
+     */
+    private function getOrder()
+    {
+        return $this->_checkoutSession->getLastRealOrder();
     }
 }

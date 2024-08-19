@@ -14,8 +14,8 @@ class ExitIntent extends Template
         array            $data = []
     )
     {
-        parent::__construct($context, $data);
         $this->configHelper = $configHelper;
+        parent::__construct($context, $data);
     }
 
     /**

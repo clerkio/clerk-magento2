@@ -19,8 +19,8 @@ class Powerstep extends AbstractProduct
         array        $data = []
     )
     {
-        parent::__construct($context, $data);
         $this->configHelper = $configHelper;
+        parent::__construct($context, $data);
     }
 
     /**
