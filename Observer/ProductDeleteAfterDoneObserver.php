@@ -4,18 +4,18 @@ namespace Clerk\Clerk\Observer;
 
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
+use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Store\Model\ScopeInterface;
-use Magento\Framework\App\RequestInterface;
 
 class ProductDeleteAfterDoneObserver implements ObserverInterface
 {
     /**
-	 * @var RequestInterface
-	 */
-	protected $request;
+     * @var RequestInterface
+     */
+    protected $request;
     /**
      * @var ScopeConfigInterface
      */
@@ -28,9 +28,9 @@ class ProductDeleteAfterDoneObserver implements ObserverInterface
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        Api $api,
-        RequestInterface $request
-        )
+        Api                  $api,
+        RequestInterface     $request
+    )
     {
         $this->scopeConfig = $scopeConfig;
         $this->api = $api;
@@ -42,19 +42,20 @@ class ProductDeleteAfterDoneObserver implements ObserverInterface
      *
      * @param Observer $observer
      * @return void
+     * @throws Exception
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $_params = $this->request->getParams();
         $scope_id = 0;
         $scope = 'default';
-        if (array_key_exists('store', $_params)){
+        if (array_key_exists('store', $_params)) {
             $scope = 'store';
             $scope_id = $_params[$scope];
         }
         $product = $observer->getEvent()->getProduct();
-        if($product && $product->getId()){
-            if($scope_id == 0){
+        if ($product && $product->getId()) {
+            if ($scope_id == 0) {
                 $store_ids_prod = $product->getStoreIds();
                 foreach ($store_ids_prod as $store_id) {
                     if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, 'store', $store_id)) {

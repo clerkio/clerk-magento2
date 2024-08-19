@@ -9,7 +9,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Widget\Block\BlockInterface;
 
 class Content extends Template implements BlockInterface
@@ -50,7 +49,9 @@ class Content extends Template implements BlockInterface
     public function getEmbeds()
     {
         $contents = $this->getContent();
-
+        if ($contents) {
+            $contents = explode(',', $contents);
+        }
         if ($this->getType() === 'cart') {
             $contents = $this->getCartContents();
         }
@@ -64,13 +65,7 @@ class Content extends Template implements BlockInterface
         }
 
         $output = '';
-
-        if ($contents) {
-            $contents_array = explode(',', $contents);
-        } else {
-            $contents_array = [0 => ''];
-        }
-        foreach ($contents_array as $content) {
+        foreach ($contents as $content) {
             $output .= $this->getHtmlForContent(str_replace(' ', '', $content));
         }
 
@@ -80,74 +75,38 @@ class Content extends Template implements BlockInterface
     /**
      * Get product ids from cart
      *
-     * @return mixed
+     * @return string[]
      */
     protected function getCartContents()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_CART_CONTENT, $scope, $scope_id);
+        return $this->configHelper->getTemplates(Config::XML_PATH_CART_CONTENT);
     }
 
     /**
      * Get content for category page slider
      *
-     * @return mixed
+     * @return string[]
      */
     protected function getCategoryContents()
     {
-
-        if ($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_CONTENT, $scope, $scope_id);
+        return $this->configHelper->getTemplates(Config::XML_PATH_CATEGORY_CONTENT);
     }
 
     /**
      * Get content for product page slider
      *
-     * @return mixed
+     * @return string[]
      */
     protected function getProductContents()
     {
-
-        if ($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_CONTENT, $scope, $scope_id);
+        return $this->configHelper->getTemplates(Config::XML_PATH_PRODUCT_CONTENT);
     }
 
     private function getHtmlForContent($content)
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, $scope, $scope_id);
-        $filter_product = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, $scope, $scope_id);
-        $filter_cart = $this->_scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, $scope, $scope_id);
+        $filter_category = $this->configHelper->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES);
+        $filter_product = $this->configHelper->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES);
+        $filter_cart = $this->configHelper->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES);
 
         static $product_contents = 0;
         static $cart_contents = 0;
@@ -156,7 +115,7 @@ class Content extends Template implements BlockInterface
         $output = '<span ';
         $spanAttributes = [
             'class' => 'clerk',
-            'data-template' => '@' . $content,
+            'data-template' => '@' . $content
         ];
 
         if ($this->getProductId()) {
@@ -172,18 +131,7 @@ class Content extends Template implements BlockInterface
                 $spanAttributes['data-product'] = $productId;
             }
             if ($filter_product) {
-                $unique_class = "clerk_" . (string)$product_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($product_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $product_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
+                $spanAttributes = $this->getAttributes($product_contents, $spanAttributes);
             }
         }
 
@@ -199,54 +147,21 @@ class Content extends Template implements BlockInterface
                 $spanAttributes['data-category'] = $categoryId;
             }
             if ($filter_category) {
-                $unique_class = "clerk_" . (string)$category_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($category_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $category_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
+                $spanAttributes = $this->getAttributes($category_contents, $spanAttributes);
             }
         }
 
         if ($this->getType() === 'cart') {
             $spanAttributes['data-products'] = json_encode($this->getCartProducts());
             if ($filter_cart) {
-                $unique_class = "clerk_" . (string)$cart_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($cart_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $cart_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
+                $spanAttributes = $this->getAttributes($cart_contents, $spanAttributes);
             }
         }
 
         if ($this->getType() === 'category') {
             $spanAttributes['data-category'] = $this->getCurrentCategory();
             if ($filter_category) {
-                $unique_class = "clerk_" . (string)$category_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($category_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $category_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
+                $spanAttributes = $this->getAttributes($category_contents, $spanAttributes);
             }
         }
 
@@ -254,18 +169,7 @@ class Content extends Template implements BlockInterface
             $spanAttributes['data-products'] = json_encode([$this->getCurrentProduct()]);
             $spanAttributes['data-product'] = $this->getCurrentProduct();
             if ($filter_product) {
-                $unique_class = "clerk_" . (string)$product_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($product_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $product_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
+                $spanAttributes = $this->getAttributes($product_contents, $spanAttributes);
             }
         }
 
@@ -283,13 +187,43 @@ class Content extends Template implements BlockInterface
     }
 
     /**
+     * @param int $product_contents
+     * @param array $spanAttributes
+     * @return array
+     */
+    public function getAttributes(int $product_contents, array $spanAttributes): array
+    {
+        $unique_class = "clerk_" . $product_contents;
+        $spanAttributes['class'] = 'clerk ' . $unique_class;
+        if ($product_contents > 0) {
+            $filter_string = $this->getFilterClassString($product_contents);
+            $spanAttributes['data-exclude-from'] = $filter_string;
+        }
+        return $spanAttributes;
+    }
+
+    /**
+     * @param int $product_contents
+     * @return string
+     */
+    public function getFilterClassString(int $product_contents): string
+    {
+        $filter_string = '';
+        for ($i = 0; $i < $product_contents; $i++) {
+            if ($i > 0) {
+                $filter_string .= ', ';
+            }
+            $filter_string .= '.clerk_' . strval($i);
+        }
+        return $filter_string;
+    }
+
+    /**
      * @return array
      */
     protected function getCartProducts()
     {
-        $products = array_values($this->cart->getProductIds());
-
-        return $products;
+        return array_values($this->cart->getProductIds());
     }
 
     /**
@@ -304,6 +238,7 @@ class Content extends Template implements BlockInterface
         if ($category) {
             return $category->getId();
         }
+        return null;
     }
 
     /**
@@ -321,196 +256,28 @@ class Content extends Template implements BlockInterface
     }
 
     /**
-     * Get attributes for Clerk span
-     *
-     * @return string
-     * @throws LocalizedException
-     */
-    public function getSpanAttributes()
-    {
-
-        if ($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        $filter_category = $this->_scopeConfig->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES, $scope, $scope_id);
-        $filter_product = $this->_scopeConfig->getValue(Config::XML_PATH_PRODUCT_FILTER_DUPLICATES, $scope, $scope_id);
-        $filter_cart = $this->_scopeConfig->getValue(Config::XML_PATH_CART_FILTER_DUPLICATES, $scope, $scope_id);
-
-        static $product_contents = 0;
-        static $cart_contents = 0;
-        static $category_contents = 0;
-
-        $output = '<span ';
-        $spanAttributes = [
-            'class' => 'clerk',
-            'data-template' => '@' . $this->getContents(),
-        ];
-
-        if ($this->getProductId()) {
-            $value = explode('/', $this->getProductId());
-            $productId = false;
-
-            if (isset($value[0]) && isset($value[1]) && $value[0] == 'product') {
-                $productId = $value[1];
-            }
-
-            if ($productId) {
-                $spanAttributes['data-products'] = json_encode([$productId]);
-                $spanAttributes['data-product'] = $productId;
-            }
-            if ($filter_product) {
-                $unique_class = "clerk_" . (string)$product_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($product_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $product_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
-            }
-        }
-
-        if ($this->getCategoryId()) {
-            $value = explode('/', $this->getCategoryId());
-            $categoryId = false;
-
-            if (isset($value[0]) && isset($value[1]) && $value[0] == 'category') {
-                $categoryId = $value[1];
-            }
-
-            if ($categoryId) {
-                $spanAttributes['data-category'] = $categoryId;
-            }
-            if ($filter_category) {
-                $unique_class = "clerk_" . (string)$category_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($category_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $category_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
-            }
-        }
-
-        if ($this->getType() === 'cart') {
-            $spanAttributes['data-products'] = json_encode($this->getCartProducts());
-            $spanAttributes['data-template'] = '@' . $this->getCartContents();
-            if ($filter_cart) {
-                $unique_class = "clerk_" . (string)$cart_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($cart_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $cart_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
-            }
-        }
-
-        if ($this->getType() === 'category') {
-            $spanAttributes['data-category'] = $this->getCurrentCategory();
-            $spanAttributes['data-template'] = '@' . $this->getCategoryContents();
-            if ($filter_category) {
-                $unique_class = "clerk_" . (string)$category_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($category_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $category_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
-            }
-        }
-
-        if ($this->getType() === 'product') {
-            $spanAttributes['data-products'] = json_encode([$this->getCurrentProduct()]);
-            $spanAttributes['data-product'] = $this->getCurrentProduct();
-            $spanAttributes['data-template'] = '@' . $this->getProductContents();
-            if ($filter_product) {
-                $unique_class = "clerk_" . (string)$product_contents;
-                $spanAttributes['class'] = 'clerk ' . $unique_class;
-                if ($product_contents > 0) {
-                    $filter_string = '';
-                    for ($i = 0; $i < $product_contents; $i++) {
-                        if ($i > 0) {
-                            $filter_string .= ', ';
-                        }
-                        $filter_string .= '.clerk_' . strval($i);
-                    }
-                    $spanAttributes['data-exclude-from'] = $filter_string;
-                }
-            }
-        }
-
-        foreach ($spanAttributes as $attribute => $value) {
-            $output .= ' ' . $attribute . '=\'' . $value . '\'';
-        }
-
-        $output .= '></span>';
-
-        $product_contents++;
-        $cart_contents++;
-        $category_contents++;
-
-        return $output;
-    }
-
-    /**
      * Determine if we should show any output
      *
-     * @return string
+     * @return string|void
      * @throws LocalizedException
      */
     protected function _toHtml()
     {
-        if ($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
         if ($this->getType() === 'cart') {
-            if (!$this->_scopeConfig->isSetFlag(Config::XML_PATH_CART_ENABLED, $scope, $scope_id)) {
+            if (!$this->configHelper->getFlag(Config::XML_PATH_CART_ENABLED)) {
                 return;
             }
         }
-
         if ($this->getType() === 'category') {
-            if (!$this->_scopeConfig->isSetFlag(Config::XML_PATH_CATEGORY_ENABLED, $scope, $scope_id)) {
+            if (!$this->configHelper->getFlag(Config::XML_PATH_CATEGORY_ENABLED)) {
                 return;
             }
         }
-
         if ($this->getType() === 'product') {
-            if (!$this->_scopeConfig->isSetFlag(Config::XML_PATH_PRODUCT_ENABLED, $scope, $scope_id)) {
+            if (!$this->configHelper->getFlag(Config::XML_PATH_PRODUCT_ENABLED)) {
                 return;
             }
         }
-
         return parent::_toHtml();
     }
 }

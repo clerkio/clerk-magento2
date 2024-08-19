@@ -3,11 +3,12 @@
 namespace Clerk\Clerk\Block\System\Config\Form\Field;
 
 use Magento\Backend\Block\Template\Context;
+use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
-class information extends \Magento\Config\Block\System\Config\Form\Field
+class information extends Field
 {
     /**
      * @var ModuleListInterface
@@ -33,12 +34,13 @@ class information extends \Magento\Config\Block\System\Config\Form\Field
      * @param array $data
      */
     public function __construct(
-        Context $context,
-        ModuleListInterface $moduleList,
-        ManagerInterface $messageManager,
+        Context              $context,
+        ModuleListInterface  $moduleList,
+        ManagerInterface     $messageManager,
         ScopeConfigInterface $ScopeConfigInterface,
-        array $data = []
-    ) {
+        array                $data = []
+    )
+    {
         $this->moduleList = $moduleList;
         $this->messageManager = $messageManager;
         $this->ScopeConfigInterface = $ScopeConfigInterface;
@@ -74,7 +76,7 @@ class information extends \Magento\Config\Block\System\Config\Form\Field
 
         $html = '';
 
-        $singlestore =  $this->ScopeConfigInterface->getValue('general/single_store_mode/enabled');
+        $singlestore = $this->ScopeConfigInterface->getValue('general/single_store_mode/enabled');
 
         if ($singlestore !== '1' && $scope === 'default') {
             $html = 'Your current scope is "Default Config", to configure Clerk settings please change scope to "website" or "store.';
