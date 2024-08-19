@@ -2,12 +2,21 @@
 
 namespace Clerk\Clerk\Block;
 
+use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\View\Element\Template;
-use Magento\Store\Model\ScopeInterface;
 
 class LiveSearch extends Template
 {
+    public function __construct(
+        ConfigHelper     $configHelper,
+        Template\Context $context,
+        array            $data = []
+    )
+    {
+        $this->configHelper = $configHelper;
+        parent::__construct($context, $data);
+    }
 
     /**
      * Get live search template
@@ -16,133 +25,79 @@ class LiveSearch extends Template
      */
     public function getLiveSearchTemplate()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_TEMPLATE, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_TEMPLATE);
     }
 
+    /**
+     */
     public function getShopBaseDomainUrl()
     {
-        return $this->_storeManager->getStore()->getBaseUrl();
+        return $this->configHelper->getBaseUrl();
     }
 
     /**
      * Determine if we should include categories in live search results
      *
-     * @return bool
+     * @return string
      */
     public function shouldIncludeCategories()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return ($this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES, $scope, $scope_id)) ? 'true' : 'false';
+        return ($this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_INCLUDE_CATEGORIES)) ? 'true' : 'false';
     }
+
+    /**
+     * @return mixed
+     */
     public function getSuggestions()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_SUGGESTIONS, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_SUGGESTIONS);
     }
 
+    /**
+     * @return mixed
+     */
     public function getCategories()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_CATEGORIES, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_CATEGORIES);
     }
 
+    /**
+     * @return mixed
+     */
     public function getPages()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_PAGES);
     }
 
+    /**
+     * @return mixed
+     */
     public function getPagesType()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_PAGES_TYPE, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_PAGES_TYPE);
     }
+
+    /**
+     * @return mixed
+     */
     public function getDropdownPosition()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_DROPDOWN_POSITION, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_DROPDOWN_POSITION);
     }
+
+    /**
+     * @return mixed
+     */
     public function getInputSelector()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_INPUT_SELECTOR, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_INPUT_SELECTOR);
     }
+
+    /**
+     * @return mixed
+     */
     public function getFormSelector()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_LIVESEARCH_FORM_SELECTOR, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_LIVESEARCH_FORM_SELECTOR);
     }
 }
