@@ -2,17 +2,17 @@
 
 namespace Clerk\Clerk\Block;
 
+use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Store\Model\ScopeInterface;
-use Magento\Catalog\Block\Product\AbstractProduct;
-use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Helper\Image;
-use Magento\Catalog\Model\Product;
 use Magento\Checkout\Helper\Cart;
 use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 
 class PowerstepPopup extends Template
 {
@@ -40,41 +40,31 @@ class PowerstepPopup extends Template
     /**
      * PowerstepPopup constructor.
      *
-     * @param Template\Context $context
-     * @param array $data
+     * @param Context $context
      * @param Session $checkoutSession
      * @param ProductRepositoryInterface $productRepository
+     * @param Cart $cartHelper
+     * @param Image $imageHelper
+     * @param ConfigHelper $configHelper
+     * @param array $data
      */
     public function __construct(
-        Template\Context $context,
-        Session $checkoutSession,
+        Template\Context           $context,
+        Session                    $checkoutSession,
         ProductRepositoryInterface $productRepository,
-        Cart $cartHelper,
-        Image $imageHelper,
-        array $data = []
-    ) {
+        Cart                       $cartHelper,
+        Image                      $imageHelper,
+        ConfigHelper               $configHelper,
+        array                      $data = []
+    )
+    {
         parent::__construct($context, $data);
         $this->checkoutSession = $checkoutSession;
         $this->productRepository = $productRepository;
         $this->cartHelper = $cartHelper;
         $this->imageHelper = $imageHelper;
+        $this->configHelper = $configHelper;
         $this->setTemplate('powerstep_popup.phtml');
-    }
-
-    /**
-     * Get product added
-     *
-     * @return Product
-     */
-    public function getProduct()
-    {
-        $productId = $this->checkoutSession->getClerkProductId();
-
-        try {
-            return $this->productRepository->getById($productId);
-        } catch (NoSuchEntityException $e) {
-            return false;
-        }
     }
 
     /**
@@ -91,7 +81,47 @@ class PowerstepPopup extends Template
             );
         }
 
-        return "failed to load product with id" . $this->checkoutSession->getClerkProductId();
+        return "failed to load product with id" . $this->getLastProductId();
+    }
+
+    /**
+     * Get product added
+     *
+     * @return false|ProductInterface
+     */
+    public function getProduct()
+    {
+        $product_id = $this->getLastProductId();
+        if ($product_id === false) {
+            return false;
+        }
+        try {
+            return $this->productRepository->getById($product_id);
+        } catch (NoSuchEntityException) {
+            return false;
+        }
+    }
+
+    /**
+     * @return false|int
+     */
+    public function getLastProductId()
+    {
+        try {
+            $product_id = $this->checkoutSession->getClerkProductId();
+            if (!empty($product_id)) {
+                return $product_id;
+            }
+            $items_collection = $this->checkoutSession->getQuote()->getItemsCollection();
+            $items_collection->getSelect()->order('created_at DESC');
+            $last_item = $items_collection->getLastItem();
+            if (empty($last_item)) {
+                return false;
+            }
+            return $last_item->getProductId();
+        } catch (NoSuchEntityException|LocalizedException) {
+            return false;
+        }
     }
 
     /**
@@ -123,17 +153,17 @@ class PowerstepPopup extends Template
     /**
      * Determine if we should show popup block
      *
-     * @return mixed
+     * @return bool
      */
     public function shouldShow()
     {
-        $showPowerstep = ($this->getRequest()->getParam('isAjax')) || ($this->checkoutSession->getClerkShowPowerstep(true));
+        $show_powerstep = ($this->getRequest()->getParam('isAjax')) || ($this->checkoutSession->getClerkShowPowerstep(true));
 
-        if ($showPowerstep) {
+        if ($show_powerstep) {
             $this->checkoutSession->setClerkShowPowerstep(false);
         }
 
-        return $showPowerstep;
+        return $show_powerstep;
     }
 
     /**
@@ -148,16 +178,7 @@ class PowerstepPopup extends Template
 
     public function getExcludeState()
     {
-
-        if ($this->_scopeConfig->getValue('general/single_store_mode/enabled') == 1) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES, $scope, $scope_id);
+        return $this->configHelper->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES);
     }
 
     /**
@@ -167,42 +188,6 @@ class PowerstepPopup extends Template
      */
     public function getTemplates()
     {
-
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-
-        $template_contents = $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TEMPLATES, $scope, $scope_id);
-        if ($template_contents) {
-            $template_contents = explode(',', $template_contents);
-        } else {
-            $template_contents = [0 => ''];
-        }
-
-        foreach ($template_contents as $key => $template) {
-
-            $templates[$key] = str_replace(' ', '', $template);
-
-        }
-
-        return (array) $templates;
-    }
-
-    public function generateRandomString($length = 25)
-    {
-
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-
-        return $randomString;
+        return $this->configHelper->getTemplates(Config::XML_PATH_POWERSTEP_TEMPLATES);
     }
 }

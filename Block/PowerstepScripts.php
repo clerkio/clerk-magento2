@@ -2,12 +2,21 @@
 
 namespace Clerk\Clerk\Block;
 
+use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\View\Element\Template;
-use Magento\Store\Model\ScopeInterface;
 
 class PowerstepScripts extends Template
 {
+    public function __construct(
+        ConfigHelper     $configHelper,
+        Template\Context $context,
+        array            $data = []
+    )
+    {
+        parent::__construct($context, $data);
+        $this->configHelper = $configHelper;
+    }
 
     /**
      * Determine if we should show scripts
@@ -16,13 +25,6 @@ class PowerstepScripts extends Template
      */
     public function shouldShow()
     {
-        if ($this->_storeManager->isSingleStoreMode()) {
-            $scope = 'default';
-            $scope_id = '0';
-        } else {
-            $scope = ScopeInterface::SCOPE_STORE;
-            $scope_id = $this->_storeManager->getStore()->getId();
-        }
-        return $this->_scopeConfig->getValue(Config::XML_PATH_POWERSTEP_TYPE, $scope, $scope_id) == Config\Source\PowerstepType::TYPE_POPUP;
+        return $this->configHelper->getValue(Config::XML_PATH_POWERSTEP_TYPE) == Config\Source\PowerstepType::TYPE_POPUP;
     }
 }
