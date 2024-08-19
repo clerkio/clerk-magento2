@@ -2,29 +2,35 @@
 
 namespace Clerk\Clerk\Block;
 
-use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\View\Element\Template;
+use Magento\Store\Model\ScopeInterface;
 
 class ExitIntent extends Template
 {
-    public function __construct(
-        ConfigHelper     $configHelper,
-        Template\Context $context,
-        array            $data = []
-    )
-    {
-        $this->configHelper = $configHelper;
-        parent::__construct($context, $data);
-    }
-
     /**
      * Get exit intent template
      *
-     * @return string[]
+     * @return mixed
      */
     public function getExitIntentTemplate()
     {
-        return $this->configHelper->getTemplates(Config::XML_PATH_EXIT_INTENT_TEMPLATE);
+
+        if ($this->_storeManager->isSingleStoreMode()) {
+            $scope = 'default';
+            $scope_id = '0';
+        } else {
+            $scope = ScopeInterface::SCOPE_STORE;
+            $scope_id = $this->_storeManager->getStore()->getId();
+        }
+
+        $template_contents = $this->_scopeConfig->getValue(Config::XML_PATH_EXIT_INTENT_TEMPLATE, $scope, $scope_id);
+        if ($template_contents) {
+            $template_contents = explode(',', $template_contents);
+        } else {
+            $template_contents = [0 => ''];
+        }
+
+        return $template_contents;
     }
 }
