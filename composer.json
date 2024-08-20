@@ -28,5 +28,13 @@
     "psr-4": {
       "Clerk\\Clerk\\": ""
     }
+  },
+  "require-dev": {
+    "magento/magento-coding-standard": "^33.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
