@@ -5,15 +5,20 @@ namespace Clerk\Clerk\Block;
 use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 
 class LiveSearch extends Template
 {
+    /**
+     * @param ConfigHelper $configHelper
+     * @param Context $context
+     * @param array $data
+     */
     public function __construct(
         ConfigHelper     $configHelper,
         Template\Context $context,
         array            $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->configHelper = $configHelper;
     }
@@ -29,6 +34,9 @@ class LiveSearch extends Template
     }
 
     /**
+     * Get shop base domain url
+     *
+     * @return string
      */
     public function getShopBaseDomainUrl()
     {
@@ -46,6 +54,8 @@ class LiveSearch extends Template
     }
 
     /**
+     * Get number of suggestions
+     *
      * @return mixed
      */
     public function getSuggestions()
@@ -54,6 +64,8 @@ class LiveSearch extends Template
     }
 
     /**
+     * Get number of categories
+     *
      * @return mixed
      */
     public function getCategories()
@@ -62,6 +74,8 @@ class LiveSearch extends Template
     }
 
     /**
+     * Get number of pages
+     *
      * @return mixed
      */
     public function getPages()
@@ -70,6 +84,8 @@ class LiveSearch extends Template
     }
 
     /**
+     * Get search pages type
+     *
      * @return mixed
      */
     public function getPagesType()
@@ -78,6 +94,8 @@ class LiveSearch extends Template
     }
 
     /**
+     * Get injection position
+     *
      * @return mixed
      */
     public function getDropdownPosition()
@@ -86,6 +104,8 @@ class LiveSearch extends Template
     }
 
     /**
+     * Get live-search css selector
+     *
      * @return mixed
      */
     public function getInputSelector()
@@ -94,6 +114,8 @@ class LiveSearch extends Template
     }
 
     /**
+     * Get form element css selector
+     *
      * @return mixed
      */
     public function getFormSelector()

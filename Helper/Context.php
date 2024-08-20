@@ -28,8 +28,7 @@ class Context
         RequestInterface      $request,
         StoreManagerInterface $storeManager,
         ClerkLogger           $logger
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->request = $request;
         $this->logger = $logger;
@@ -84,9 +83,16 @@ class Context
     {
         try {
             $params = $this->request->getParams();
-            if (array_key_exists('scope_id', $params) && array_key_exists('scope', $params) && $params['scope'] === 'store') {
-                $store_id = $params['scope_id'];
-                return $this->storeManager->getStore($store_id);
+            if (array_key_exists('scope_id', $params)) {
+                if (array_key_exists('scope', $params) && $params['scope'] === 'store') {
+                    $store_id = $params['scope_id'];
+                    return $this->storeManager->getStore($store_id);
+                } elseif (array_key_exists('store', $params)) {
+                    $store_id = $params['store'];
+                    return $this->storeManager->getStore($store_id);
+                } else {
+                    return $this->storeManager->getStore();
+                }
             } elseif (array_key_exists('store', $params)) {
                 $store_id = $params['store'];
                 return $this->storeManager->getStore($store_id);
@@ -96,5 +102,37 @@ class Context
         } catch (Exception $error) {
             $this->logger->error("getStore Error", ['error' => $error->getMessage()]);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getScopeAdmin()
+    {
+        $_params = $this->request->getParams();
+        $scope = 'default';
+        if (array_key_exists('website', $_params)) {
+            $scope = 'website';
+        }
+        if (array_key_exists('store', $_params)) {
+            $scope = 'store';
+        }
+        return $scope;
+    }
+
+    /**
+     * @return int
+     */
+    public function getScopeIdAdmin()
+    {
+        $_params = $this->request->getParams();
+        $scope_id = 0;
+        if (array_key_exists('website', $_params)) {
+            $scope_id = (int) $_params['website'];
+        }
+        if (array_key_exists('store', $_params)) {
+            $scope_id = (int) $_params['store'];
+        }
+        return $scope_id;
     }
 }

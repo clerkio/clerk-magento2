@@ -30,7 +30,10 @@
     }
   },
   "require-dev": {
-    "magento/magento-coding-standard": "^33.0"
+    "magento/magento-coding-standard": "^33.0",
+    "composer": "*",
+    "psr/log": "^3.0",
+    "friendsofphp/php-cs-fixer": "^3.62"
   },
   "config": {
     "allow-plugins": {

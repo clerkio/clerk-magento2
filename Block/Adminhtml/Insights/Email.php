@@ -6,5 +6,8 @@ use Clerk\Clerk\Block\Adminhtml\Dashboard;
 
 class Email extends Dashboard
 {
+    /**
+     * @var string
+     */
     protected $type = 'email';
 }

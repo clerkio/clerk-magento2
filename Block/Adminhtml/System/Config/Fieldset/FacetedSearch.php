@@ -2,12 +2,16 @@
 
 namespace Clerk\Clerk\Block\Adminhtml\System\Config\Fieldset;
 
+use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
-use Magento\Config\Model\ResourceModel\Config as SystemConfig;
+use Magento\Backend\Block\Context;
+use Magento\Backend\Model\Auth\Session;
 use Magento\Config\Block\System\Config\Form\Fieldset;
+use Magento\Config\Model\ResourceModel\Config as SystemConfig;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\View\Helper\Js;
 
 class FacetedSearch extends Fieldset
 {
@@ -29,18 +33,19 @@ class FacetedSearch extends Fieldset
     /**
      * FacetedSearch constructor.
      *
-     * @param \Magento\Backend\Block\Context $context
-     * @param \Magento\Backend\Model\Auth\Session $authSession
-     * @param \Magento\Framework\View\Helper\Js $jsHelper
-     * @param \Magento\Framework\App\RequestInterface $requestInterface
+     * @param Context $context
+     * @param Session $authSession
+     * @param Js $jsHelper
+     * @param RequestInterface $requestInterface
      * @param Api $api
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Context $context,
-        \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Framework\View\Helper\Js $jsHelper,
-        \Magento\Framework\App\RequestInterface $requestInterface,
+        ConfigHelper     $configHelper,
+        Context $context,
+        Session $authSession,
+        Js $jsHelper,
+        RequestInterface $requestInterface,
         Api $api,
         SystemConfig $systemConfig,
         array $data = []
@@ -48,6 +53,7 @@ class FacetedSearch extends Fieldset
         $this->api = $api;
         $this->systemConfig = $systemConfig;
         $this->requestInterface = $requestInterface;
+        $this->configHelper = $configHelper;
 
         parent::__construct($context, $authSession, $jsHelper, $data);
     }

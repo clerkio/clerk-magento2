@@ -6,5 +6,9 @@ use Clerk\Clerk\Block\Adminhtml\Dashboard;
 
 class Audience extends Dashboard
 {
+
+    /**
+     * @var string
+     */
     protected $type = 'audience';
 }

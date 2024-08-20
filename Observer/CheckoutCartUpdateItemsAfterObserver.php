@@ -13,6 +13,7 @@ use Magento\Customer\Model\Session as CustomerSession;
 
 class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
 {
+
     /**
      * @var ScopeConfigInterface
      */
@@ -33,22 +34,25 @@ class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
      */
     protected $cart;
 
+
     /**
      * CheckoutCartUpdateItemsAfterObserver constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
-     * @param Session $checkoutSession
+     * @param Session              $checkoutSession
      */
     public function __construct(ScopeConfigInterface $scopeConfig, Session $checkoutSession, Cart $cart, CustomerSession $customerSession)
     {
-        $this->scopeConfig = $scopeConfig;
+        $this->scopeConfig     = $scopeConfig;
         $this->checkoutSession = $checkoutSession;
         $this->customerSession = $customerSession;
-        $this->cart = $cart;
-    }
+        $this->cart            = $cart;
+
+    }//end __construct()
+
 
     /**
-     * @param Observer $observer
+     * @param  Observer $observer
      * @return void
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
@@ -64,10 +68,13 @@ class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
             if ($this->customerSession->isLoggedIn()) {
                 $Endpoint = 'https://api.clerk.io/v2/log/basket/set';
 
-                $data_string = json_encode([
-                    'key' => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE),
-                    'products' => $cart_productIds,
-                    'email' => $this->customerSession->getCustomer()->getEmail()]);
+                $data_string = json_encode(
+                    [
+                        'key'      => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE),
+                        'products' => $cart_productIds,
+                        'email'    => $this->customerSession->getCustomer()->getEmail(),
+                    ]
+                );
 
                 $curl = curl_init();
 
@@ -76,8 +83,10 @@ class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
                 curl_exec($curl);
-
             }
-        }
-    }
-}
+        }//end if
+
+    }//end execute()
+
+
+}//end class

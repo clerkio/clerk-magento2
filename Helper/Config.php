@@ -15,8 +15,7 @@ class Config
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Context              $context
-    )
-    {
+    ) {
         $this->scopeConfig = $scopeConfig;
         $this->context = $context;
     }
@@ -57,6 +56,19 @@ class Config
             $key,
             $this->context->getScope(),
             $this->context->getScopeId()
+        );
+    }
+
+    /**
+     * @param $key
+     * @return mixed
+     */
+    public function getValueAdmin($key)
+    {
+        return $this->scopeConfig->getValue(
+            $key,
+            $this->context->getScopeAdmin(),
+            $this->context->getScopeIdAdmin()
         );
     }
 
