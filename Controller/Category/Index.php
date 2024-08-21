@@ -2,21 +2,22 @@
 
 namespace Clerk\Clerk\Controller\Category;
 
-use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
-use Magento\Cms\Helper\Page;
-use Magento\Framework\App\Action\Context;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
-use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
-use Magento\Framework\Module\ModuleList;
-use Psr\Log\LoggerInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
-use Magento\Framework\Webapi\Rest\Request as RequestApi;
-use Magento\Framework\App\ProductMetadataInterface;
+use Clerk\Clerk\Model\Api;
+use Exception;
 use Magento\Catalog\Model\CategoryFactory;
-use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
+use Magento\Cms\Helper\Page;
+use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Module\ModuleList;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
 {
@@ -73,13 +74,14 @@ class Index extends AbstractAction
      *
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
+     * @param StoreManagerInterface $storeManager
      * @param CollectionFactory $categoryCollectionFactory
+     * @param CategoryFactory $categoryFactory
      * @param LoggerInterface $logger
      * @param PageCollectionFactory $pageCollectionFactory
      * @param Page $pageHelper
-     * @param StoreManagerInterface $storeManager
-     * @param CategoryRepositoryInterface $categoryRepository
-     * @param CategoryFactory $categoryFactory
+     * @param ClerkLogger $clerk_logger
+     * @param ModuleList $moduleList
      * @param ProductMetadataInterface $product_metadata
      * @param RequestApi $request_api
      * @param Api $api
@@ -131,7 +133,7 @@ class Index extends AbstractAction
     protected function addFieldHandlers()
     {
         try {
-            //Add parent fieldhandler
+            //Add parent field handler
             $this->addFieldHandler('parent', function ($item) {
                 return $item->getParentId();
             });
@@ -139,16 +141,15 @@ class Index extends AbstractAction
             $this->addFieldHandler('parent_name', function ($item) {
                 $parentId = $item->getParentId();
                 $parent = $this->categoryFactory->create()->load($parentId);
-                $parent_name = $parent->getName();
-                return $parent_name;
+                return $parent->getName();
             });
 
-            //Add url fieldhandler
+            //Add url field handler
             $this->addFieldHandler('url', function ($item) {
                 return $item->getUrl();
             });
 
-            //Add subcategories fieldhandler
+            //Add subcategories field handler
             $this->addFieldHandler('subcategories', function ($item) {
                 $children = $item->getAllChildren(true);
                 //Remove own ID from subcategories array
@@ -163,7 +164,7 @@ class Index extends AbstractAction
                 return $item->getShortName();
             });
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Category addFieldHandlers ERROR', ['error' => $e->getMessage()]);
 
@@ -218,7 +219,7 @@ class Index extends AbstractAction
                 $this->getResponse()->setBody(json_encode($response));
                 $this->clerk_logger->log('Fetched page ' . $this->page . ' with ' . count($response) . ' Categories', ['response' => $response]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->getResponse()
                 ->setHttpResponseCode(500)
                 ->setHeader('Content-Type', 'application/json', true)
@@ -240,7 +241,7 @@ class Index extends AbstractAction
      * Prepare collection
      *
      * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     protected function prepareCollection()
     {
@@ -262,7 +263,7 @@ class Index extends AbstractAction
 
             return $collection;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Category prepareCollection ERROR', ['error' => $e->getMessage()]);
 

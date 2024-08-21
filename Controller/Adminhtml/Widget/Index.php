@@ -2,24 +2,23 @@
 
 namespace Clerk\Clerk\Controller\Adminhtml\Widget;
 
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config\Source\Content;
+use Exception;
 use Magento\Backend\App\Action;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Data\Form;
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Block\Widget\Form\Renderer\Fieldset as FieldSet;
+use Magento\Backend\Block\Widget\Form\Renderer\Fieldset\Element as FieldElement;
+use Magento\Catalog\Block\Adminhtml\Product\Widget\Chooser as WidgetChooser;
+use Magento\Framework\Data\Form\Element\Select as FormSelect;
 use Magento\Framework\Data\FormFactory;
 use Magento\Framework\Option\ArrayPool;
-use Clerk\Clerk\Controller\Logger\ClerkLogger;
-
-use Magento\Framework\Data\Form\Element\Select as FormSelect;
-use Magento\Backend\Block\Widget\Form\Renderer\Fieldset\Element as FieldElement;
-use Magento\Backend\Block\Widget\Form\Renderer\Fieldset as FieldSet;
-use Magento\Catalog\Block\Adminhtml\Product\Widget\Chooser as WidgetChooser;
 
 class Index extends Action
 {
     /**
-     * @var
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
@@ -61,14 +60,15 @@ class Index extends Action
     /**
      * Index constructor.
      *
-     * @param Action\Context $context
+     * @param Context $context
      * @param Api $api
      * @param FormFactory $formFactory
-     * @param ArrayPool $sourceModelPool
      * @param FormSelect $formSelect
      * @param FieldElement $fieldElement
      * @param FieldSet $fieldSet
      * @param WidgetChooser $widgetChooser
+     * @param ArrayPool $sourceModelPool
+     * @param ClerkLogger $clerk_logger
      */
     public function __construct(
         Action\Context $context,
@@ -80,8 +80,7 @@ class Index extends Action
         WidgetChooser $widgetChooser,
         ArrayPool $sourceModelPool,
         ClerkLogger $clerk_logger
-        )
-    {
+    ) {
         $this->api = $api;
         $this->formFactory = $formFactory;
         $this->sourceModelPool = $sourceModelPool;
@@ -95,8 +94,9 @@ class Index extends Action
     }
 
     /**
-     * @return ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * Block execute function
+     *
+     * @return void
      */
     public function execute()
     {
@@ -114,17 +114,21 @@ class Index extends Action
                 default:
                     $this->getInvalidResponse();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Widget execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }
 
+    /**
+     * Create content response for widget
+     *
+     * @return void
+     */
     public function getContentResponse()
     {
         try {
-            /** @var Form $form */
             $form = $this->formFactory->create();
             $select = $this->_formSelect;
             $select->setHtmlId('clerk_widget_content');
@@ -147,13 +151,18 @@ class Index extends Action
                     ])
                 );
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Widget getContentResponse ERROR', ['error' => $e->getMessage()]);
 
         }
     }
 
+    /**
+     * Get parameters for response
+     *
+     * @return void
+     */
     public function getParametersResponse()
     {
         try {
@@ -166,7 +175,6 @@ class Index extends Action
             $html = '';
 
             if (!!array_intersect(['products', 'category'], $parameters)) {
-                /** @var Form $form */
                 $form = $this->formFactory->create();
                 $form->setFieldsetRenderer($this->_fieldSet);
                 $form->setUseContainer(false);
@@ -239,7 +247,7 @@ class Index extends Action
                     ])
                 );
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Widget getParametersResponse ERROR', ['error' => $e->getMessage()]);
 
@@ -260,7 +268,7 @@ class Index extends Action
                     ])
                 );
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Widget getInvalidResponse ERROR', ['error' => $e->getMessage()]);
 

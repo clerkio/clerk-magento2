@@ -66,11 +66,19 @@ class Index extends AbstractAction
      * Customer controller constructor.
      *
      * @param Context $context
+     * @param StoreManagerInterface $storeManager
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $customerCollectionFactory
+     * @param LoggerInterface $logger
+     * @param ModuleList $moduleList
+     * @param ClerkLogger $clerk_logger
+     * @param CustomerMetadataInterface $customerMetadata
      * @param ProductMetadataInterface $product_metadata
      * @param RequestApi $request_api
+     * @param SubscriberFactory $subscriberFactory
+     * @param SubscriberCollectionFactory $subscriberCollectionFactory
      * @param Api $api
+     * @param GroupRepositoryInterface $groupRepository
      */
     public function __construct(
         Context $context,
@@ -108,6 +116,11 @@ class Index extends AbstractAction
         );
     }
 
+    /**
+     * Execute page function
+     *
+     * @return void
+     */
     public function execute()
     {
         try {
@@ -135,7 +148,7 @@ class Index extends AbstractAction
 
                 foreach ($response->getData() as $customer) {
 
-                    $_customer = array();
+                    $_customer = [];
                     $_customer['id'] = $customer['entity_id'];
                     $_customer['name'] = $customer['firstname'] . " " . (!is_null($customer['middlename']) ? $customer['middlename'] . " " : "") . $customer['lastname'];
                     $_customer['email'] = $customer['email'];
@@ -178,7 +191,7 @@ class Index extends AbstractAction
                     foreach ($subscribersOnlyResponse->getData() as $subscriber) {
                         if (isset($subscriber['subscriber_id'])) {
                             $sub_state = $subscriberInstance->loadByEmail($subscriber['subscriber_email']);
-                            $_sub = array();
+                            $_sub = [];
                             $_sub['id'] = 'SUB' . $subscriber['subscriber_id'];
                             $_sub['email'] = $subscriber['subscriber_email'];
                             $_sub['subscribed'] = (bool) ($subscriber['subscriber_status'] == 1);

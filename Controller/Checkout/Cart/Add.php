@@ -4,9 +4,6 @@ namespace Clerk\Clerk\Controller\Checkout\Cart;
 
 use Clerk\Clerk\Model\Config;
 use Magento\Checkout\Controller\Cart\Add as BaseAdd;
-use Clerk\Clerk\Controller\Logger\ClerkLogger;
-use Magento\Checkout\Model\Session;
-use Magento\Framework\App\Action\Context;
 use Magento\Store\Model\ScopeInterface;
 
 class Add extends BaseAdd
@@ -14,8 +11,7 @@ class Add extends BaseAdd
     /**
      * Get resolved back url
      *
-     * @param null $defaultUrl
-     *
+     * @param string|void $defaultUrl
      * @return mixed|null|string
      */
     protected function getBackUrl($defaultUrl = null)
