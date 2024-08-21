@@ -124,12 +124,12 @@ class Context
      */
     public function getScopeAdmin()
     {
-        $_params = $this->request->getParams();
+        $params = $this->request->getParams();
         $scope = 'default';
-        if (array_key_exists('website', $_params)) {
+        if (array_key_exists('website', $params)) {
             $scope = 'website';
         }
-        if (array_key_exists('store', $_params)) {
+        if (array_key_exists('store', $params)) {
             $scope = 'store';
         }
         return $scope;
@@ -142,13 +142,13 @@ class Context
      */
     public function getScopeIdAdmin()
     {
-        $_params = $this->request->getParams();
+        $params = $this->request->getParams();
         $scope_id = 0;
-        if (array_key_exists('website', $_params)) {
-            $scope_id = (int) $_params['website'];
+        if (array_key_exists('website', $params)) {
+            $scope_id = (int) $params['website'];
         }
-        if (array_key_exists('store', $_params)) {
-            $scope_id = (int) $_params['store'];
+        if (array_key_exists('store', $params)) {
+            $scope_id = (int) $params['store'];
         }
         return $scope_id;
     }

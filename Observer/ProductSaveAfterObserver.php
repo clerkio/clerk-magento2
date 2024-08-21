@@ -74,20 +74,25 @@ class ProductSaveAfterObserver implements ObserverInterface
      * @var ProductRepositoryInterface
      */
     protected $productRepository;
+    /**
+     * @var ClerkLogger
+     */
+    protected $clerkLogger;
 
     /**
      * ProductSaveAfterObserver constructor.
      *
-     * @param ScopeConfigInterface       $scopeConfig
-     * @param ManagerInterface           $eventManager
-     * @param RequestInterface           $request
-     * @param Emulation                  $emulation
-     * @param StoreManagerInterface      $storeManager
-     * @param Api                        $api
-     * @param ProductAdapter             $productAdapter
-     * @param ProductModelConfigurable   $productModelConfigurable
-     * @param ProductModelGrouped        $productModelGrouped
+     * @param ScopeConfigInterface $scopeConfig
+     * @param ManagerInterface $eventManager
+     * @param RequestInterface $request
+     * @param Emulation $emulation
+     * @param StoreManagerInterface $storeManager
+     * @param Api $api
+     * @param ProductAdapter $productAdapter
+     * @param ProductModelConfigurable $productModelConfigurable
+     * @param ProductModelGrouped $productModelGrouped
      * @param ProductRepositoryInterface $productRepository
+     * @param ClerkLogger $clerkLogger
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -112,6 +117,7 @@ class ProductSaveAfterObserver implements ObserverInterface
         $this->productRepository = $productRepository;
         $this->_productModelConfigurable = $productModelConfigurable;
         $this->_productModelGrouped      = $productModelGrouped;
+        $this->clerkLogger         = $clerkLogger;
     }
 
     /**
@@ -178,10 +184,11 @@ class ProductSaveAfterObserver implements ObserverInterface
         if (!empty($parent_product_ids)) {
             try {
                 $parent_product = $this->productRepository->getById((int)$parent_product_ids[0], false, $store_id);
-                $parent_product_data = $this->productAdapter->getInfoForItem($parent_product, ScopeInterface::SCOPE_STORE, $store_id);
+                $parent_product_data =
+                    $this->productAdapter->getInfoForItem($parent_product, ScopeInterface::SCOPE_STORE, $store_id);
                 $this->api->addProduct($parent_product_data, $store_id);
-            } catch (NoSuchEntityException $ignored) {
-
+            } catch (NoSuchEntityException $e) {
+                $this->clerkLogger->error('No parent products', ['warning' => $e->getMessage()]);
             }
         }
 
@@ -194,8 +201,8 @@ class ProductSaveAfterObserver implements ObserverInterface
                     $group_parent_product_data =
                         $this->productAdapter->getInfoForItem($group_parent_product, ScopeInterface::SCOPE_STORE, $store_id);
                     $this->api->addProduct($group_parent_product_data, $store_id);
-                } catch (NoSuchEntityException $ignored) {
-
+                } catch (NoSuchEntityException $e) {
+                    $this->clerkLogger->error('No parent products', ['warning' => $e->getMessage()]);
                 }
             }
         }

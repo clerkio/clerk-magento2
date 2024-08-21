@@ -86,8 +86,7 @@ class ClerkLogger
         ConfigInterface          $configWriter,
         ModuleList               $moduleList,
         ProductMetadataInterface $product_metadata
-    )
-    {
+    ) {
 
         $this->configWriter = $configWriter;
         $this->directory = $dir;
@@ -328,7 +327,7 @@ class ClerkLogger
 
             fopen($log_path, "a+");
             file_put_contents($log_path, $log_message, FILE_APPEND);
-        } catch (FileSystemException) {
+        } catch (FileSystemException $ex) {
             // Drop error if file system exception is found
         }
     }
@@ -372,6 +371,5 @@ class ClerkLogger
         } elseif ($this->loggingMethod == 'file') {
             $this->logToFile($message, $metadata);
         }
-
     }
 }
