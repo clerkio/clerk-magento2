@@ -254,6 +254,11 @@ class Index extends Action
         }
     }
 
+    /**
+     * Get invalid response
+     *
+     * @return void
+     */
     public function getInvalidResponse()
     {
         try {

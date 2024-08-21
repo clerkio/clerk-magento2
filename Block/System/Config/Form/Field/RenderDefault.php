@@ -7,7 +7,7 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class renderDefault extends Field
+class RenderDefault extends Field
 {
     /**
      * @var ScopeConfigInterface

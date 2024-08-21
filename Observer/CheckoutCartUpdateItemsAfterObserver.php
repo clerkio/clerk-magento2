@@ -2,28 +2,18 @@
 
 namespace Clerk\Clerk\Observer;
 
+use Clerk\Clerk\Helper\Config as ConfigHelper;
+use Clerk\Clerk\Helper\Context as ContextHelper;
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
-use Magento\Checkout\Model\Session;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
-use Magento\Store\Model\ScopeInterface;
+use Exception;
 use Magento\Checkout\Model\Cart;
 use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 
 class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
 {
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
-    /**
-     * @var Session
-     */
-    protected $checkoutSession;
-
     /**
      * @var CustomerSession
      */
@@ -33,60 +23,70 @@ class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
      * @var Cart
      */
     protected $cart;
-
+    /**
+     * @var string
+     */
+    protected $endpoint;
+    /**
+     * @var Api
+     */
+    protected $api;
+    /**
+     * @var ConfigHelper
+     */
+    protected $configHelper;
+    /**
+     * @var ContextHelper
+     */
+    protected $contextHelper;
 
     /**
      * CheckoutCartUpdateItemsAfterObserver constructor.
      *
-     * @param ScopeConfigInterface $scopeConfig
-     * @param Session              $checkoutSession
+     * @param Cart $cart
+     * @param CustomerSession $customerSession
+     * @param Api $api
+     * @param ConfigHelper $configHelper
+     * @param ContextHelper $contextHelper
      */
-    public function __construct(ScopeConfigInterface $scopeConfig, Session $checkoutSession, Cart $cart, CustomerSession $customerSession)
-    {
-        $this->scopeConfig     = $scopeConfig;
-        $this->checkoutSession = $checkoutSession;
+    public function __construct(
+        Cart $cart,
+        CustomerSession $customerSession,
+        Api $api,
+        ConfigHelper $configHelper,
+        ContextHelper $contextHelper
+    ) {
         $this->customerSession = $customerSession;
         $this->cart            = $cart;
-
-    }//end __construct()
-
+        $this->api = $api;
+        $this->configHelper = $configHelper;
+        $this->contextHelper = $contextHelper;
+    }
 
     /**
+     * Event observer
+     *
      * @param  Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
-        if ($this->scopeConfig->getValue('clerk/product_synchronization/collect_baskets', ScopeInterface::SCOPE_STORE) == '1') {
-            $cart_productIds = [];
-            foreach ($this->cart->getQuote()->getAllVisibleItems() as $item) {
-                if (!in_array($item->getProductId(), $cart_productIds)) {
-                    array_push($cart_productIds, $item->getProductId());
-                }
+        if (!$this->configHelper->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS)
+            || !$this->configHelper->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS)
+            || !$this->customerSession->isLoggedIn()) {
+            return;
+        }
+        $cart_product_ids = [];
+        foreach ($this->cart->getQuote()->getAllVisibleItems() as $item) {
+            if (!in_array($item->getProductId(), $cart_product_ids)) {
+                $cart_product_ids[] = $item->getProductId();
             }
-
-            if ($this->customerSession->isLoggedIn()) {
-                $Endpoint = 'https://api.clerk.io/v2/log/basket/set';
-
-                $data_string = json_encode(
-                    [
-                        'key'      => $this->scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, ScopeInterface::SCOPE_STORE),
-                        'products' => $cart_productIds,
-                        'email'    => $this->customerSession->getCustomer()->getEmail(),
-                    ]
-                );
-
-                $curl = curl_init();
-
-                curl_setopt($curl, CURLOPT_URL, $Endpoint);
-                curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-                curl_exec($curl);
-            }
-        }//end if
-
-    }//end execute()
-
-
-}//end class
+        }
+        $email = $this->customerSession->getCustomer()->getEmail();
+        try {
+            $this->api->logBasket($cart_product_ids, $email, $this->contextHelper->getStoreId());
+        } catch (Exception $e) {
+            return;
+        }
+    }
+}

@@ -14,16 +14,21 @@ class Context
     /**
      * @var StoreManagerInterface
      */
-    private StoreManagerInterface $storeManager;
+    private $storeManager;
     /**
      * @var RequestInterface
      */
-    private RequestInterface $request;
+    private $request;
     /**
      * @var ClerkLogger
      */
-    private ClerkLogger $logger;
+    private $logger;
 
+    /**
+     * @param RequestInterface $request
+     * @param StoreManagerInterface $storeManager
+     * @param ClerkLogger $logger
+     */
     public function __construct(
         RequestInterface      $request,
         StoreManagerInterface $storeManager,
@@ -35,6 +40,8 @@ class Context
     }
 
     /**
+     * Get scope frontend context
+     *
      * @return string
      */
     public function getScope()
@@ -50,6 +57,8 @@ class Context
     }
 
     /**
+     * Get scope id frontend context
+     *
      * @return int
      */
     public function getScopeId()
@@ -65,6 +74,8 @@ class Context
     }
 
     /**
+     * Get store id
+     *
      * @return int
      */
     public function getStoreId()
@@ -77,6 +88,8 @@ class Context
     }
 
     /**
+     * Get store
+     *
      * @return StoreInterface|void
      */
     public function getStore()
@@ -105,6 +118,8 @@ class Context
     }
 
     /**
+     * Get scope admin
+     *
      * @return string
      */
     public function getScopeAdmin()
@@ -121,6 +136,8 @@ class Context
     }
 
     /**
+     * Get scope id admin
+     *
      * @return int
      */
     public function getScopeIdAdmin()

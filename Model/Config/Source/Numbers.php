@@ -14,7 +14,7 @@ class Numbers implements ArrayInterface
      */
     public function toOptionArray()
     {
-        $Numbers = [
+        return [
             ['value' => '0', 'label' => 'Don\'t show'],
             ['value' => '1', 'label' => '1'],
             ['value' => '2', 'label' => '2'],
@@ -27,7 +27,5 @@ class Numbers implements ArrayInterface
             ['value' => '9', 'label' => '9'],
             ['value' => '10', 'label' => '10']
         ];
-
-        return $Numbers;
     }
 }

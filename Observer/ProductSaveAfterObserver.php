@@ -2,9 +2,12 @@
 
 namespace Clerk\Clerk\Observer;
 
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
 use Clerk\Clerk\Model\Adapter\Product as ProductAdapter;
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
+use Exception;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product as ProductModel;
@@ -19,16 +22,9 @@ use Magento\GroupedProduct\Model\Product\Type\Grouped as ProductModelGrouped;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Psr\Log\LoggerInterface;
 
 class ProductSaveAfterObserver implements ObserverInterface
 {
-
-    /**
-     * @var ProductModel
-     */
-    protected $_productModel;
-
     /**
      * @var ProductModelGrouped
      */
@@ -80,12 +76,6 @@ class ProductSaveAfterObserver implements ObserverInterface
     protected $productRepository;
 
     /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-
-    /**
      * ProductSaveAfterObserver constructor.
      *
      * @param ScopeConfigInterface       $scopeConfig
@@ -97,9 +87,7 @@ class ProductSaveAfterObserver implements ObserverInterface
      * @param ProductAdapter             $productAdapter
      * @param ProductModelConfigurable   $productModelConfigurable
      * @param ProductModelGrouped        $productModelGrouped
-     * @param ProductModel               $productModel
      * @param ProductRepositoryInterface $productRepository
-     * @param LoggerInterface            $logger
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -111,9 +99,8 @@ class ProductSaveAfterObserver implements ObserverInterface
         ProductAdapter $productAdapter,
         ProductModelConfigurable $productModelConfigurable,
         ProductModelGrouped $productModelGrouped,
-        ProductModel $productModel,
         ProductRepositoryInterface $productRepository,
-        LoggerInterface $logger
+        ClerkLogger              $clerkLogger
     ) {
         $this->scopeConfig       = $scopeConfig;
         $this->eventManager      = $eventManager;
@@ -123,12 +110,9 @@ class ProductSaveAfterObserver implements ObserverInterface
         $this->api               = $api;
         $this->productAdapter    = $productAdapter;
         $this->productRepository = $productRepository;
-        $this->logger            = $logger;
         $this->_productModelConfigurable = $productModelConfigurable;
         $this->_productModelGrouped      = $productModelGrouped;
-        $this->_productModel             = $productModel;
-    }//end __construct()
-
+    }
 
     /**
      * Add product to Clerk
@@ -139,85 +123,83 @@ class ProductSaveAfterObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $_params = $this->request->getParams();
-        $storeId = 0;
-        $scope   = 'default';
-        if (array_key_exists('store', $_params)) {
-            $scope   = 'store';
-            $storeId = $_params[$scope];
-        }
-
         $product = $observer->getEvent()->getProduct();
-        if ($storeId == 0) {
-            // Update all stores the product is connected to
-            $productstoreIds = $product->getStoreIds();
-            foreach ($productstoreIds as $productstoreId) {
-                $product = $this->productRepository->getById($product->getId(), false, $productstoreId);
-                if ($this->storeManager->getStore($productstoreId)->isActive()) {
-                    try {
-                        $this->updateStore($product, $productstoreId);
-                    } catch (NoSuchEntityException $e) {
-                        $this->logger->error('Updating Products Error', ['error' => $e->getMessage()]);
-                    } finally {
-                        $this->emulation->stopEnvironmentEmulation();
-                    }
+        $product_store_ids = $product->getStoreIds();
+        foreach ($product_store_ids as $store_id) {
+            $product = $this->productRepository->getById($product->getId(), false, $store_id);
+            if ($this->storeManager->getStore($store_id)->isActive()) {
+                try {
+                    $this->updateStore($product, $store_id);
+                } finally {
+                    $this->emulation->stopEnvironmentEmulation();
                 }
-            }
-        } else {
-            // Update single store
-            try {
-                $this->updateStore($product, $storeId);
-            } finally {
-                $this->emulation->stopEnvironmentEmulation();
             }
         }
     }
 
     /**
-     * @param ProductModel $product
-     * @param $storeId
+     * Update store with product data
+     *
+     * @param ProductModel|ProductInterface $product
+     * @param int|string $store_id
      */
-    protected function updateStore(Product $product, $storeId)
+    protected function updateStore(Product $product, $store_id)
     {
-        $this->emulation->startEnvironmentEmulation($storeId);
-        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, ScopeInterface::SCOPE_STORE, $storeId)) {
-            if ($product->getId()) {
-                // Cancel if product visibility is not as defined
-                if ('any' != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
-                    if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
-                        return;
-                    }
+        $this->emulation->startEnvironmentEmulation($store_id);
+
+        if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, ScopeInterface::SCOPE_STORE, $store_id)) {
+            return;
+        }
+        if (!$product->getId()) {
+            return;
+        }
+        // Cancel if product visibility is not as defined
+        if ('any' != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $store_id)) {
+            if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $store_id)) {
+                try {
+                    $this->api->removeProduct($product->getId());
+                } catch (Exception $e) {
+                    return;
                 }
-
-                // Cancel if product is not saleable
-                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE, $storeId)) {
-                    if (!$product->isSalable()) {
-                        return;
-                    }
+            }
+        }
+        // Cancel if product is not saleable
+        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, ScopeInterface::SCOPE_STORE, $store_id)) {
+            if (!$product->isSalable()) {
+                try {
+                    $this->api->removeProduct($product->getId());
+                } catch (Exception $e) {
+                    return;
                 }
+            }
+        }
 
-                $confParentProductIds = $this->_productModelConfigurable->getParentIdsByChild($product->getId());
-                if (isset($confParentProductIds[0])) {
-                    $confparentproduct = $this->_productModel->load($confParentProductIds[0]);
+        $parent_product_ids = $this->_productModelConfigurable->getParentIdsByChild($product->getId());
+        if (!empty($parent_product_ids)) {
+            try {
+                $parent_product = $this->productRepository->getById((int)$parent_product_ids[0], false, $store_id);
+                $parent_product_data = $this->productAdapter->getInfoForItem($parent_product, ScopeInterface::SCOPE_STORE, $store_id);
+                $this->api->addProduct($parent_product_data, $store_id);
+            } catch (NoSuchEntityException $ignored) {
 
-                    $productInfo = $this->productAdapter->getInfoForItem($confparentproduct, 'store', $storeId);
-                    $this->api->addProduct($productInfo, $storeId);
+            }
+        }
+
+        $group_parent_product_ids = $this->_productModelGrouped->getParentIdsByChild($product->getId());
+        if (!empty($group_parent_product_ids)) {
+            foreach ($group_parent_product_ids as $group_parent_product_id) {
+                try {
+                    $group_parent_product =
+                        $this->productRepository->getById((int)$group_parent_product_id, false, $store_id);
+                    $group_parent_product_data =
+                        $this->productAdapter->getInfoForItem($group_parent_product, ScopeInterface::SCOPE_STORE, $store_id);
+                    $this->api->addProduct($group_parent_product_data, $store_id);
+                } catch (NoSuchEntityException $ignored) {
+
                 }
-
-                $groupParentProductIds = $this->_productModelGrouped->getParentIdsByChild($product->getId());
-                if (isset($groupParentProductIds[0])) {
-                    foreach ($groupParentProductIds as $groupParentProductId) {
-                        $groupparentproduct = $this->_productModel->load($groupParentProductId);
-
-                        $productInfo = $this->productAdapter->getInfoForItem($groupparentproduct, 'store', $storeId);
-                        $this->api->addProduct($productInfo, $storeId);
-                    }
-                }
-
-                $productInfo = $this->productAdapter->getInfoForItem($product, 'store', $storeId);
-
-                $this->api->addProduct($productInfo, $storeId);
-            }//end if
-        }//end if
-    }//end updateStore()
-}//end class
+            }
+        }
+        $product_data = $this->productAdapter->getInfoForItem($product, 'store', $store_id);
+        $this->api->addProduct($product_data, $store_id);
+    }
+}

@@ -2,35 +2,37 @@
 
 namespace Clerk\Clerk\Observer;
 
+use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\View\Layout;
-use Magento\Store\Model\ScopeInterface;
 
 class LayoutLoadBeforeObserver implements ObserverInterface
 {
     /**
-     * @var ScopeConfigInterface
+     * @var ConfigHelper
      */
-    protected $scopeConfig;
+    protected $configHelper;
 
     /**
      * LayoutGenerateBlocksAfterObserver constructor.
      *
-     * @param ScopeConfigInterface $scopeConfig
+     * @param ConfigHelper $configHelper
      */
-    public function __construct(ScopeConfigInterface $scopeConfig)
-    {
-        $this->scopeConfig = $scopeConfig;
+    public function __construct(
+        ConfigHelper $configHelper
+    ) {
+        $this->configHelper = $configHelper;
     }
 
     /**
+     * Event observer
+     *
      * @param Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var Layout $layout */
         $layout = $observer->getLayout();
@@ -49,6 +51,6 @@ class LayoutLoadBeforeObserver implements ObserverInterface
      */
     private function isClerkSearchEnabled()
     {
-        return $this->scopeConfig->isSetFlag(Config::XML_PATH_SEARCH_ENABLED, ScopeInterface::SCOPE_STORE);
+        return $this->configHelper->getFlag(Config::XML_PATH_SEARCH_ENABLED);
     }
 }

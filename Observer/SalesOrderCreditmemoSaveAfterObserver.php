@@ -7,8 +7,8 @@ use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
 {
@@ -27,8 +27,16 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
       */
     protected $orderRepository;
 
-    public function __construct(ScopeConfigInterface $scopeConfig, Api $api, OrderRepositoryInterface $orderRepository)
-    {
+    /**
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Api $api
+     * @param OrderRepositoryInterface $orderRepository
+     */
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        Api $api,
+        OrderRepositoryInterface $orderRepository
+    ) {
         $this->orderRepository = $orderRepository;
         $this->scopeConfig = $scopeConfig;
         $this->api = $api;
@@ -40,25 +48,22 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
      * @param Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
-        if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ENABLE_ORDER_RETURN_SYNCHRONIZATION, ScopeInterface::SCOPE_STORE)) {
+        $creditmemo = $observer->getEvent()->getCreditmemo();
+        $order_id = $creditmemo->getOrderId();
+        $order = $this->orderRepository->get($order_id);
+        $order_increment_id = $order->getIncrementId();
+        $store_id = $order->getStore()->getId();
 
-            $creditmemo = $observer->getEvent()->getCreditmemo();
-            $order_id = $creditmemo->getOrderId();
-            $order = $this->orderRepository->get($order_id);
-            $orderIncrementId = $order->getIncrementId();
-            $store_id = $order->getStore()->getId();
-
-            foreach ($creditmemo->getAllItems() as $item) {
-
-                $product_id = $item->getProductId();
-                $quantity = $item->getQty();
-
-                if ($product_id && $orderIncrementId && $quantity !=0) {
-                    $this->api->returnProduct($orderIncrementId, $product_id, $quantity, $store_id);
-                }
-
+        if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ENABLE_ORDER_RETURN_SYNCHRONIZATION, ScopeInterface::SCOPE_STORE, $store_id)) {
+            return;
+        }
+        foreach ($creditmemo->getAllItems() as $item) {
+            $product_id = $item->getProductId();
+            $quantity = $item->getQty();
+            if ($product_id && $order_increment_id && $quantity !=0) {
+                $this->api->returnProduct($order_increment_id, $product_id, $quantity, $store_id);
             }
         }
     }

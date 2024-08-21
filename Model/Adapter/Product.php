@@ -19,37 +19,34 @@ use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Tax\Model\Calculation\Rate as TaxRate;
+use Magento\Tax\Model\Calculation\RateFactory as TaxRateFactory;
 
 class Product extends AbstractAdapter
 {
 
-    const PRODUCT_TYPE_SIMPLE = 'simple';
-    const PRODUCT_TYPE_CONFIGURABLE = 'configurable';
-    const PRODUCT_TYPE_GROUPED = 'grouped';
-    const PRODUCT_TYPE_BUNDLE = 'bundle';
-    const PRODUCT_TYPES = [
+    public const PRODUCT_TYPE_SIMPLE = 'simple';
+    public const PRODUCT_TYPE_CONFIGURABLE = 'configurable';
+    public const PRODUCT_TYPE_GROUPED = 'grouped';
+    public const PRODUCT_TYPE_BUNDLE = 'bundle';
+    public const PRODUCT_TYPES = [
         self::PRODUCT_TYPE_SIMPLE,
         self::PRODUCT_TYPE_CONFIGURABLE,
         self::PRODUCT_TYPE_GROUPED,
         self::PRODUCT_TYPE_BUNDLE
     ];
 
-
     /**
      * @var ProductRepositoryInterface;
      */
     protected $_productRepository;
 
-
     /**
-     * @var TaxRate;
+     * @var TaxRateFactory;
      */
-    protected $taxRate;
-
+    protected $taxRateFactory;
 
     /**
-     * @var null
+     * @var array|object
      */
     protected $productTaxRates;
 
@@ -71,7 +68,7 @@ class Product extends AbstractAdapter
     /**
      * @var LoggerInterface
      */
-    protected $clerk_logger;
+    protected $clerkLogger;
 
     /**
      * @var RequestInterface
@@ -130,24 +127,31 @@ class Product extends AbstractAdapter
      * @var bool
      */
     protected $msiEnabled;
+    /**
+     * @var string
+     */
+    protected $scope;
+    /**
+     * @var int|string
+     */
+    protected $scopeId;
 
     /**
-     * Summary of __construct
      * @param ScopeConfigInterface $scopeConfig
      * @param ManagerInterface $eventManager
      * @param CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManager
      * @param Image $imageHelper
      * @param ClerkLogger $clerkLogger
-     * @param Stock $stockFilter
+     * @param StockFilter $stockFilter
      * @param Data $taxHelper
      * @param StockStateInterface $stockStateInterface
      * @param ProductMetadataInterface $productMetadataInterface
      * @param RequestInterface $requestInterface
-     * @param GetSalableQuantityDataBySku $getSalableQuantityDataBySku
-     * @param ItemSource $itemSource
-     * @param Rate $taxRate
+     * @param TaxRateFactory $taxRate
      * @param ProductRepositoryInterface $productRepository
+     * @param ModuleManager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         ScopeConfigInterface       $scopeConfig,
@@ -161,15 +165,14 @@ class Product extends AbstractAdapter
         StockStateInterface        $stockStateInterface,
         ProductMetadataInterface   $productMetadataInterface,
         RequestInterface           $requestInterface,
-        TaxRate                    $taxRate,
+        TaxRateFactory             $taxRate,
         ProductRepositoryInterface $productRepository,
         ModuleManager              $moduleManager,
         ObjectManagerInterface     $objectManager
-    )
-    {
+    ) {
         $this->taxHelper = $taxHelper;
         $this->stockFilter = $stockFilter;
-        $this->clerk_logger = $clerkLogger;
+        $this->clerkLogger = $clerkLogger;
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;
         $this->moduleManager = $moduleManager;
@@ -177,10 +180,11 @@ class Product extends AbstractAdapter
         $this->stockStateInterface = $stockStateInterface;
         $this->productMetadataInterface = $productMetadataInterface;
         $this->requestInterface = $requestInterface;
-        $this->taxRate = $taxRate;
-        $this->productTaxRates = $this->taxRate->getCollection()->getData();
+        $this->taxRateFactory = $taxRate;
+        $this->productTaxRates = $this->taxRateFactory->create()->getData();
         $this->_productRepository = $productRepository;
-        $this->msiEnabled = $this->moduleManager->isEnabled('Magento_Inventory') && $this->moduleManager->isEnabled('Magento_InventoryAdminUi');
+        $this->msiEnabled = $this->moduleManager->isEnabled('Magento_Inventory')
+            && $this->moduleManager->isEnabled('Magento_InventoryAdminUi');
         parent::__construct(
             $scopeConfig,
             $eventManager,
@@ -193,7 +197,13 @@ class Product extends AbstractAdapter
     /**
      * Prepare collection
      *
-     * @return mixed
+     * @param int|string $page
+     * @param int|string $limit
+     * @param int|string $orderBy
+     * @param int|string $order
+     * @param int|string $scope
+     * @param int|string $scopeid
+     * @return mixed|void
      */
     protected function prepareCollection($page, $limit, $orderBy, $order, $scope, $scopeid)
     {
@@ -206,23 +216,19 @@ class Product extends AbstractAdapter
             $productMetadata = $this->productMetadataInterface;
             $version = $productMetadata->getVersion();
 
-            if (!$version >= '2.3.3') {
-
-                //Filter on is_saleable if defined
-                if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, $scope, $scopeid)) {
+            if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, $scope, $scopeid)) {
+                if (!$version >= '2.3.3') {
                     $this->stockFilter->addInStockFilterToCollection($collection);
-                }
-
-
-            } else {
-
-                if (!$this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY, $scope, $scopeid)) {
+                } else {
                     $collection->setFlag('has_stock_status_filter', true);
                 }
-
             }
 
-            $visibility = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, $scope, $scopeid);
+            $visibility = $this->scopeConfig->getValue(
+                Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY,
+                $scope,
+                $scopeid
+            );
 
             switch ($visibility) {
                 case Visibility::VISIBILITY_IN_CATALOG:
@@ -235,7 +241,11 @@ class Product extends AbstractAdapter
                     $collection->setVisibility([Visibility::VISIBILITY_BOTH]);
                     break;
                 case 'any':
-                    $collection->addAttributeToFilter('visibility', ['in' => [Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH]]);
+                    $collection->addAttributeToFilter('visibility', ['in' => [
+                        Visibility::VISIBILITY_IN_CATALOG,
+                        Visibility::VISIBILITY_IN_SEARCH,
+                        Visibility::VISIBILITY_BOTH
+                    ]]);
                     break;
             }
 
@@ -249,26 +259,24 @@ class Product extends AbstractAdapter
             return $collection;
 
         } catch (Exception $e) {
-
-            $this->clerk_logger->error('Prepare Collection Error', ['error' => $e->getMessage()]);
-
+            $this->clerkLogger->error('Prepare Collection Error', ['error' => $e->getMessage()]);
         }
     }
 
     /**
-     * Add field handlers for products
+     * Add field handlers
+     *
+     * @return void
      */
     protected function addFieldHandlers()
     {
 
         try {
 
-            //Add age fieldhandler
             $this->addFieldHandler('age', function ($item) {
                 return floor((time() - strtotime($item->getCreatedAt())) / (60 * 60 * 24));
             });
 
-            //Add created_at fieldhandler
             $this->addFieldHandler('created_at', function ($item) {
                 return strtotime($item->getCreatedAt());
             });
@@ -286,7 +294,7 @@ class Product extends AbstractAdapter
             });
 
             $this->addFieldHandler('description', function ($item) {
-                return $this->getAttributeValue($item, 'description') ? str_replace(array("\r", "\n"), ' ', strip_tags(html_entity_decode($this->getAttributeValue($item, 'description')))) : '';
+                return $this->getAttributeValue($item, 'description') ? str_replace(["\r", "\n"], ' ', strip_tags(html_entity_decode($this->getAttributeValue($item, 'description')))) : '';
             });
 
             $this->addFieldhandler('visibility', function ($item) {
@@ -335,7 +343,7 @@ class Product extends AbstractAdapter
                         return $this->formatPrice($item->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue());
                     }
                     if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
-                        $childPrices = array();
+                        $childPrices = [];
                         $childProducts = $productTypeInstance->getUsedProducts($item);
                         if (!empty($childProducts)) {
                             foreach ($childProducts as $childProduct) {
@@ -351,7 +359,7 @@ class Product extends AbstractAdapter
                         }
                     }
                 } catch (Exception $e) {
-                    $this->clerk_logger->error('Getting Product Price Error', ['error' => $e->getMessage()]);
+                    $this->clerkLogger->error('Getting Product Price Error', ['error' => $e->getMessage()]);
                 }
             });
 
@@ -388,7 +396,7 @@ class Product extends AbstractAdapter
                         return $this->formatPrice($item->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue());
                     }
                     if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
-                        $childPrices = array();
+                        $childPrices = [];
                         $childProducts = $productTypeInstance->getUsedProducts($item);
                         if (!empty($childProducts)) {
                             foreach ($childProducts as $childProduct) {
@@ -404,7 +412,7 @@ class Product extends AbstractAdapter
                         }
                     }
                 } catch (Exception $e) {
-                    $this->clerk_logger->error('Getting Product Price Exc Tax Error', ['error' => $e->getMessage()]);
+                    $this->clerkLogger->error('Getting Product Price Exc Tax Error', ['error' => $e->getMessage()]);
                 }
             });
 
@@ -440,7 +448,7 @@ class Product extends AbstractAdapter
                         return $this->formatPrice($item->getPriceInfo()->getPrice('regular_price')->getMinimalPrice()->getValue());
                     }
                     if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
-                        $childPrices = array();
+                        $childPrices = [];
                         $childProducts = $productTypeInstance->getUsedProducts($item);
                         if (!empty($childProducts)) {
                             foreach ($childProducts as $childProduct) {
@@ -456,7 +464,7 @@ class Product extends AbstractAdapter
                         }
                     }
                 } catch (Exception $e) {
-                    $this->clerk_logger->error('Getting Product List Price Error', ['error' => $e->getMessage()]);
+                    $this->clerkLogger->error('Getting Product List Price Error', ['error' => $e->getMessage()]);
                 }
             });
 
@@ -491,7 +499,7 @@ class Product extends AbstractAdapter
                         return $this->formatPrice($item->getPriceInfo()->getPrice('regular_price')->getMinimalPrice()->getValue());
                     }
                     if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
-                        $childPrices = array();
+                        $childPrices = [];
                         $childProducts = $productTypeInstance->getUsedProducts($item);
                         if (!empty($childProducts)) {
                             foreach ($childProducts as $childProduct) {
@@ -507,12 +515,12 @@ class Product extends AbstractAdapter
                         }
                     }
                 } catch (Exception $e) {
-                    $this->clerk_logger->error('Getting Product List Price Exc Tax Error', ['error' => $e->getMessage()]);
+                    $this->clerkLogger->error('Getting Product List Price Exc Tax Error', ['error' => $e->getMessage()]);
                 }
             });
 
             $this->addFieldHandler('tier_price_values', function ($item) {
-                $tierPriceValues = array();
+                $tierPriceValues = [];
                 $tierPrices = $item->getTierPrice();
                 if (!empty($tierPrices)) {
                     foreach ($tierPrices as $tierPrice) {
@@ -525,7 +533,7 @@ class Product extends AbstractAdapter
             });
 
             $this->addFieldHandler('tier_price_quantities', function ($item) {
-                $tierPriceQuantities = array();
+                $tierPriceQuantities = [];
                 $tierPrices = $item->getTierPrice();
                 if (!empty($tierPrices)) {
                     foreach ($tierPrices as $tierPrice) {
@@ -544,8 +552,7 @@ class Product extends AbstractAdapter
 
             //Add url fieldhandler
             $this->addFieldHandler('url', function ($item) {
-                $storeId = $this->getStoreIdFromContext();
-                return $item->setStoreId($storeId)->getUrlInStore();
+                return $item->setStoreId($item->scopeId)->getUrlInStore();
             });
 
             //Add categories fieldhandler
@@ -556,7 +563,7 @@ class Product extends AbstractAdapter
             $this->addFieldHandler('child_stocks', function ($item) {
                 $productType = $item->getTypeID();
                 $productTypeInstance = $item->getTypeInstance();
-                $stockValues = array();
+                $stockValues = [];
                 if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
                     $usedProducts = $productTypeInstance->getUsedProducts($item);
                     foreach ($usedProducts as $usedProduct) {
@@ -575,7 +582,7 @@ class Product extends AbstractAdapter
             $this->addFieldHandler('child_prices', function ($item) {
                 $productType = $item->getTypeID();
                 $productTypeInstance = $item->getTypeInstance();
-                $childPrices = array();
+                $childPrices = [];
                 if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
                     $usedProducts = $productTypeInstance->getUsedProducts($item);
                     foreach ($usedProducts as $usedProduct) {
@@ -594,7 +601,7 @@ class Product extends AbstractAdapter
             $this->addFieldHandler('child_list_prices', function ($item) {
                 $productType = $item->getTypeID();
                 $productTypeInstance = $item->getTypeInstance();
-                $childPrices = array();
+                $childPrices = [];
                 if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
                     $usedProducts = $productTypeInstance->getUsedProducts($item);
                     foreach ($usedProducts as $usedProduct) {
@@ -614,7 +621,7 @@ class Product extends AbstractAdapter
                 $heavyAttributeQuery = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY, 'store', $this->getStoreIdFromContext());
                 $productType = $item->getTypeID();
                 $productTypeInstance = $item->getTypeInstance();
-                $childImages = array();
+                $childImages = [];
                 if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
                     if ($heavyAttributeQuery) {
                         $childIdsRaw = $productTypeInstance->getChildrenIds($item->getId());
@@ -682,14 +689,14 @@ class Product extends AbstractAdapter
                     //}
                 }
                 if ($productType == self::PRODUCT_TYPE_BUNDLE) {
-                    $productsArray = array();
+                    $productsArray = [];
                     $selectionCollection = $item->getTypeInstance(true)->getSelectionsCollection(
                         $item->getTypeInstance(true)->getOptionsIds($item),
                         $item
                     );
 
                     foreach ($selectionCollection as $proselection) {
-                        $selectionArray = array();
+                        $selectionArray = [];
                         $selectionArray['min_qty'] = $proselection->getSelectionQty();
                         $selectionArray['stock'] = $this->stockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
                         $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
@@ -733,14 +740,14 @@ class Product extends AbstractAdapter
                     }
                 }
                 if ($productType == self::PRODUCT_TYPE_BUNDLE) {
-                    $productsArray = array();
+                    $productsArray = [];
                     $selectionCollection = $item->getTypeInstance(true)->getSelectionsCollection(
                         $item->getTypeInstance(true)->getOptionsIds($item),
                         $item
                     );
 
                     foreach ($selectionCollection as $proselection) {
-                        $selectionArray = array();
+                        $selectionArray = [];
                         $selectionArray['min_qty'] = $proselection->getSelectionQty();
                         $selectionArray['stock'] = $this->stockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
                         $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
@@ -765,7 +772,7 @@ class Product extends AbstractAdapter
             });
 
         } catch (Exception $e) {
-            $this->clerk_logger->error('Getting Field Handlers Error', ['error' => $e->getMessage()]);
+            $this->clerkLogger->error('Getting Field Handlers Error', ['error' => $e->getMessage()]);
         }
     }
 
@@ -801,7 +808,7 @@ class Product extends AbstractAdapter
 
         } catch (Exception $e) {
 
-            $this->clerk_logger->error('Getting Attribute Value Error', ['error' => $e->getMessage()]);
+            $this->clerkLogger->error('Getting Attribute Value Error', ['error' => $e->getMessage()]);
 
         }
     }
@@ -887,19 +894,25 @@ class Product extends AbstractAdapter
                 }
             }
         } catch (Exception $e) {
+            $this->clerkLogger->error('getSaleableStockBySku Error', ['error' => $e->getMessage()]);
         }
         return $stockQuantity;
     }
 
     /**
-     * Get default product fields
+     * Get default fields to build for resourceItem
      *
-     * @return array
+     * @param string $scope
+     * @param int|string $scopeid
+     * @return array|void
      */
     protected function getDefaultFields($scope, $scopeid)
     {
 
         try {
+
+            $this->scope = $scope;
+            $this->scopeId = $scopeid;
 
             $fields = [
                 'name',
@@ -926,25 +939,19 @@ class Product extends AbstractAdapter
                 'tax_rate'
             ];
 
-            $additionalFields = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS, $scope, $scopeid);
-
-            if ($additionalFields) {
-                $fields = array_merge($fields, str_replace(' ', '', explode(',', $additionalFields)));
+            $additional_fields =
+                $this->scopeConfig->getValue(
+                    Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS,
+                    $scope,
+                    $scopeid
+                );
+            if ($additional_fields) {
+                $fields = array_map('trim', explode(',', $additional_fields));
             }
-
-            foreach ($fields as $key => $field) {
-
-                $fields[$key] = $field;
-
-            }
-
-            return $fields;
+            return array_values(array_unique($fields));
 
         } catch (Exception $e) {
-
-            $this->clerk_logger->error('Getting Default Fields Error', ['error' => $e->getMessage()]);
-
+            $this->clerkLogger->error('Getting Default Fields Error', ['error' => $e->getMessage()]);
         }
     }
 }
-

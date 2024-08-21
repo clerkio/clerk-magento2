@@ -2,6 +2,7 @@
 
 namespace Clerk\Clerk\Model\Config\Source;
 
+use Exception;
 use Magento\Catalog\Helper\Image;
 use Magento\Framework\Option\ArrayInterface;
 use Magento\Framework\View\ConfigInterface;
@@ -20,6 +21,10 @@ class ImageType implements ArrayInterface
     protected $themeCollectionFactory;
 
 
+    /**
+     * @param ConfigInterface $viewConfig
+     * @param CollectionFactory $themeCollectionFactory
+     */
     public function __construct(
         ConfigInterface $viewConfig,
         CollectionFactory $themeCollectionFactory
@@ -37,17 +42,13 @@ class ImageType implements ArrayInterface
     {
         $types = [];
 
-        /** @var Collection $themes */
         $themes = $this->themeCollectionFactory->create();
         $themes->addAreaFilter('frontend');
 
         $common = [];
 
-        /** @var ThemeInterface $theme */
         foreach ($themes as $theme) {
-
             try {
-
                 $config = $this->viewConfig->getViewConfig([
                     'themeModel' => $theme,
                 ]);
@@ -55,11 +56,8 @@ class ImageType implements ArrayInterface
                 $types[$theme->getCode()] = $mediaEntities;
 
                 $common = $common ? array_intersect_key($common, $types[$theme->getCode()]) : $types[$theme->getCode()];
-
-            } catch (\Exception $e) {
-
+            } catch (Exception $e) {
                 continue;
-
             }
         }
 

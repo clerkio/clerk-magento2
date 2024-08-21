@@ -6,8 +6,8 @@ use Magento\Framework\Option\ArrayInterface;
 
 class PowerstepType implements ArrayInterface
 {
-    const TYPE_PAGE = 1;
-    const TYPE_POPUP = 2;
+    public const TYPE_PAGE = 1;
+    public const TYPE_POPUP = 2;
 
     /**
      * Options getter

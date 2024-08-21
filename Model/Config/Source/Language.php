@@ -2,8 +2,8 @@
 
 namespace Clerk\Clerk\Model\Config\Source;
 
-use Magento\Framework\Option\ArrayInterface;
 use Magento\Framework\Locale\Resolver;
+use Magento\Framework\Option\ArrayInterface;
 
 class Language implements ArrayInterface
 {
@@ -19,8 +19,7 @@ class Language implements ArrayInterface
      */
     public function __construct(
         Resolver $localeResolver
-        )
-    {
+    ) {
         $this->_store = $localeResolver;
     }
 
@@ -34,7 +33,7 @@ class Language implements ArrayInterface
 
         $store = $this->_store;
 
-        $Langs = [
+        $languages = [
             ['value' => 'danish', 'label' => 'Danish'],
             ['value' => 'dutch', 'label' => 'Dutch'],
             ['value' => 'english', 'label' => 'English'],
@@ -54,7 +53,7 @@ class Language implements ArrayInterface
 
         $locale = $store->getLocale();
 
-        $LangsAuto = [
+        $langs_auto = [
             'da_DK' => 'Danish',
             'nl_NL' => 'Dutch',
             'en_US' => 'English',
@@ -77,18 +76,18 @@ class Language implements ArrayInterface
             'tr_TR' => 'Turkish'
         ];
 
-        if (isset($LangsAuto[$locale])) {
+        if (isset($langs_auto[$locale])) {
 
-            $AutoLang = ['label' => sprintf('Auto (%s)', $LangsAuto[$locale]), 'value' => 'auto_'.strtolower($LangsAuto[$locale])];
-
-        }
-
-        if (isset($AutoLang)) {
-
-            array_unshift($Langs, $AutoLang);
+            $auto_lang = ['label' => sprintf('Auto (%s)', $langs_auto[$locale]), 'value' => 'auto_'.strtolower($langs_auto[$locale])];
 
         }
 
-        return $Langs;
+        if (isset($auto_lang)) {
+
+            array_unshift($languages, $auto_lang);
+
+        }
+
+        return $languages;
     }
 }

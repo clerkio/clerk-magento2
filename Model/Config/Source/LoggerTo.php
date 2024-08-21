@@ -6,8 +6,8 @@ use Magento\Framework\Option\ArrayInterface;
 
 class LoggerTo implements ArrayInterface
 {
-    const TO_FILE = 'file';
-    const TO_COLLECTION = 'collect';
+    public const TO_FILE = 'file';
+    public const TO_COLLECTION = 'collect';
     /**
      * Options getter
      *

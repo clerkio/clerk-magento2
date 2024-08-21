@@ -9,9 +9,16 @@ class Config
     /**
      * @var ScopeConfigInterface
      */
-    protected ScopeConfigInterface $scopeConfig;
-    private Context $context;
+    protected $scopeConfig;
+    /**
+     * @var Context
+     */
+    private $context;
 
+    /**
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Context $context
+     */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Context              $context
@@ -21,7 +28,9 @@ class Config
     }
 
     /**
-     * @param $key
+     * Get config flag in frontend context
+     *
+     * @param string $key
      * @return bool
      */
     public function getFlag($key)
@@ -34,7 +43,9 @@ class Config
     }
 
     /**
-     * @param $key
+     * Get config templates array in frontend context
+     *
+     * @param string $key
      * @return array|string[]
      */
     public function getTemplates($key)
@@ -47,7 +58,9 @@ class Config
     }
 
     /**
-     * @param $key
+     * Get config value in frontend context
+     *
+     * @param string $key
      * @return mixed
      */
     public function getValue($key)
@@ -60,7 +73,9 @@ class Config
     }
 
     /**
-     * @param $key
+     * Get config value in admin context
+     *
+     * @param string $key
      * @return mixed
      */
     public function getValueAdmin($key)
@@ -73,6 +88,8 @@ class Config
     }
 
     /**
+     * Get base url in frontend context
+     *
      * @return string
      */
     public function getBaseUrl()

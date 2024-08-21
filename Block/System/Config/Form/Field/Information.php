@@ -9,7 +9,7 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Module\ModuleListInterface;
 
-class information extends Field
+class Information extends Field
 {
     /**
      * @var ModuleListInterface
@@ -80,12 +80,10 @@ class information extends Field
         $singlestore = $this->ScopeConfigInterface->getValue('general/single_store_mode/enabled');
 
         if ($singlestore !== '1' && $scope === 'default') {
-            $html = 'Your current scope is "Default Config", to configure Clerk settings please change scope to "website" or "store.';
-            return $this->_decorateRowHtml($element, $html);
-        } else {
-
-            return $this->_decorateRowHtml($element, $html);
+            $html = 'Your current scope is "Default Config",' .
+                ' to configure Clerk settings please change scope to "website" or "store.';
         }
+        return $this->_decorateRowHtml($element, $html);
     }
 
     /**

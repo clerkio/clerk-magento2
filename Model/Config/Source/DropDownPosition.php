@@ -14,14 +14,12 @@ class DropDownPosition implements ArrayInterface
      */
     public function toOptionArray()
     {
-        $Positions= [
+        return [
             ['value' => 'left', 'label' => 'Left'],
             ['value' => 'center', 'label' => 'Center'],
             ['value' => 'right', 'label' => 'Right'],
             ['value' => 'below', 'label' => 'Below'],
             ['value' => 'off', 'label' => 'Off']
         ];
-
-        return $Positions;
     }
 }

@@ -7,9 +7,9 @@ use Magento\Framework\Option\ArrayInterface;
 class LoggerLevel implements ArrayInterface
 {
 
-    const LEVEL_ERROR = 'error';
-    const LEVEL_WARN = 'warn';
-    const LEVEL_ALL = 'all';
+    public const LEVEL_ERROR = 'error';
+    public const LEVEL_WARN = 'warn';
+    public const LEVEL_ALL = 'all';
     /**
      * Options getter
      *

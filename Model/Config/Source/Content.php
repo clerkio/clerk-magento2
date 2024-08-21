@@ -3,14 +3,19 @@
 namespace Clerk\Clerk\Model\Config\Source;
 
 use Clerk\Clerk\Model\Api;
+use Exception;
+use Magento\Framework\Option\ArrayInterface;
 
-class Content implements \Magento\Framework\Option\ArrayInterface
+class Content implements ArrayInterface
 {
     /**
      * @var Api
      */
     protected $api;
 
+    /**
+     * @param Api $api
+     */
     public function __construct(Api $api)
     {
         $this->api = $api;
@@ -42,7 +47,7 @@ class Content implements \Magento\Framework\Option\ArrayInterface
                     ];
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $contents[] = [
                 'value' => '',
                 'label' => 'No content found'

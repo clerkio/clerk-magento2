@@ -2,44 +2,44 @@
 
 namespace Clerk\Clerk\Observer;
 
+use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\View\Layout;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Store\Model\ScopeInterface;
 
 class ControllerActionLayoutRenderBeforeObserver implements ObserverInterface
 {
     /**
-     * @var ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
-    /**
      * @var PageFactory
      */
     protected $resultPageFactory;
+    /**
+     * @var ConfigHelper
+     */
+    protected $configHelper;
 
     /**
      * LayoutGenerateBlocksAfterObserver constructor.
      *
-     * @param ScopeConfigInterface $scopeConfig
+     * @param ConfigHelper $configHelper
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
+        ConfigHelper $configHelper,
         PageFactory $resultPageFactory
     ) {
-        $this->scopeConfig = $scopeConfig;
+        $this->configHelper = $configHelper;
         $this->resultPageFactory = $resultPageFactory;
     }
 
     /**
+     * Event observer
+     *
      * @param Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         //Change page layout if faceted search is enabled
         if (!$this->isFacetedSearchEnabled() && $this->isClerkSearchEnabled()) {
@@ -54,9 +54,9 @@ class ControllerActionLayoutRenderBeforeObserver implements ObserverInterface
      *
      * @return bool
      */
-    private function isClerkSearchEnabled()
+    private function isFacetedSearchEnabled()
     {
-        return $this->scopeConfig->isSetFlag(Config::XML_PATH_SEARCH_ENABLED, ScopeInterface::SCOPE_STORE);
+        return $this->configHelper->getFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED);
     }
 
     /**
@@ -64,8 +64,8 @@ class ControllerActionLayoutRenderBeforeObserver implements ObserverInterface
      *
      * @return bool
      */
-    private function isFacetedSearchEnabled()
+    private function isClerkSearchEnabled()
     {
-        return $this->scopeConfig->isSetFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED);
+        return $this->configHelper->getFlag(Config::XML_PATH_SEARCH_ENABLED);
     }
 }

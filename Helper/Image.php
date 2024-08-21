@@ -44,6 +44,7 @@ class Image
 
     /**
      * @param ConfigHelper $configHelper
+     * @param Context $contextHelper
      * @param ImageFactory $helperFactory
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
@@ -56,8 +57,7 @@ class Image
         ScopeConfigInterface  $scopeConfig,
         StoreManagerInterface $storeManager,
         RequestInterface      $requestInterface
-    )
-    {
+    ) {
         $this->helperFactory = $helperFactory;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;

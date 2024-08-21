@@ -17,16 +17,20 @@ class Config
     /**
      * Product Synchronization configuration
      */
-    public const XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED = 'clerk/product_synchronization/use_realtime_updates';
+    public const XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED =
+        'clerk/product_synchronization/use_realtime_updates';
     public const XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS = 'clerk/product_synchronization/collect_emails';
     public const XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS = 'clerk/product_synchronization/collect_baskets';
     public const XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS = 'clerk/product_synchronization/additional_fields';
-    public const XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY = 'clerk/product_synchronization/additional_fields_heavy_query';
+    public const XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY =
+        'clerk/product_synchronization/additional_fields_heavy_query';
     public const XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY = 'clerk/product_synchronization/saleable_only';
     public const XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY = 'clerk/product_synchronization/visibility';
-    public const XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION = 'clerk/product_synchronization/disable_order_synchronization';
+    public const XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION =
+        'clerk/product_synchronization/disable_order_synchronization';
     public const XML_PATH_PRODUCT_SYNCHRONIZATION_IMAGE_TYPE = 'clerk/product_synchronization/image_type';
-    public const XML_PATH_PRODUCT_SYNCHRONIZATION_ENABLE_ORDER_RETURN_SYNCHRONIZATION = 'clerk/product_synchronization/return_order_synchronization';
+    public const XML_PATH_PRODUCT_SYNCHRONIZATION_ENABLE_ORDER_RETURN_SYNCHRONIZATION =
+        'clerk/product_synchronization/return_order_synchronization';
     /**
      * Customer Synchronization configuration
      */

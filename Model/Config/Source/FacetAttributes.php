@@ -3,6 +3,7 @@
 namespace Clerk\Clerk\Model\Config\Source;
 
 use Clerk\Clerk\Model\Api;
+use Exception;
 use Magento\Framework\Option\ArrayInterface;
 
 class FacetAttributes implements ArrayInterface
@@ -31,11 +32,15 @@ class FacetAttributes implements ArrayInterface
     {
         $res = [];
 
-        foreach (self::toArray() as $index => $value) {
-            $res[] = [
-                'value' => $value,
-                'label' => $value
-            ];
+        try {
+            foreach (self::toArray() as $_ => $value) {
+                $res[] = [
+                    'value' => $value,
+                    'label' => $value
+                ];
+            }
+        } catch (Exception $e) {
+            return $res;
         }
 
         return $res;
@@ -45,16 +50,15 @@ class FacetAttributes implements ArrayInterface
      * Get options in "key-value" format
      *
      * @return array
+     * @throws Exception
      */
     public function toArray()
     {
         $attributes = $this->getFacetAttributes();
         $values = [];
-
         foreach ($attributes as $attribute => $facet) {
             $values[$attribute] = $attribute;
         }
-
         return $values;
     }
 
@@ -62,15 +66,14 @@ class FacetAttributes implements ArrayInterface
      * Get facet attributes from Clerk API
      *
      * @return array|mixed
+     * @throws Exception
      */
     private function getFacetAttributes()
     {
         $attributes = $this->api->getFacetAttributes();
-
         if ($attributes && isset($attributes->facets)) {
             return $attributes->facets;
         }
-
         return [];
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Clerk\Clerk\Model\Config\Source;
 
+use Clerk\Clerk\Helper\Context as ContextHelper;
 use Clerk\Clerk\Model\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Option\ArrayInterface;
-use Magento\Store\Model\ScopeInterface;
 
 class MultiselectFacetAttributes implements ArrayInterface
 {
@@ -13,18 +13,21 @@ class MultiselectFacetAttributes implements ArrayInterface
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
+    /**
+     * @var ContextHelper
+     */
+    protected $contextHelper;
 
     /**
-     * @var RequestInterface
+     * @param ScopeConfigInterface $scopeConfig
+     * @param ContextHelper $contextHelper
      */
-    protected $requestInterface;
-
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\App\RequestInterface $requestInterface
+        ContextHelper $contextHelper
     ) {
         $this->scopeConfig = $scopeConfig;
-        $this->requestInterface = $requestInterface;
+        $this->contextHelper = $contextHelper;
     }
 
     /**
@@ -36,7 +39,7 @@ class MultiselectFacetAttributes implements ArrayInterface
     {
         $res = [];
 
-        foreach (self::toArray() as $index => $value) {
+        foreach (self::toArray() as $_ => $value) {
             $res[] = ['value' => $value, 'label' => $value];
         }
 
@@ -52,7 +55,7 @@ class MultiselectFacetAttributes implements ArrayInterface
     {
         $attributes = $this->getConfiguredAttributes();
 
-        $attributes_defined = is_null($attributes) ? false : true;
+        $attributes_defined = $attributes !== null;
 
         if (!$attributes_defined) {
             return [];
@@ -72,17 +75,8 @@ class MultiselectFacetAttributes implements ArrayInterface
      */
     private function getConfiguredAttributes()
     {
-        $_params = $this->requestInterface->getParams();
-        $scope_id = '0';
-        $scope = 'default';
-        if (array_key_exists('website', $_params)) {
-            $scope = 'website';
-            $scope_id = $_params[$scope];
-        }
-        if (array_key_exists('store', $_params)) {
-            $scope = 'store';
-            $scope_id = $_params[$scope];
-        }
+        $scope = $this->contextHelper->getScopeAdmin();
+        $scope_id = $this->contextHelper->getScopeIdAdmin();
         return $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, $scope, $scope_id);
     }
 }

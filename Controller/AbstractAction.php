@@ -160,8 +160,7 @@ abstract class AbstractAction extends Action
         ProductMetadataInterface $productMetadata,
         RequestApi               $requestApi,
         Api                      $api
-    )
-    {
+    ) {
         $this->moduleList = $moduleList;
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
@@ -257,7 +256,6 @@ abstract class AbstractAction extends Action
             $collection->addFieldToSelect('*');
 
             if ($this->start_date) {
-
                 $collection->setPageSize($this->limit)
                     ->setCurPage($this->page)
                     ->addAttributeToFilter('created_at', ['from' => $this->start_date, 'to' => $this->end_date])
@@ -617,7 +615,6 @@ abstract class AbstractAction extends Action
         }
         $private_key = $this->getPrivateKey($scope_info['scope'], $scope_info['scope_id']);
         return $this->timingSafeEquals($private_key, $this->privateKey);
-
     }
 
     /**
@@ -650,7 +647,6 @@ abstract class AbstractAction extends Action
         }
 
         return true;
-
     }
 
     /**
@@ -783,23 +779,18 @@ abstract class AbstractAction extends Action
     /**
      * Get mapped field name
      *
-     * @param $field
+     * @param string $field
      * @return mixed
-     * @throws FileSystemException
      */
     protected function getFieldName($field)
     {
 
         try {
-
             if (isset($this->fieldMap[$field])) {
                 return $this->fieldMap[$field];
             }
-
         } catch (Exception $e) {
-
             $this->clerkLogger->error('Getting Field Name ERROR', ['error' => $e->getMessage()]);
-
         }
         return $field;
     }
