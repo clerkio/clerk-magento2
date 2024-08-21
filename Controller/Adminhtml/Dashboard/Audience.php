@@ -2,29 +2,33 @@
 
 namespace Clerk\Clerk\Controller\Adminhtml\Dashboard;
 
-use Magento\Backend\App\Action;
-use Magento\Framework\App\ResponseInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Exception;
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Page;
+use Magento\Framework\View\Result\PageFactory;
 
 class Audience extends Action
 {
     /**
-     * @var
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
     /**
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var PageFactory
      */
     protected $resultPageFactory;
 
     /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     * @param ClerkLogger $clerk_logger
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        Context $context,
+        PageFactory $resultPageFactory,
         ClerkLogger $clerk_logger
     ) {
         parent::__construct($context);
@@ -33,13 +37,15 @@ class Audience extends Action
     }
 
     /**
-     * @return \Magento\Backend\Model\View\Result\Page
+     * Execute page
+     *
+     * @return Page|void
      */
     public function execute()
     {
         try {
 
-            /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
+            /** @var Page $resultPage */
             $resultPage = $this->resultPageFactory->create();
             $resultPage->setActiveMenu('Clerk_Clerk::report_clerkroot_audience_insights');
             $resultPage->addBreadcrumb(__('Clerk.io - Audience Insights'), __('Clerk.io - Audience Insights'));
@@ -47,7 +53,7 @@ class Audience extends Action
 
             return $resultPage;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Audience execute ERROR', ['error' => $e->getMessage()]);
 

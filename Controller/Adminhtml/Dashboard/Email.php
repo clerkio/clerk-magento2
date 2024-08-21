@@ -2,29 +2,33 @@
 
 namespace Clerk\Clerk\Controller\Adminhtml\Dashboard;
 
-use Magento\Backend\App\Action;
-use Magento\Framework\App\ResponseInterface;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Exception;
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Page;
+use Magento\Framework\View\Result\PageFactory;
 
 class Email extends Action
 {
     /**
-     * @var
+     * @var ClerkLogger
      */
     protected $clerk_logger;
 
     /**
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var PageFactory
      */
     protected $resultPageFactory;
 
     /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     * @param ClerkLogger $clerk_logger
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        Context $context,
+        PageFactory $resultPageFactory,
         ClerkLogger $clerk_logger
     ) {
         parent::__construct($context);
@@ -33,13 +37,15 @@ class Email extends Action
     }
 
     /**
-     * @return \Magento\Backend\Model\View\Result\Page
+     * Page execute function
+     *
+     * @return Page|void
      */
     public function execute()
     {
         try {
 
-            /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
+            /** @var Page $resultPage */
             $resultPage = $this->resultPageFactory->create();
             $resultPage->setActiveMenu('Clerk_Clerk::report_clerkroot_email_insights');
             $resultPage->addBreadcrumb(__('Clerk.io - Email Insights'), __('Clerk.io - Email Insights'));
@@ -47,7 +53,7 @@ class Email extends Action
 
             return $resultPage;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Email execute ERROR', ['error' => $e->getMessage()]);
 

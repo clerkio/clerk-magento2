@@ -20,14 +20,34 @@ use Magento\Store\Model\StoreManagerInterface;
 class Tracking extends Template
 {
 
+    /**
+     * @var FormKey
+     */
     protected $formKey;
 
+    /**
+     * @var Currency
+     */
     protected $_currency;
 
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
 
+    /**
+     * @var Session
+     */
     protected $_customerSession;
 
+    /**
+     * @param ConfigHelper $configHelper
+     * @param Context $context
+     * @param FormKey $formKey
+     * @param Currency $_currency
+     * @param StoreManagerInterface $_storeManager
+     * @param Session $_customerSession
+     */
     public function __construct(
         ConfigHelper          $configHelper,
         Context               $context,
@@ -35,8 +55,7 @@ class Tracking extends Template
         Currency              $_currency,
         StoreManagerInterface $_storeManager,
         Session               $_customerSession
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->formKey = $formKey;
         $this->_currency = $_currency;
@@ -45,8 +64,9 @@ class Tracking extends Template
         $this->configHelper = $configHelper;
     }
 
-
     /**
+     * Get customer email
+     *
      * @return string
      */
     public function getCustomerEmail()
@@ -56,6 +76,7 @@ class Tracking extends Template
             $customerData = $this->_customerSession->getCustomer();
             $email = $customerData->getEmail();
         } catch (Exception $ex) {
+            return $email;
         }
         return $email;
     }
@@ -70,6 +91,11 @@ class Tracking extends Template
         return $this->configHelper->getValue(Config::XML_PATH_PUBLIC_KEY);
     }
 
+    /**
+     * Get the scope language string
+     *
+     * @return mixed
+     */
     public function getLanguage()
     {
         return $this->configHelper->getValue(Config::XML_PATH_LANGUAGE);
@@ -78,6 +104,7 @@ class Tracking extends Template
     /**
      * Get collect emails
      *
+     * @param bool $as_bool
      * @return string
      */
     public function getCollectionEmails($as_bool = false)
@@ -85,7 +112,7 @@ class Tracking extends Template
         if ($as_bool) {
             return $this->configHelper->getFlag(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS);
         }
-        return ($this->configHelper->getFlag(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS) ? 'true' : 'false');
+        return $this->configHelper->getFlag(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_EMAILS) ? 'true' : 'false';
     }
 
     /**
@@ -95,19 +122,18 @@ class Tracking extends Template
      */
     public function getCollectionBaskets()
     {
-        return ($this->configHelper->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS)) ? "true" : "false";
+        return $this->configHelper->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_COLLECT_BASKETS) ? "true" : "false";
     }
 
     /**
-     * @return mixed|string
+     * Get context FormKey
+     *
+     * @return string
      * @throws LocalizedException
      */
     public function getFormKey()
     {
-        if (array_key_exists('form_key', $_COOKIE)) {
-            return $_COOKIE['form_key'];
-        }
-        return $this->formKey->getFormKey();
+        return !empty($_COOKIE) && array_key_exists('form_key', $_COOKIE) ? $_COOKIE['form_key'] : $this->formKey->getFormKey();
     }
 
     /**
@@ -181,13 +207,15 @@ class Tracking extends Template
     }
 
     /**
+     * Get all enabled currency rates
+     *
      * @return array
      * @throws NoSuchEntityException
      */
     public function getAllCurrencyRates()
     {
         $currency_codes = $this->getAllowedCurrencies();
-        $currency_rates_array = array();
+        $currency_rates_array = [];
         foreach ($currency_codes as $key => $code) {
             $currency_rates_array[$code] = $this->getCurrencyRateFromIso($code);
         }
@@ -223,6 +251,8 @@ class Tracking extends Template
     }
 
     /**
+     * Get clerk.js custom URL
+     *
      * @return string
      * @throws NoSuchEntityException
      */
@@ -233,6 +263,8 @@ class Tracking extends Template
     }
 
     /**
+     * Get handleized version of the store name
+     *
      * @return string
      * @throws NoSuchEntityException
      */

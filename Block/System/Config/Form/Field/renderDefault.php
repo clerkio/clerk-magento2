@@ -25,8 +25,7 @@ class renderDefault extends Field
         Context              $context,
         ScopeConfigInterface $ScopeConfigInterface,
         array                $data = []
-    )
-    {
+    ) {
         $this->ScopeConfigInterface = $ScopeConfigInterface;
         parent::__construct($context, $data);
     }

@@ -13,8 +13,16 @@ use Magento\Search\Model\QueryFactory;
 
 class Result extends BaseResult
 {
-    const TARGET_ID = 'clerk-search-results';
+    public const TARGET_ID = 'clerk-search-results';
 
+    /**
+     * @param ConfigHelper $configHelper
+     * @param Context $context
+     * @param LayerResolver $layerResolver
+     * @param Data $catalogSearchData
+     * @param QueryFactory $queryFactory
+     * @param array $data
+     */
     public function __construct(
         ConfigHelper  $configHelper,
         Context       $context,
@@ -22,13 +30,14 @@ class Result extends BaseResult
         Data          $catalogSearchData,
         QueryFactory  $queryFactory,
         array         $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
         $this->configHelper = $configHelper;
     }
 
     /**
+     * Get suggestions limit
+     *
      * @return mixed
      */
     public function getSuggestions()
@@ -61,7 +70,6 @@ class Result extends BaseResult
             $span_attributes['data-search-pages-type'] = $this->getPagesType();
         }
 
-
         if ($this->configHelper->getFlag(Config::XML_PATH_FACETED_SEARCH_ENABLED)) {
             try {
                 $span_attributes['data-facets-target'] = "#clerk-search-filters";
@@ -86,7 +94,7 @@ class Result extends BaseResult
                         $span_attributes['data-facets-multiselect-attributes'] = '["' . str_replace(',', '","', $multiselectAttributes) . '"]';
                     }
                 }
-            } catch (Exception) {
+            } catch (Exception $ex) {
                 $span_attributes['data-facets-attributes'] = '["price","categories"]';
             }
         }
@@ -132,7 +140,6 @@ class Result extends BaseResult
      * Determine if we should include categories and pages in search results
      *
      * @return string
-     *
      */
     public function shouldIncludeCategories()
     {
@@ -140,6 +147,8 @@ class Result extends BaseResult
     }
 
     /**
+     * Get categories limit
+     *
      * @return mixed
      */
     public function getCategories()
@@ -148,6 +157,8 @@ class Result extends BaseResult
     }
 
     /**
+     * Get pages limit
+     *
      * @return mixed
      */
     public function getPages()
@@ -156,6 +167,8 @@ class Result extends BaseResult
     }
 
     /**
+     * Get pages type filter
+     *
      * @return mixed
      */
     public function getPagesType()

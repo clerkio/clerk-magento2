@@ -37,8 +37,7 @@ class SalesTracking extends Template
         Session      $checkoutSession,
         Grouped      $productGrouped,
         array        $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->_checkoutSession = $checkoutSession;
         $this->_productGrouped = $productGrouped;

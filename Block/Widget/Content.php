@@ -37,8 +37,7 @@ class Content extends Template implements BlockInterface
         Registry         $registry,
         Cart             $cart,
         array            $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->registry = $registry;
         $this->cart = $cart;
@@ -46,6 +45,11 @@ class Content extends Template implements BlockInterface
         $this->setTemplate('Clerk_Clerk::widget.phtml');
     }
 
+    /**
+     * Generate HTML elements for embeds
+     *
+     * @return string
+     */
     public function getEmbeds()
     {
         $contents = $this->getContent();
@@ -102,6 +106,12 @@ class Content extends Template implements BlockInterface
         return $this->configHelper->getTemplates(Config::XML_PATH_PRODUCT_CONTENT);
     }
 
+    /**
+     * Get HTML tag for clerk elements
+     *
+     * @param $content
+     * @return string
+     */
     private function getHtmlForContent($content)
     {
         $filter_category = $this->configHelper->getValue(Config::XML_PATH_CATEGORY_FILTER_DUPLICATES);
@@ -187,22 +197,26 @@ class Content extends Template implements BlockInterface
     }
 
     /**
+     * Set element classes
+     *
      * @param int $product_contents
-     * @param array $spanAttributes
+     * @param array $span_attributes
      * @return array
      */
-    public function getAttributes(int $product_contents, array $spanAttributes): array
+    public function getAttributes(int $product_contents, array $span_attributes): array
     {
         $unique_class = "clerk_" . $product_contents;
-        $spanAttributes['class'] = 'clerk ' . $unique_class;
+        $span_attributes['class'] = 'clerk ' . $unique_class;
         if ($product_contents > 0) {
             $filter_string = $this->getFilterClassString($product_contents);
-            $spanAttributes['data-exclude-from'] = $filter_string;
+            $span_attributes['data-exclude-from'] = $filter_string;
         }
-        return $spanAttributes;
+        return $span_attributes;
     }
 
     /**
+     * Get filter class
+     *
      * @param int $product_contents
      * @return string
      */
@@ -213,12 +227,14 @@ class Content extends Template implements BlockInterface
             if ($i > 0) {
                 $filter_string .= ', ';
             }
-            $filter_string .= '.clerk_' . strval($i);
+            $filter_string .= '.clerk_' . $i;
         }
         return $filter_string;
     }
 
     /**
+     * Get cart ids
+     *
      * @return array
      */
     protected function getCartProducts()
@@ -229,7 +245,7 @@ class Content extends Template implements BlockInterface
     /**
      * Get current category id
      *
-     * @return mixed
+     * @return int|void
      */
     protected function getCurrentCategory()
     {
@@ -238,13 +254,12 @@ class Content extends Template implements BlockInterface
         if ($category) {
             return $category->getId();
         }
-        return null;
     }
 
     /**
      * Get current product id
      *
-     * @return mixed
+     * @return int|void
      */
     protected function getCurrentProduct()
     {

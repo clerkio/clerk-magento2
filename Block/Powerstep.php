@@ -13,12 +13,16 @@ use Magento\Catalog\Model\Product;
 class Powerstep extends AbstractProduct
 {
 
+    /**
+     * @param ConfigHelper $configHelper
+     * @param Context $context
+     * @param array $data
+     */
     public function __construct(
         ConfigHelper $configHelper,
         Context      $context,
         array        $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->configHelper = $configHelper;
     }
@@ -71,6 +75,8 @@ class Powerstep extends AbstractProduct
     }
 
     /**
+     * Get content exclude flag
+     *
      * @return mixed
      */
     public function getExcludeState()
@@ -79,11 +85,12 @@ class Powerstep extends AbstractProduct
     }
 
     /**
-     * @return array|string[]
+     * Get content templates
+     *
+     * @return string[]
      */
     public function getTemplates()
     {
         return $this->configHelper->getTemplates(Config::XML_PATH_POWERSTEP_TEMPLATES);
     }
-
 }

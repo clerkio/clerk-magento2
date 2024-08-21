@@ -4,9 +4,10 @@ namespace Clerk\Clerk\Block\System\Config\Form\Field;
 
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Module\ModuleListInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class information extends Field
 {
@@ -30,6 +31,7 @@ class information extends Field
      *
      * @param Context $context
      * @param ModuleListInterface $moduleList
+     * @param ManagerInterface $messageManager
      * @param ScopeConfigInterface $ScopeConfigInterface
      * @param array $data
      */
@@ -39,8 +41,7 @@ class information extends Field
         ManagerInterface     $messageManager,
         ScopeConfigInterface $ScopeConfigInterface,
         array                $data = []
-    )
-    {
+    ) {
         $this->moduleList = $moduleList;
         $this->messageManager = $messageManager;
         $this->ScopeConfigInterface = $ScopeConfigInterface;
@@ -50,10 +51,10 @@ class information extends Field
     /**
      * Render form field
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      */
-    public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    public function render(AbstractElement $element)
     {
         //Hide scope label and inheritance checkbox
         $element->setCanUseWebsiteValue(false);
@@ -90,11 +91,11 @@ class information extends Field
     /**
      * Decorate field row html
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @param string $html
      * @return string
      */
-    protected function _decorateRowHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element, $html)
+    protected function _decorateRowHtml(AbstractElement $element, $html)
     {
         return '<tr id="row_' . $element->getHtmlId() . '">' . $html . '</tr>';
     }

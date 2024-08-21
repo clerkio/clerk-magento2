@@ -33,11 +33,13 @@ class FacetedSearch extends Fieldset
     /**
      * FacetedSearch constructor.
      *
+     * @param ConfigHelper $configHelper
      * @param Context $context
      * @param Session $authSession
      * @param Js $jsHelper
      * @param RequestInterface $requestInterface
      * @param Api $api
+     * @param SystemConfig $systemConfig
      * @param array $data
      */
     public function __construct(
@@ -54,7 +56,6 @@ class FacetedSearch extends Fieldset
         $this->systemConfig = $systemConfig;
         $this->requestInterface = $requestInterface;
         $this->configHelper = $configHelper;
-
         parent::__construct($context, $authSession, $jsHelper, $data);
     }
 
@@ -92,18 +93,7 @@ class FacetedSearch extends Fieldset
      */
     private function isConfigured()
     {
-        $_params = $this->requestInterface->getParams();
-        $scope_id = '0';
-        $scope = 'default';
-        if (array_key_exists('website', $_params)) {
-            $scope = 'website';
-            $scope_id = $_params[$scope];
-        }
-        if (array_key_exists('store', $_params)) {
-            $scope = 'store';
-            $scope_id = $_params[$scope];
-        }
-        return (bool) ($this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, $scope, $scope_id) && $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, $scope, $scope_id));
+        return this->configHelper->getValueAdmin(Config::XML_PATH_PUBLIC_KEY) && $this->configHelper->getValueAdmin(Config::XML_PATH_PRIVATE_KEY);
     }
 
     /**

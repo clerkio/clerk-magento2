@@ -34,8 +34,7 @@ class Version extends Field
         ModuleListInterface $moduleList,
         ManagerInterface    $messageManager,
         array               $data = []
-    )
-    {
+    ) {
         $this->moduleList = $moduleList;
         $this->messageManager = $messageManager;
 

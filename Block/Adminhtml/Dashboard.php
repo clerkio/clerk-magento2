@@ -4,6 +4,7 @@ namespace Clerk\Clerk\Block\Adminhtml;
 
 use Clerk\Clerk\Model\Config;
 use Magento\Backend\Block\Template;
+use Magento\Backend\Block\Template\Context;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -17,6 +18,11 @@ class Dashboard extends Template
      */
     private $storeRepository;
 
+    /**
+     * @param Context $context
+     * @param StoreRepositoryInterface $storeRepository
+     * @param array $data
+     */
     public function __construct(Template\Context $context, StoreRepositoryInterface $storeRepository, array $data = [])
     {
         $this->storeRepository = $storeRepository;
@@ -52,7 +58,7 @@ class Dashboard extends Template
 
         $storePart = $this->getStorePart($publicKey);
 
-        return sprintf('https://my.clerk.io/#/store/%s/analytics/%s?key=%s&private_key=%s&embed=yes', $storePart, $this->type, $publicKey, $privateKey);
+        return sprintf("https://my.clerk.io/#/store/%s/analytics/%s?key=%s&private_key=%s&embed=yes", $storePart, $this->type, $publicKey, $privateKey);
     }
 
     /**
@@ -76,7 +82,7 @@ class Dashboard extends Template
     /**
      * Get first 8 characters of public key
      *
-     * @param $publicKey
+     * @param string $publicKey
      * @return string
      */
     protected function getStorePart($publicKey)

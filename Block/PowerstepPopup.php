@@ -36,7 +36,6 @@ class PowerstepPopup extends Template
      */
     protected $imageHelper;
 
-
     /**
      * PowerstepPopup constructor.
      *
@@ -56,8 +55,7 @@ class PowerstepPopup extends Template
         Image                      $imageHelper,
         ConfigHelper               $configHelper,
         array                      $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->checkoutSession = $checkoutSession;
         $this->productRepository = $productRepository;
@@ -97,12 +95,14 @@ class PowerstepPopup extends Template
         }
         try {
             return $this->productRepository->getById($product_id);
-        } catch (NoSuchEntityException) {
+        } catch (NoSuchEntityException $ex) {
             return false;
         }
     }
 
     /**
+     * Get last product id added to the cart
+     *
      * @return false|int
      */
     public function getLastProductId()
@@ -119,7 +119,7 @@ class PowerstepPopup extends Template
                 return false;
             }
             return $last_item->getProductId();
-        } catch (NoSuchEntityException|LocalizedException) {
+        } catch (NoSuchEntityException|LocalizedException $ex) {
             return false;
         }
     }
@@ -157,7 +157,7 @@ class PowerstepPopup extends Template
      */
     public function shouldShow()
     {
-        $show_powerstep = ($this->getRequest()->getParam('isAjax')) || ($this->checkoutSession->getClerkShowPowerstep(true));
+        $show_powerstep = $this->getRequest()->getParam('isAjax') || $this->checkoutSession->getClerkShowPowerstep(true);
 
         if ($show_powerstep) {
             $this->checkoutSession->setClerkShowPowerstep(false);
@@ -176,6 +176,11 @@ class PowerstepPopup extends Template
         return $this->getRequest()->getParam('isAjax');
     }
 
+    /**
+     * Get content exclude state
+     *
+     * @return mixed
+     */
     public function getExcludeState()
     {
         return $this->configHelper->getValue(Config::XML_PATH_POWERSTEP_FILTER_DUPLICATES);
