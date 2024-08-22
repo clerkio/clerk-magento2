@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Block\Adminhtml\System\Config\Fieldset;
 use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
+use Exception;
 use Magento\Backend\Block\Context;
 use Magento\Backend\Model\Auth\Session;
 use Magento\Config\Block\System\Config\Form\Fieldset;
@@ -44,14 +45,15 @@ class FacetedSearch extends Fieldset
      */
     public function __construct(
         ConfigHelper     $configHelper,
-        Context $context,
-        Session $authSession,
-        Js $jsHelper,
+        Context          $context,
+        Session          $authSession,
+        Js               $jsHelper,
         RequestInterface $requestInterface,
-        Api $api,
-        SystemConfig $systemConfig,
-        array $data = []
-    ) {
+        Api              $api,
+        SystemConfig     $systemConfig,
+        array            $data = []
+    )
+    {
         $this->api = $api;
         $this->systemConfig = $systemConfig;
         $this->requestInterface = $requestInterface;
@@ -64,16 +66,17 @@ class FacetedSearch extends Fieldset
      *
      * @param AbstractElement $element
      * @return string
+     * @throws Exception
      */
     public function render(AbstractElement $element)
     {
         $this->setElement($element);
         $header = $this->_getHeaderHtml($element);
 
-        if (! $this->isConfigured()) {
+        if (!$this->isConfigured()) {
             $elements = __('Public and private key must be set in order to enable faceted search');
         } else {
-            if (! $this->keysValid()) {
+            if (!$this->keysValid()) {
                 $elements = __('Public or private key invalid');
             } else {
                 $elements = $this->_getChildrenElementsHtml($element);
@@ -93,29 +96,19 @@ class FacetedSearch extends Fieldset
      */
     private function isConfigured()
     {
-        return this->configHelper->getValueAdmin(Config::XML_PATH_PUBLIC_KEY) && $this->configHelper->getValueAdmin(Config::XML_PATH_PRIVATE_KEY);
+        return $this->configHelper->getValueAdmin(Config::XML_PATH_PUBLIC_KEY) && $this->configHelper->getValueAdmin(Config::XML_PATH_PRIVATE_KEY);
     }
 
     /**
      * Determine if public & private keys are valid
      *
      * @return bool
+     * @throws Exception
      */
     private function keysValid()
     {
-        $_params = $this->requestInterface->getParams();
-        $scope_id = '0';
-        $scope = 'default';
-        if (array_key_exists('website', $_params)) {
-            $scope = 'website';
-            $scope_id = $_params[$scope];
-        }
-        if (array_key_exists('store', $_params)) {
-            $scope = 'store';
-            $scope_id = $_params[$scope];
-        }
-        $publicKey = $this->_scopeConfig->getValue(Config::XML_PATH_PUBLIC_KEY, $scope, $scope_id);
-        $privateKey = $this->_scopeConfig->getValue(Config::XML_PATH_PRIVATE_KEY, $scope, $scope_id);
+        $publicKey = $this->configHelper->getValueAdmin(Config::XML_PATH_PUBLIC_KEY);
+        $privateKey = $this->configHelper->getValueAdmin(Config::XML_PATH_PRIVATE_KEY);
 
         $keysValid = json_decode($this->api->keysValid($publicKey, $privateKey));
 
