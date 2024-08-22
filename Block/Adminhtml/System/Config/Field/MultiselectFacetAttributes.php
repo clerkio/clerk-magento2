@@ -6,16 +6,10 @@ use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Model\Config;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
 class MultiselectFacetAttributes extends Field
 {
-
-    /**
-     * @var RequestInterface
-     */
-    protected $requestInterface;
 
     /**
      * FacetTitles constructor.
@@ -24,10 +18,11 @@ class MultiselectFacetAttributes extends Field
      * @param array $data
      */
     public function __construct(
-        ConfigHelper     $configHelper,
-        Context $context,
-        array $data = []
-    ) {
+        ConfigHelper $configHelper,
+        Context      $context,
+        array        $data = []
+    )
+    {
         parent::__construct($context, $data);
         $this->configHelper = $configHelper;
     }
