@@ -33,7 +33,8 @@ class Context
         RequestInterface      $request,
         StoreManagerInterface $storeManager,
         ClerkLogger           $logger
-    ) {
+    )
+    {
         $this->storeManager = $storeManager;
         $this->request = $request;
         $this->logger = $logger;
@@ -90,11 +91,15 @@ class Context
     /**
      * Get store
      *
+     * @param int|string|void $store_id
      * @return StoreInterface|void
      */
-    public function getStore()
+    public function getStore($store_id = null)
     {
         try {
+            if (null !== $store_id) {
+                return $this->storeManager->getStore($store_id);
+            }
             $params = $this->request->getParams();
             if (array_key_exists('scope_id', $params)) {
                 if (array_key_exists('scope', $params) && $params['scope'] === 'store') {
@@ -145,10 +150,10 @@ class Context
         $params = $this->request->getParams();
         $scope_id = 0;
         if (array_key_exists('website', $params)) {
-            $scope_id = (int) $params['website'];
+            $scope_id = (int)$params['website'];
         }
         if (array_key_exists('store', $params)) {
-            $scope_id = (int) $params['store'];
+            $scope_id = (int)$params['store'];
         }
         return $scope_id;
     }

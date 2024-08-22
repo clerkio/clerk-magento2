@@ -2,20 +2,20 @@
 
 namespace Clerk\Clerk\Controller\Order;
 
-use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
+use Exception;
 use Magento\Framework\App\Action\Context;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Module\ModuleList;
-use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
-use Magento\Store\Model\ScopeInterface;
-use Psr\Log\LoggerInterface;
-use Clerk\Clerk\Controller\Logger\ClerkLogger;
-use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
 {
@@ -52,17 +52,18 @@ class Index extends AbstractAction
      * @param Api $api
      */
     public function __construct(
-        Context $context,
-        ScopeConfigInterface $scopeConfig,
-        CollectionFactory $orderCollectionFactory,
-        StoreManagerInterface $storeManager,
-        LoggerInterface $logger,
-        ModuleList $moduleList,
-        ClerkLogger $clerk_logger,
+        Context                  $context,
+        ScopeConfigInterface     $scopeConfig,
+        CollectionFactory        $orderCollectionFactory,
+        StoreManagerInterface    $storeManager,
+        LoggerInterface          $logger,
+        ModuleList               $moduleList,
+        ClerkLogger              $clerk_logger,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api,
-        Api $api
-    ) {
+        RequestApi               $request_api,
+        Api                      $api
+    )
+    {
         $this->collectionFactory = $orderCollectionFactory;
         $this->clerk_logger = $clerk_logger;
         $this->moduleList = $moduleList;
@@ -114,14 +115,14 @@ class Index extends AbstractAction
                 foreach ($item->getAllVisibleItems() as $productItem) {
                     $products[] = [
                         'id' => $productItem->getProductId(),
-                        'quantity' => (int) $productItem->getQtyOrdered(),
-                        'price' => (float) $productItem->getPrice(),
+                        'quantity' => (int)$productItem->getQtyOrdered(),
+                        'price' => (float)$productItem->getPrice(),
                     ];
                 }
                 return $products;
             });
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Order addFieldHandlers ERROR', ['error' => $e->getMessage()]);
 
@@ -142,6 +143,7 @@ class Index extends AbstractAction
             );
 
             if ($disabled) {
+                /** @noinspection PhpPossiblePolymorphicInvocationInspection */
                 $this->getResponse()
                     ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true)
@@ -154,7 +156,7 @@ class Index extends AbstractAction
 
             parent::execute();
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Order execute ERROR', ['error' => $e->getMessage()]);
 
@@ -172,7 +174,7 @@ class Index extends AbstractAction
             //Use increment id instead of entity_id
             $this->fields = str_replace('entity_id', 'increment_id', $this->fields);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Order getArguments ERROR', ['error' => $e->getMessage()]);
 

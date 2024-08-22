@@ -72,15 +72,16 @@ class Index extends Action
      */
     public function __construct(
         Action\Context $context,
-        Api $api,
-        FormFactory $formFactory,
-        FormSelect $formSelect,
-        FieldElement $fieldElement,
-        FieldSet $fieldSet,
-        WidgetChooser $widgetChooser,
-        ArrayPool $sourceModelPool,
-        ClerkLogger $clerk_logger
-    ) {
+        Api            $api,
+        FormFactory    $formFactory,
+        FormSelect     $formSelect,
+        FieldElement   $fieldElement,
+        FieldSet       $fieldSet,
+        WidgetChooser  $widgetChooser,
+        ArrayPool      $sourceModelPool,
+        ClerkLogger    $clerk_logger
+    )
+    {
         $this->api = $api;
         $this->formFactory = $formFactory;
         $this->sourceModelPool = $sourceModelPool;
@@ -134,6 +135,7 @@ class Index extends Action
             $select->setHtmlId('clerk_widget_content');
             $select->setId('clerk_widget_content');
             $select->setCssClass('clerk_content_select');
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $select->setName('parameters[content]');
             $select->setValues($this->sourceModelPool->get(Content::class)->toOptionArray());
             $select->setLabel(__('Content'));
@@ -141,6 +143,7 @@ class Index extends Action
 
             $renderer = $this->_fieldElement;
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true)
@@ -237,6 +240,7 @@ class Index extends Action
                 $html .= $form->toHtml();
             }
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true)
@@ -263,6 +267,7 @@ class Index extends Action
     {
         try {
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->getResponse()
                 ->setHttpResponseCode(422)
                 ->setHeader('Content-Type', 'application/json', true)

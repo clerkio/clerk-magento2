@@ -2,24 +2,26 @@
 
 namespace Clerk\Clerk\Controller\Page;
 
-use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
-use Magento\Framework\App\Action\Context;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Module\ModuleList;
-use Magento\Framework\App\RequestInterface;
+use Exception;
+use Magento\Cms\Api\PageRepositoryInterface;
+use Magento\Cms\Helper\Page as PageHelper;
+use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
-use Magento\Cms\Api\PageRepositoryInterface;
-use Psr\Log\LoggerInterface;
-use Magento\Store\Model\ScopeInterface;
-use Clerk\Clerk\Controller\Logger\ClerkLogger;
-use Magento\Framework\Webapi\Rest\Request as RequestApi;
-use Magento\Cms\Helper\Page as PageHelper;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
-use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageFactory;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Module\ModuleList;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
 {
@@ -84,21 +86,22 @@ class Index extends AbstractAction
      * @param Api $api
      */
     public function __construct(
-        Context $context,
-        ScopeConfigInterface $scopeConfig,
-        PageRepositoryInterface $PageRepositoryInterface,
-        SearchCriteriaBuilder $SearchCriteriaBuilder,
-        StoreManagerInterface $storeManager,
+        Context                      $context,
+        ScopeConfigInterface         $scopeConfig,
+        PageRepositoryInterface      $PageRepositoryInterface,
+        SearchCriteriaBuilder        $SearchCriteriaBuilder,
+        StoreManagerInterface        $storeManager,
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        LoggerInterface $logger,
-        ClerkLogger $clerk_logger,
-        ModuleList $moduleList,
-        PageHelper $pageHelper,
-        ProductMetadataInterface $product_metadata,
-        PageFactory $pageFactory,
-        RequestApi $request_api,
-        Api $api
-    ) {
+        LoggerInterface              $logger,
+        ClerkLogger                  $clerk_logger,
+        ModuleList                   $moduleList,
+        PageHelper                   $pageHelper,
+        ProductMetadataInterface     $product_metadata,
+        PageFactory                  $pageFactory,
+        RequestApi                   $request_api,
+        Api                          $api
+    )
+    {
         $this->_searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->_PageRepositoryInterface = $PageRepositoryInterface;
         $this->_SearchCriteriaBuilder = $SearchCriteriaBuilder;
@@ -122,8 +125,8 @@ class Index extends AbstractAction
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @return ResponseInterface|ResultInterface|void
+     * @throws FileSystemException
      */
     public function execute()
     {
@@ -138,6 +141,7 @@ class Index extends AbstractAction
 
             if ($Include_pages) {
 
+                /** @noinspection PhpPossiblePolymorphicInvocationInspection */
                 $this->getResponse()
                     ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true);
@@ -180,7 +184,7 @@ class Index extends AbstractAction
 
                         $pages[] = $page;
 
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
 
                         continue;
 
@@ -226,7 +230,7 @@ class Index extends AbstractAction
 
                         $pages[] = $page;
 
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
 
                         continue;
 
@@ -238,13 +242,25 @@ class Index extends AbstractAction
 
             $this->getResponse()->setBody(json_encode($pages));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Product execute ERROR', ['error' => $e->getMessage()]);
 
         }
     }
 
+    public function getPageCollection($page, $limit, $storeid)
+    {
+
+        $store = $this->storeManager->getStore($storeid);
+        $collection = $this->_pageFactory->create();
+        $collection->addFilter('is_active', 1);
+        $collection->addFilter('store_id', $store->getId());
+        $collection->addStoreFilter($store);
+        $collection->setPageSize($limit);
+        $collection->setCurPage($page);
+        return $collection;
+    }
 
     public function ValidatePage($Page)
     {
@@ -260,18 +276,5 @@ class Index extends AbstractAction
         }
 
         return true;
-    }
-
-    public function getPageCollection($page, $limit, $storeid)
-    {
-
-        $store = $this->storeManager->getStore($storeid);
-        $collection = $this->_pageFactory->create();
-        $collection->addFilter('is_active', 1);
-        $collection->addFilter('store_id', $store->getId());
-        $collection->addStoreFilter($store);
-        $collection->setPageSize($limit);
-        $collection->setCurPage($page);
-        return $collection;
     }
 }

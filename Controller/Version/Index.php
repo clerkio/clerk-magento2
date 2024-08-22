@@ -2,16 +2,18 @@
 
 namespace Clerk\Clerk\Controller\Version;
 
-use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
+use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Clerk\Clerk\Model\Api;
+use Exception;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Module\ModuleList;
-use Psr\Log\LoggerInterface;
-use Clerk\Clerk\Controller\Logger\ClerkLogger;
-use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Module\ModuleList;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class Index extends AbstractAction
 {
@@ -42,16 +44,17 @@ class Index extends AbstractAction
      * @param Api $api
      */
     public function __construct(
-        Context $context,
-        ScopeConfigInterface $scopeConfig,
-        LoggerInterface $logger,
-        ModuleList $moduleList,
-        StoreManagerInterface $storeManager,
-        ClerkLogger $clerk_logger,
+        Context                  $context,
+        ScopeConfigInterface     $scopeConfig,
+        LoggerInterface          $logger,
+        ModuleList               $moduleList,
+        StoreManagerInterface    $storeManager,
+        ClerkLogger              $clerk_logger,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api,
-        Api $api
-    ) {
+        RequestApi               $request_api,
+        Api                      $api
+    )
+    {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $clerk_logger;
         $this->_product_metadata = $product_metadata;
@@ -76,6 +79,7 @@ class Index extends AbstractAction
         try {
             $version = $this->_product_metadata->getVersion();
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
@@ -84,7 +88,7 @@ class Index extends AbstractAction
                 $scope = 'default';
                 $scope_id = '0';
             } else {
-                $scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+                $scope = ScopeInterface::SCOPE_STORE;
                 $scope_id = $this->storeManager->getStore()->getId();
             }
 
@@ -102,7 +106,7 @@ class Index extends AbstractAction
             } else {
                 $this->getResponse()->setBody(json_encode($response));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Version execute ERROR', ['error' => $e->getMessage()]);
 

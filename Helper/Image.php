@@ -5,6 +5,7 @@ namespace Clerk\Clerk\Helper;
 use Clerk\Clerk\Helper\Config as ConfigHelper;
 use Clerk\Clerk\Helper\Context as ContextHelper;
 use Clerk\Clerk\Model\Config;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -57,7 +58,8 @@ class Image
         ScopeConfigInterface  $scopeConfig,
         StoreManagerInterface $storeManager,
         RequestInterface      $requestInterface
-    ) {
+    )
+    {
         $this->helperFactory = $helperFactory;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -69,7 +71,7 @@ class Image
     /**
      * Builds product image URL
      *
-     * @param Product $item
+     * @param Product|ProductInterface $item
      * @return string
      * @throws NoSuchEntityException
      */
@@ -94,7 +96,9 @@ class Image
                 $imageUrl = $this->contextHelper->getStore()->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
             }
         }
-
-        return $imageUrl;
+        if (strpos($imageUrl, 'catalog/product/') > -1) {
+            return $imageUrl;
+        }
+        return str_replace('catalog/product', 'catalog/product/', $imageUrl);
     }
 }

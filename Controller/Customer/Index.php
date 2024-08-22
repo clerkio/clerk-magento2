@@ -2,22 +2,23 @@
 
 namespace Clerk\Clerk\Controller\Customer;
 
-use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Controller\AbstractAction;
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
-use Magento\Framework\App\Action\Context;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
+use Exception;
+use Magento\Customer\Api\CustomerMetadataInterface;
+use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Module\ModuleList;
+use Magento\Framework\Webapi\Rest\Request as RequestApi;
 use Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory as SubscriberCollectionFactory;
 use Magento\Newsletter\Model\SubscriberFactory as SubscriberFactory;
-use Magento\Framework\Module\ModuleList;
+use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
-use Magento\Customer\Api\CustomerMetadataInterface;
-use Magento\Framework\Webapi\Rest\Request as RequestApi;
-use Magento\Framework\App\ProductMetadataInterface;
-use Magento\Customer\Api\GroupRepositoryInterface;
 
 class Index extends AbstractAction
 {
@@ -81,21 +82,22 @@ class Index extends AbstractAction
      * @param GroupRepositoryInterface $groupRepository
      */
     public function __construct(
-        Context $context,
-        StoreManagerInterface $storeManager,
-        ScopeConfigInterface $scopeConfig,
-        CollectionFactory $customerCollectionFactory,
-        LoggerInterface $logger,
-        ModuleList $moduleList,
-        ClerkLogger $clerk_logger,
-        CustomerMetadataInterface $customerMetadata,
-        ProductMetadataInterface $product_metadata,
-        RequestApi $request_api,
-        SubscriberFactory $subscriberFactory,
+        Context                     $context,
+        StoreManagerInterface       $storeManager,
+        ScopeConfigInterface        $scopeConfig,
+        CollectionFactory           $customerCollectionFactory,
+        LoggerInterface             $logger,
+        ModuleList                  $moduleList,
+        ClerkLogger                 $clerk_logger,
+        CustomerMetadataInterface   $customerMetadata,
+        ProductMetadataInterface    $product_metadata,
+        RequestApi                  $request_api,
+        SubscriberFactory           $subscriberFactory,
         SubscriberCollectionFactory $subscriberCollectionFactory,
-        Api $api,
-        GroupRepositoryInterface $groupRepository
-    ) {
+        Api                         $api,
+        GroupRepositoryInterface    $groupRepository
+    )
+    {
         $this->collectionFactory = $customerCollectionFactory;
         $this->clerk_logger = $clerk_logger;
         $this->_customerMetadata = $customerMetadata;
@@ -128,6 +130,7 @@ class Index extends AbstractAction
             if ($this->scopeConfig->getValue(Config::XML_PATH_CUSTOMER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
 
                 $Customers = [];
+                /** @noinspection PhpPossiblePolymorphicInvocationInspection */
                 $this->getResponse()
                     ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true);
@@ -174,7 +177,7 @@ class Index extends AbstractAction
                     if ($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
                         $sub_state = $subscriberInstance->loadByEmail($customer['email']);
                         if ($sub_state->getId()) {
-                            $_customer['subscribed'] = (bool) ($sub_state->getSubscriberStatus() == 1);
+                            $_customer['subscribed'] = (bool)($sub_state->getSubscriberStatus() == 1);
                         } else {
                             $_customer['subscribed'] = false;
                         }
@@ -194,7 +197,7 @@ class Index extends AbstractAction
                             $_sub = [];
                             $_sub['id'] = 'SUB' . $subscriber['subscriber_id'];
                             $_sub['email'] = $subscriber['subscriber_email'];
-                            $_sub['subscribed'] = (bool) ($subscriber['subscriber_status'] == 1);
+                            $_sub['subscribed'] = (bool)($subscriber['subscriber_status'] == 1);
                             $_sub['name'] = "";
                             $_sub['firstname'] = "";
                             $_sub['unsub_url'] = $sub_state->getUnsubscriptionLink();
@@ -210,6 +213,7 @@ class Index extends AbstractAction
                 }
             } else {
 
+                /** @noinspection PhpPossiblePolymorphicInvocationInspection */
                 $this->getResponse()
                     ->setHttpResponseCode(200)
                     ->setHeader('Content-Type', 'application/json', true);
@@ -218,7 +222,7 @@ class Index extends AbstractAction
 
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->clerk_logger->error('Customer execute ERROR', ['error' => $e->getMessage()]);
 
@@ -235,6 +239,11 @@ class Index extends AbstractAction
         return $customerCollection;
     }
 
+    public function getCustomerGender($GenderCode)
+    {
+        return $this->_customerMetadata->getAttributeMetadata('gender')->getOptions()[$GenderCode]->getLabel();
+    }
+
     public function getSubscriberCollection($page, $limit, $storeid)
     {
         $subscriberCollection = $this->_subscriberCollectionFactory->create();
@@ -243,10 +252,5 @@ class Index extends AbstractAction
         $subscriberCollection->setPageSize($limit);
         $subscriberCollection->setCurPage($page);
         return $subscriberCollection;
-    }
-
-    public function getCustomerGender($GenderCode)
-    {
-        return $this->_customerMetadata->getAttributeMetadata('gender')->getOptions()[$GenderCode]->getLabel();
     }
 }

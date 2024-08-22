@@ -34,16 +34,17 @@ class Index extends AbstractAction
      * @param Api $api
      */
     public function __construct(
-        Context $context,
-        StoreManagerInterface $storeManager,
-        ScopeConfigInterface $scopeConfig,
-        LoggerInterface $logger,
-        ModuleList $moduleList,
-        ClerkLogger $clerk_logger,
+        Context                  $context,
+        StoreManagerInterface    $storeManager,
+        ScopeConfigInterface     $scopeConfig,
+        LoggerInterface          $logger,
+        ModuleList               $moduleList,
+        ClerkLogger              $clerk_logger,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api,
-        Api $api
-    ) {
+        RequestApi               $request_api,
+        Api                      $api
+    )
+    {
         $this->moduleList = $moduleList;
         $this->clerk_logger = $clerk_logger;
         parent::__construct(
@@ -65,6 +66,7 @@ class Index extends AbstractAction
     public function execute()
     {
         try {
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);

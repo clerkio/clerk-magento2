@@ -87,20 +87,21 @@ class Index extends AbstractAction
      * @param Api $api
      */
     public function __construct(
-        Context $context,
-        ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager,
-        CollectionFactory $categoryCollectionFactory,
-        CategoryFactory $categoryFactory,
-        LoggerInterface $logger,
-        PageCollectionFactory $pageCollectionFactory,
-        Page $pageHelper,
-        ClerkLogger $clerk_logger,
-        ModuleList $moduleList,
+        Context                  $context,
+        ScopeConfigInterface     $scopeConfig,
+        StoreManagerInterface    $storeManager,
+        CollectionFactory        $categoryCollectionFactory,
+        CategoryFactory          $categoryFactory,
+        LoggerInterface          $logger,
+        PageCollectionFactory    $pageCollectionFactory,
+        Page                     $pageHelper,
+        ClerkLogger              $clerk_logger,
+        ModuleList               $moduleList,
         ProductMetadataInterface $product_metadata,
-        RequestApi $request_api,
-        Api $api
-    ) {
+        RequestApi               $request_api,
+        Api                      $api
+    )
+    {
         $this->moduleList = $moduleList;
         $this->collectionFactory = $categoryCollectionFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
@@ -208,6 +209,7 @@ class Index extends AbstractAction
                 }
             }
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);
@@ -220,6 +222,7 @@ class Index extends AbstractAction
                 $this->clerk_logger->log('Fetched page ' . $this->page . ' with ' . count($response) . ' Categories', ['response' => $response]);
             }
         } catch (Exception $e) {
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->getResponse()
                 ->setHttpResponseCode(500)
                 ->setHeader('Content-Type', 'application/json', true)

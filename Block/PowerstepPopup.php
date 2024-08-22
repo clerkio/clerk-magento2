@@ -55,7 +55,8 @@ class PowerstepPopup extends Template
         Image                      $imageHelper,
         ConfigHelper               $configHelper,
         array                      $data = []
-    ) {
+    )
+    {
         parent::__construct($context, $data);
         $this->checkoutSession = $checkoutSession;
         $this->productRepository = $productRepository;
@@ -118,6 +119,7 @@ class PowerstepPopup extends Template
             if (empty($last_item)) {
                 return false;
             }
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             return $last_item->getProductId();
         } catch (NoSuchEntityException|LocalizedException $ex) {
             return false;

@@ -3,6 +3,7 @@
 namespace Clerk\Clerk\Model\Adapter;
 
 use Clerk\Clerk\Controller\Logger\ClerkLogger;
+use Clerk\Clerk\Helper\Context as ContextHelper;
 use Clerk\Clerk\Helper\Image;
 use Clerk\Clerk\Model\Config;
 use Exception;
@@ -18,6 +19,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Model\Calculation\RateFactory as TaxRateFactory;
 
@@ -51,19 +53,9 @@ class Product extends AbstractAdapter
     protected $productTaxRates;
 
     /**
-     * @var ItemSource
-     */
-    protected $itemSource;
-
-    /**
      * @var StockFilter
      */
     protected $stockFilter;
-
-    /**
-     * @var GetSalableQuantityDataBySku
-     */
-    protected $getSalableQuantityDataBySku;
 
     /**
      * @var LoggerInterface
@@ -100,11 +92,6 @@ class Product extends AbstractAdapter
     protected $eventPrefix = 'product';
 
     /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * @var Data
      */
     protected $taxHelper;
@@ -135,6 +122,14 @@ class Product extends AbstractAdapter
      * @var int|string
      */
     protected $scopeId;
+    /**
+     * @var ContextHelper
+     */
+    protected $contextHelper;
+    /**
+     * @var array
+     */
+    protected $exportProduct;
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -152,6 +147,7 @@ class Product extends AbstractAdapter
      * @param ProductRepositoryInterface $productRepository
      * @param ModuleManager $moduleManager
      * @param ObjectManagerInterface $objectManager
+     * @param ContextHelper $contextHelper
      */
     public function __construct(
         ScopeConfigInterface       $scopeConfig,
@@ -168,13 +164,14 @@ class Product extends AbstractAdapter
         TaxRateFactory             $taxRate,
         ProductRepositoryInterface $productRepository,
         ModuleManager              $moduleManager,
-        ObjectManagerInterface     $objectManager
-    ) {
+        ObjectManagerInterface     $objectManager,
+        ContextHelper              $contextHelper
+    )
+    {
         $this->taxHelper = $taxHelper;
         $this->stockFilter = $stockFilter;
         $this->clerkLogger = $clerkLogger;
         $this->imageHelper = $imageHelper;
-        $this->storeManager = $storeManager;
         $this->moduleManager = $moduleManager;
         $this->objectManager = $objectManager;
         $this->stockStateInterface = $stockStateInterface;
@@ -183,8 +180,10 @@ class Product extends AbstractAdapter
         $this->taxRateFactory = $taxRate;
         $this->productTaxRates = $this->taxRateFactory->create()->getData();
         $this->_productRepository = $productRepository;
+        $this->contextHelper = $contextHelper;
         $this->msiEnabled = $this->moduleManager->isEnabled('Magento_Inventory')
             && $this->moduleManager->isEnabled('Magento_InventoryAdminUi');
+        $this->exportProduct = [];
         parent::__construct(
             $scopeConfig,
             $eventManager,
@@ -201,7 +200,7 @@ class Product extends AbstractAdapter
      * @param int|string $limit
      * @param int|string $orderBy
      * @param int|string $order
-     * @param int|string $scope
+     * @param string $scope
      * @param int|string $scopeid
      * @return mixed|void
      */
@@ -547,7 +546,7 @@ class Product extends AbstractAdapter
 
             //Add image fieldhandler
             $this->addFieldHandler('image', function ($item) {
-                return $this->fixImagePath($this->imageHelper->getUrl($item));
+                return $this->imageHelper->getUrl($item);
             });
 
             //Add url fieldhandler
@@ -618,7 +617,7 @@ class Product extends AbstractAdapter
             });
 
             $this->addFieldHandler('child_images', function ($item) {
-                $heavyAttributeQuery = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY, 'store', $this->getStoreIdFromContext());
+                $heavyAttributeQuery = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY, ScopeInterface::SCOPE_STORE, $this->scopeId);
                 $productType = $item->getTypeID();
                 $productTypeInstance = $item->getTypeInstance();
                 $childImages = [];
@@ -632,22 +631,24 @@ class Product extends AbstractAdapter
                                 $childIds = $childIdsRaw;
                             }
                         }
-                        foreach ($childIds as $childId) {
-                            // Emulate product even if disabled
-                            $childProduct = $this->_productRepository->getById($childId);
-                            $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($childProduct));
+                        if (!empty($childIds)) {
+                            foreach ($childIds as $childId) {
+                                // Emulate product even if disabled
+                                $childProduct = $this->_productRepository->getById($childId);
+                                $childImages[] = $this->imageHelper->getUrl($childProduct);
+                            }
                         }
                     } else {
                         $usedProducts = $productTypeInstance->getUsedProducts($item);
                         foreach ($usedProducts as $usedProduct) {
-                            $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($usedProduct));
+                            $childImages[] = $this->imageHelper->getUrl($usedProduct);
                         }
                     }
                 }
                 if ($productType == self::PRODUCT_TYPE_GROUPED) {
                     $associatedProducts = $productTypeInstance->getAssociatedProducts($item);
                     foreach ($associatedProducts as $associatedProduct) {
-                        $childImages[] = $this->fixImagePath($this->imageHelper->getUrl($associatedProduct));
+                        $childImages[] = $this->imageHelper->getUrl($associatedProduct);
                     }
                 }
                 return $childImages;
@@ -661,32 +662,18 @@ class Product extends AbstractAdapter
 
                 if ($productType == self::PRODUCT_TYPE_SIMPLE || !in_array($productType, self::PRODUCT_TYPES)) {
                     $productStock = $this->getProductStockStateQty($item);
-                    // If stock was 0, try to get it without looking at the scope.
-                    //if($productStock == 0){
-                    //  $productStock = $this->getSaleableStockBySku($item->getSku());
-                    //}
                 }
                 if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
                     $usedProducts = $productTypeInstance->getUsedProducts($item);
                     foreach ($usedProducts as $usedProduct) {
                         $productStock += $this->getProductStockStateQty($usedProduct);
                     }
-                    //if($productStock == 0){
-                    //  foreach ($usedProducts as $usedProduct) {
-                    //    $productStock += $this->getSaleableStockBySku($usedProduct->getSku());
-                    //  }
-                    //}
                 }
                 if ($productType == self::PRODUCT_TYPE_GROUPED) {
                     $associatedProducts = $productTypeInstance->getAssociatedProducts($item);
                     foreach ($associatedProducts as $associatedProduct) {
                         $productStock += $this->getProductStockStateQty($associatedProduct);
                     }
-                    //if($productStock == 0){
-                    //  foreach($associatedProducts as $associatedProduct){
-                    //    $productStock += $this->getSaleableStockBySku($associatedProduct->getSku());
-                    //  }
-                    //}
                 }
                 if ($productType == self::PRODUCT_TYPE_BUNDLE) {
                     $productsArray = [];
@@ -741,16 +728,16 @@ class Product extends AbstractAdapter
                 }
                 if ($productType == self::PRODUCT_TYPE_BUNDLE) {
                     $productsArray = [];
-                    $selectionCollection = $item->getTypeInstance(true)->getSelectionsCollection(
+                    $product_selection_collection = $item->getTypeInstance(true)->getSelectionsCollection(
                         $item->getTypeInstance(true)->getOptionsIds($item),
                         $item
                     );
 
-                    foreach ($selectionCollection as $proselection) {
+                    foreach ($product_selection_collection as $product_selection) {
                         $selectionArray = [];
-                        $selectionArray['min_qty'] = $proselection->getSelectionQty();
-                        $selectionArray['stock'] = $this->stockStateInterface->getStockQty($proselection->getProductId(), $item->getStore()->getWebsiteId());
-                        $productsArray[$proselection->getOptionId()][$proselection->getSelectionId()] = $selectionArray;
+                        $selectionArray['min_qty'] = $product_selection->getSelectionQty();
+                        $selectionArray['stock'] = $this->stockStateInterface->getStockQty($product_selection->getProductId(), $item->getStore()->getWebsiteId());
+                        $productsArray[$product_selection->getOptionId()][$product_selection->getSelectionId()] = $selectionArray;
                     }
 
                     $bundle_stock = 0;
@@ -781,20 +768,16 @@ class Product extends AbstractAdapter
      *
      * @param $resourceItem
      * @param $field
-     * @return mixed
+     * @return mixed|void
      */
     protected function getAttributeValue($resourceItem, $field)
     {
         try {
-
             $attributeResource = $resourceItem->getResource();
-
             if (!$attributeResource) {
                 return parent::getAttributeValue($resourceItem, $field);
             }
-
             $attribute = $attributeResource->getAttribute($field);
-
             if (!is_bool($attribute) && is_object($attribute)) {
                 if ($attribute->usesSource()) {
                     $source = $attribute->getSource();
@@ -803,20 +786,16 @@ class Product extends AbstractAdapter
                     }
                 }
             }
-
             return parent::getAttributeValue($resourceItem, $field);
-
         } catch (Exception $e) {
-
             $this->clerkLogger->error('Getting Attribute Value Error', ['error' => $e->getMessage()]);
-
         }
     }
 
     /**
      * Format Price to 2 decimals
      * @param float|int $price
-     * @return float|int $price
+     * @return float
      */
     protected function formatPrice($price)
     {
@@ -824,28 +803,18 @@ class Product extends AbstractAdapter
     }
 
     /**
-     * Get Product price with contextual taxes
+     * Get product price
+     *
+     * @param $product
+     * @param $price
+     * @param $withTax
+     * @return float
      */
-
     protected function getProductTaxPrice($product, $price, $withTax = true)
     {
-        $store = $this->getStoreFromContext();
-        return $this->taxHelper->getTaxPrice($product, $price, $withTax, null, null, null, $store, null, true);
+        return $this->taxHelper->getTaxPrice($product, $price, $withTax, null, null, null, $this->contextHelper->getStore($this->scopeId), null, true);
     }
 
-    /**
-     * Format Image Path Valid
-     * @param string $imagePath
-     * @return string $imagePath
-     */
-    protected function fixImagePath($imagePath)
-    {
-        if (strpos($imagePath, 'catalog/product/') > -1) {
-            return $imagePath;
-        } else {
-            return str_replace('catalog/product', 'catalog/product/', $imagePath);
-        }
-    }
 
     /**
      * Get Product stock from interface

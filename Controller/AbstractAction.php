@@ -160,7 +160,8 @@ abstract class AbstractAction extends Action
         ProductMetadataInterface $productMetadata,
         RequestApi               $requestApi,
         Api                      $api
-    ) {
+    )
+    {
         $this->moduleList = $moduleList;
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
@@ -243,7 +244,7 @@ abstract class AbstractAction extends Action
     /**
      * Prepare collection
      *
-     * @return object|null
+     * @return object|void
      * @throws FileSystemException
      */
     protected function prepareCollection()
@@ -275,14 +276,13 @@ abstract class AbstractAction extends Action
             $this->clerkLogger->error('prepareCollection ERROR', ['error' => $e->getMessage()]);
 
         }
-        return null;
     }
 
     /**
      * Dispatch request
      *
      * @param RequestInterface $request
-     * @return ResponseInterface|null
+     * @return ResponseInterface|void
      * @throws FileSystemException
      * @noinspection PhpPossiblePolymorphicInvocationInspection
      */
@@ -329,18 +329,13 @@ abstract class AbstractAction extends Action
             return parent::dispatch($request);
 
         } catch (Exception $e) {
-
             $this->clerkLogger->error('Validating API Keys ERROR', ['error' => $e->getMessage()]);
-
         }
-
-        return null;
     }
 
     /**
      * @param $key
-     * @return mixed|null
-     * @throws FileSystemException
+     * @return mixed|void
      */
     public function getRequestBodyParam($key)
     {
@@ -353,17 +348,12 @@ abstract class AbstractAction extends Action
             }
 
         } catch (Exception $e) {
-
             $this->clerkLogger->error('Getting Request Body ERROR', ['error' => $e->getMessage()]);
-
         }
-
-        return null;
     }
 
     /**
      * @return array
-     * @throws FileSystemException
      */
     private function identifyScope()
     {
@@ -400,27 +390,20 @@ abstract class AbstractAction extends Action
     /**
      * Verify public & private key
      *
-     * @return int|null
-     * @throws FileSystemException
+     * @return int|void
      */
     private function verifyWebsiteKeys()
     {
-
         try {
-
             $websiteids = $this->getWebsites();
             foreach ($websiteids as $scopeID) {
                 if ($this->timingSafeEquals($this->getPublicWebsiteKey($scopeID), $this->publicKey)) {
                     return $scopeID;
                 }
             }
-
         } catch (Exception $e) {
-
             $this->clerkLogger->error('verifyKeys ERROR', ['error' => $e->getMessage()]);
-
         }
-        return null;
     }
 
     public function getWebsites()
@@ -464,30 +447,25 @@ abstract class AbstractAction extends Action
      * Get public website key
      *
      * @param $scopeID
-     * @return string|null
-     * @throws FileSystemException
+     * @return string|void
      */
     private function getPublicWebsiteKey($scopeID)
     {
         try {
-
             return $this->scopeConfig->getValue(
                 Config::XML_PATH_PUBLIC_KEY,
                 ScopeInterface::SCOPE_WEBSITES,
                 $scopeID
             );
-
         } catch (Exception $e) {
             $this->clerkLogger->error('getPublicKey ERROR', ['error' => $e->getMessage()]);
         }
-        return null;
     }
 
     /**
      * Verify public & private key
      *
-     * @return int|null
-     * @throws FileSystemException
+     * @return int|void
      */
     private function verifyKeys()
     {
@@ -506,7 +484,6 @@ abstract class AbstractAction extends Action
             $this->clerkLogger->error('verifyKeys ERROR', ['error' => $e->getMessage()]);
 
         }
-        return null;
     }
 
     public function getStores()
@@ -515,11 +492,10 @@ abstract class AbstractAction extends Action
     }
 
     /**
-     * Get public store key
+     * Get the public store key
      *
      * @param $scopeID
-     * @return string|null
-     * @throws FileSystemException
+     * @return string|void
      */
     private function getPublicKey($scopeID)
     {
@@ -536,14 +512,12 @@ abstract class AbstractAction extends Action
             $this->clerkLogger->error('getPublicKey ERROR', ['error' => $e->getMessage()]);
 
         }
-        return null;
     }
 
     /**
      * Verify public & private key
      *
-     * @return int|null
-     * @throws FileSystemException
+     * @return int|void
      */
     private function verifyDefaultKeys()
     {
@@ -559,15 +533,13 @@ abstract class AbstractAction extends Action
 
             $this->clerkLogger->error('verifyKeys ERROR', ['error' => $e->getMessage()]);
         }
-        return null;
     }
 
     /**
-     * Get public store key
+     * Get the public store key
      *
      * @param $scopeID
-     * @return string|null
-     * @throws FileSystemException
+     * @return string|void
      */
     private function getPublicDefaultKey($scopeID)
     {
@@ -584,7 +556,6 @@ abstract class AbstractAction extends Action
             $this->clerkLogger->error('getPublicKey ERROR', ['error' => $e->getMessage()]);
 
         }
-        return null;
     }
 
     /**
@@ -660,7 +631,7 @@ abstract class AbstractAction extends Action
             $token = '';
             $auth_header = $this->requestApi->getHeader('X-Clerk-Authorization');
 
-            if (null == $auth_header && !is_string($auth_header)) {
+            if (!is_string($auth_header)) {
                 return "";
             }
 
@@ -680,12 +651,11 @@ abstract class AbstractAction extends Action
     }
 
     /**
-     * Get private store key
+     * Get the private store key
      *
      * @param string $scope
      * @param int $scope_id
-     * @return string|null
-     * @throws FileSystemException
+     * @return string|void
      */
     private function getPrivateKey($scope, $scope_id)
     {
@@ -698,16 +668,15 @@ abstract class AbstractAction extends Action
             );
 
         } catch (Exception $e) {
-
             $this->clerkLogger->error('getPrivateKey ERROR', ['error' => $e->getMessage()]);
-
         }
-        return null;
     }
 
     /**
      * Parse request arguments
-     * @throws FileSystemException
+     *
+     * @param RequestInterface $request
+     * @return void
      */
     protected function getArguments(RequestInterface $request)
     {
@@ -747,7 +716,7 @@ abstract class AbstractAction extends Action
             $this->order = $request->getParam('order') === 'desc' ? Collection::SORT_ORDER_DESC : Collection::SORT_ORDER_ASC;
 
             /**
-             * Explode fields on , and filter out "empty" entries
+             * Explode fields on ',' and filter out "empty" entries
              */
             $fields = $request->getParam('fields');
             $this->fields = $fields ? array_filter(explode(',', $fields), 'strlen') : $this->getDefaultFields();
@@ -760,9 +729,7 @@ abstract class AbstractAction extends Action
             }
 
         } catch (Exception $e) {
-
             $this->clerkLogger->error('getArguments ERROR', ['error' => $e->getMessage()]);
-
         }
     }
 
@@ -784,7 +751,6 @@ abstract class AbstractAction extends Action
      */
     protected function getFieldName($field)
     {
-
         try {
             if (isset($this->fieldMap[$field])) {
                 return $this->fieldMap[$field];

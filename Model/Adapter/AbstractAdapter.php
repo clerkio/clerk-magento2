@@ -18,50 +18,50 @@ abstract class AbstractAdapter
     public const PRODUCT_TYPE_GROUPED = 'grouped';
     public const PRODUCT_TYPE_BUNDLE = 'bundle';
     public const PRODUCT_TYPES = [
-    self::PRODUCT_TYPE_SIMPLE,
-    self::PRODUCT_TYPE_CONFIGURABLE,
-    self::PRODUCT_TYPE_GROUPED,
-    self::PRODUCT_TYPE_BUNDLE
+        self::PRODUCT_TYPE_SIMPLE,
+        self::PRODUCT_TYPE_CONFIGURABLE,
+        self::PRODUCT_TYPE_GROUPED,
+        self::PRODUCT_TYPE_BUNDLE
     ];
 
-  /**
-   * @var ScopeConfigInterface
-   */
+    /**
+     * @var ScopeConfigInterface
+     */
     protected $scopeConfig;
 
-  /**
-   * @var ClerkLogger
-   */
+    /**
+     * @var ClerkLogger
+     */
     protected $clerkLogger;
 
-  /**
-   * @var ManagerInterface
-   */
+    /**
+     * @var ManagerInterface
+     */
     protected $eventManager;
 
-  /**
-   * @var StoreManagerInterface
-   */
+    /**
+     * @var StoreManagerInterface
+     */
     protected $storeManager;
 
-  /**
-   * @var mixed
-   */
+    /**
+     * @var mixed
+     */
     protected $collectionFactory;
 
-  /**
-   * @var array
-   */
+    /**
+     * @var array
+     */
     protected $fieldMap;
 
-  /**
-   * @var array
-   */
+    /**
+     * @var array
+     */
     protected $fields = [];
 
-  /**
-   * @var array
-   */
+    /**
+     * @var array
+     */
     protected $fieldHandlers = [];
 
     /**
@@ -74,12 +74,13 @@ abstract class AbstractAdapter
      * @param ClerkLogger $clerkLogger
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        ManagerInterface $eventManager,
+        ScopeConfigInterface  $scopeConfig,
+        ManagerInterface      $eventManager,
         StoreManagerInterface $storeManager,
-        CollectionFactory $collectionFactory,
-        ClerkLogger $clerkLogger
-    ) {
+        CollectionFactory     $collectionFactory,
+        ClerkLogger           $clerkLogger
+    )
+    {
         $this->clerkLogger = $clerkLogger;
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
@@ -88,23 +89,23 @@ abstract class AbstractAdapter
         $this->addFieldHandlers();
     }
 
-  /**
-   * Add default fieldhandlers
-   */
+    /**
+     * Add default fieldhandlers
+     */
     abstract protected function addFieldHandlers();
 
-  /**
-   * Get request response
-   *
-   * @param array $fields
-   * @param int|string $page
-   * @param int|string $limit
-   * @param int|string $orderBy
-   * @param int|string $order
-   * @param string $scope
-   * @param int|string $scopeid
-   * @return array|void
-   */
+    /**
+     * Get request response
+     *
+     * @param array $fields
+     * @param int|string $page
+     * @param int|string $limit
+     * @param int|string $orderBy
+     * @param int|string $order
+     * @param string $scope
+     * @param int|string $scopeid
+     * @return array|void
+     */
     public function getResponse($fields, $page, $limit, $orderBy, $order, $scope, $scopeid)
     {
         try {
@@ -201,17 +202,10 @@ abstract class AbstractAdapter
                 $info['on_sale'] = $info['price'] < $info['list_price'];
             }
 
-          // Fix for bundle products not reliably having implicit tax.
-            if (isset($info['tax_rate']) && $info['product_type'] == self::PRODUCT_TYPE_BUNDLE) {
-                if ($info['price'] === $info['price_excl_tax']) {
-                    $info['price_excl_tax'] = $info['price'] / (1 + ($info['tax_rate'] / 100) );
-                }
-                if ($info['list_price'] === $info['list_price_excl_tax']) {
-                    $info['list_price_excl_tax'] = $info['list_price'] / (1 + ($info['tax_rate'] / 100) );
-                }
-            }
+            // Fix for bundle products not reliably having implicit tax.
+            $info = $this->fixForBundleProductsNotReliablyHavingImplicitTax($info);
 
-          // Fix for including a list of Bundle Products child skus.
+            // Fix for including a list of Bundle Products child skus.
             if ($resource_item_type_id == self::PRODUCT_TYPE_BUNDLE) {
                 $bundle_skus = [];
                 $selections = $resourceItem->getTypeInstance(true)->getSelectionsCollection(
@@ -233,12 +227,12 @@ abstract class AbstractAdapter
             $this->clerkLogger->error('Getting Response ERROR', ['error' => $e->getMessage()]);
         }
     }
-    
-  /**
-   * Get list of fields
-   *
-   * @return array
-   */
+
+    /**
+     * Get an array of fields
+     *
+     * @return array
+     */
     public function getFields()
     {
         return $this->fields;
@@ -256,12 +250,12 @@ abstract class AbstractAdapter
         $this->fields = array_merge(['entity_id'], $this->getDefaultFields($scope, $scopeid), (array)$fields);
     }
 
-  /**
-   * Get mapped field name
-   *
-   * @param string $field
-   * @return mixed
-   */
+    /**
+     * Get mapped field name
+     *
+     * @param string $field
+     * @return mixed
+     */
     protected function getFieldName($field)
     {
         if (isset($this->fieldMap[$field])) {
@@ -271,25 +265,25 @@ abstract class AbstractAdapter
         return $field;
     }
 
-  /**
-   * Get attribute value
-   *
-   * @param object $resourceItem
-   * @param string $field
-   * @return mixed
-   */
+    /**
+     * Get attribute value
+     *
+     * @param object $resourceItem
+     * @param string $field
+     * @return mixed
+     */
     protected function getAttributeValue($resourceItem, $field)
     {
         return $resourceItem[$field];
     }
 
-  /**
-   * Get attribute value for product by simulating resource
-   *
-   * @param object $resourceItem
-   * @param string $field
-   * @return mixed|void
-   */
+    /**
+     * Get attribute value for product by simulating resource
+     *
+     * @param object $resourceItem
+     * @param string $field
+     * @return mixed|void
+     */
     public function getAttributeValueHeavy($resourceItem, $field)
     {
         try {
@@ -322,7 +316,7 @@ abstract class AbstractAdapter
     public function getChildAttributes($related_products, $export_data, $field, $emulate_deactivated)
     {
         $child_attribute_values = [];
-        $entity_field = 'entity_'.$field;
+        $entity_field = 'entity_' . $field;
         if (empty($related_products)) {
             return $export_data;
         }
@@ -339,7 +333,7 @@ abstract class AbstractAdapter
                 }
             }
         }
-        $attribute_key = 'child_'.$this->getFieldName($field).'s';
+        $attribute_key = 'child_' . $this->getFieldName($field) . 's';
         if (!empty($child_attribute_values) && !array_key_exists($attribute_key, $export_data)) {
             $child_attribute_values = $this->flattenArray($child_attribute_values);
             $export_data[$attribute_key] = $child_attribute_values;
@@ -348,16 +342,16 @@ abstract class AbstractAdapter
         return $export_data;
     }
 
-  /**
-   * Flatten array
-   *
-   * @param array $array
-   * @return array $array
-   */
+    /**
+     * Flatten array
+     *
+     * @param array $array
+     * @return array $array
+     */
     public function flattenArray($array)
     {
         if (is_object($array)) {
-            $array = (array) $array;
+            $array = (array)$array;
         }
         if (!is_array($array)) {
             return $array;
@@ -369,33 +363,50 @@ abstract class AbstractAdapter
         return $return;
     }
 
-  /**
-   * Add field to get
-   *
-   * @param string $field
-   */
+    /**
+     * @param array $info
+     * @return array
+     */
+    public function fixForBundleProductsNotReliablyHavingImplicitTax(array $info): array
+    {
+        if (isset($info['tax_rate']) && $info['product_type'] == self::PRODUCT_TYPE_BUNDLE) {
+            if ($info['price'] === $info['price_excl_tax']) {
+                $info['price_excl_tax'] = $info['price'] / (1 + ($info['tax_rate'] / 100));
+            }
+            if ($info['list_price'] === $info['list_price_excl_tax']) {
+                $info['list_price_excl_tax'] = $info['list_price'] / (1 + ($info['tax_rate'] / 100));
+            }
+        }
+        return $info;
+    }
+
+    /**
+     * Add field to get
+     *
+     * @param string $field
+     */
     public function addField($field)
     {
         $this->fields[] = $field;
     }
 
-  /**
-   * Add fieldhandler
-   *
-   * @param string $field
-   * @param callable $handler
-   */
+    /**
+     * Add fieldhandler
+     *
+     * @param string $field
+     * @param callable $handler
+     */
     public function addFieldHandler($field, callable $handler)
     {
         $this->fieldHandlers[$field] = $handler;
     }
 
-  /**
-   * Get default fields
-   *
-   * @param string $scope
-   * @param int|string $scopeid
-   * @return array
-   */
+    /**
+     * Get default fields
+     *
+     * @param string $scope
+     * @param int|string $scopeid
+     * @return array
+     */
     abstract protected function getDefaultFields($scope, $scopeid);
 }

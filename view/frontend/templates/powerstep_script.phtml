@@ -1,49 +1,41 @@
 <?php
-/** @var \Clerk\Clerk\Block\PowerstepScripts $block */
+/** @var PowerstepScripts $block */
+
+use Clerk\Clerk\Block\PowerstepScripts;
+
 if ($block->shouldShow()):
     ?>
-<script>
-require(['jquery', 'mage/url'], function($, urlBuilder) {
-    function getPowerstepPopup(isAjax)
-    {
-        $("#clerk_powerstep").remove();
-        $("#clerk_powerstep .clerk-slider").remove();
-        var data = isAjax ? { isAjax: true } : {};
-        $.ajax({
-            url: urlBuilder.build('clerk/powerstep/popup'),
-            data: data,
-            type: 'get',
-            success: function(res) {
-                if (res.length > 0) {
-                    $('body').append(res);
-                    Clerk('ui', 'popup', '.clerk-popup', 'show');
-                    Clerk("content",".clerk_powerstep_templates > span");
+    <script>
+        require(['jquery', 'mage/url'], function ($, urlBuilder) {
+            function getPowerstepPopup(isAjax) {
+                $("#clerk_powerstep").remove();
+                $("#clerk_powerstep .clerk-slider").remove();
+                var data = isAjax ? {isAjax: true} : {};
+                $.ajax({
+                    url: urlBuilder.build('clerk/powerstep/popup'),
+                    data: data,
+                    type: 'get',
+                    success: function (res) {
+                        if (res.length > 0) {
+                            $('body').append(res);
+                            Clerk('ui', 'popup', '.clerk-popup', 'show');
+                            Clerk("content", ".clerk_powerstep_templates > span");
 
-                }
+                        }
+                    }
+                });
             }
+
+            $(document).on('ajax:addToCart', function (e) {
+                getPowerstepPopup(true);
+            });
+
+            $(document).ready(function () {
+                let product_added_with_reload = (document.querySelectorAll('[data-ui-id="message-success"]').length > 0);
+                if (product_added_with_reload) {
+                    getPowerstepPopup();
+                }
+            });
         });
-    }
-
-    $(document).on('ajax:addToCart', function(e) {
-        getPowerstepPopup(true);
-    });
-    
-    $(document).ready(function() {
-        let product_added_with_reload = (document.querySelectorAll('[data-ui-id="message-success"]').length > 0) ? true : false;
-        if(product_added_with_reload){
-            getPowerstepPopup();
-        }
-    });
-
-    /*
-    $(document).ready(function() {
-        let invoke_powerstep = ''; // Build PHP Function that checks checkoutsession for showpowertep
-        if(invoke_powerstep){
-            getPowerstepPopup(true);
-        }
-
-    });
-    */
-});
-</script>
+    </script>
 <?php endif; ?>

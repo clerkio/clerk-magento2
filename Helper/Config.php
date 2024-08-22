@@ -22,13 +22,14 @@ class Config
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Context              $context
-    ) {
+    )
+    {
         $this->scopeConfig = $scopeConfig;
         $this->context = $context;
     }
 
     /**
-     * Get config flag in frontend context
+     * Get a config flag in frontend context
      *
      * @param string $key
      * @return bool

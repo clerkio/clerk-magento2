@@ -119,6 +119,7 @@ class Index extends AbstractAction
     {
         try {
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $post = $this->getRequest()->getcontent();
             $scope = $this->getRequest()->getParam('scope');
             if ($scope !== 'default') {
@@ -155,6 +156,7 @@ class Index extends AbstractAction
             }
 
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Content-Type', 'application/json', true);

@@ -1,10 +1,14 @@
 <?php
-/** @var \Clerk\Clerk\Block\Powerstep $block */
+/** @var Powerstep $block */
+
+use Clerk\Clerk\Block\Powerstep;
+
 ?>
 <div class="powerstep-success">
     <div class="powerstep-product">
-        <img src="<?php echo $block->getImageUrl(); ?>">
-            <?php echo __('You added %1 to your shopping cart.', $block->escapeHtml($block->getProduct()->getName())); ?>
+        <img src="<?php echo $block->getImageUrl(); ?>"
+             alt="<?php echo $block->escapeHtml($block->getProduct()->getName()); ?>">
+        <?php echo __('You added %1 to your shopping cart.', $block->escapeHtml($block->getProduct()->getName())); ?>
     </div>
     <div class="powerstep-actions">
         <button class="action"
@@ -20,7 +24,7 @@
     </div>
 </div>
 <div class="powerstep-templates">
-<?php
+    <?php
     $filter_duplicates = $block->getExcludeState();
     $slider_count = 0;
     $spanAttributes = [];
@@ -28,34 +32,34 @@
     $spanAttributes['products'] = $block->getProduct()->getId();
     $spanAttributes['category'] = $block->getProduct()->getCategoryId();
 
-foreach ($block->getTemplates() as $template):
-    if ($filter_duplicates) {
-        $spanAttributes['class'] = 'clerk clerk_' . (string)$slider_count;
-    }
-    if ($slider_count > 0 && $filter_duplicates) {
-        $filter_string = '';
-        for ($i = 0; $i < $slider_count; $i++) {
-            if ($i > 0) {
-                $filter_string .= ', ';
-            }
-            $filter_string .= '.clerk_'.(string)$i;
+    foreach ($block->getTemplates() as $template):
+        if ($filter_duplicates) {
+            $spanAttributes['class'] = 'clerk clerk_' . (string)$slider_count;
         }
-        $spanAttributes['exclude'] = $filter_string;
-    }
-    ?>
-    <span
-        class="<?php echo $spanAttributes['class']; ?>"
+        if ($slider_count > 0 && $filter_duplicates) {
+            $filter_string = '';
+            for ($i = 0; $i < $slider_count; $i++) {
+                if ($i > 0) {
+                    $filter_string .= ', ';
+                }
+                $filter_string .= '.clerk_' . (string)$i;
+            }
+            $spanAttributes['exclude'] = $filter_string;
+        }
+        ?>
+        <span
+                class="<?php echo $spanAttributes['class']; ?>"
     <?php
     if ($slider_count > 0 && $filter_duplicates) {
-        echo 'data-exclude-from="'.$spanAttributes['exclude'].'"';
+        echo 'data-exclude-from="' . $spanAttributes['exclude'] . '"';
     }
     ?>
         data-template="@<?php echo str_replace(' ', '', $template); ?>"
-        data-products="[<?php echo $spanAttributes['products']; ?>]"
-        data-category="<?php echo $spanAttributes['category']; ?>"
-    ></span>
-    <?php
-    $slider_count++;
+                data-products="[<?php echo $spanAttributes['products']; ?>]"
+                data-category="<?php echo $spanAttributes['category']; ?>"
+        ></span>
+        <?php
+        $slider_count++;
     endforeach;
-?>
+    ?>
 </div>

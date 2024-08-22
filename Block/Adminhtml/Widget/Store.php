@@ -31,11 +31,12 @@ class Store extends Widget
      * @param array $data
      */
     public function __construct(
-        Context $context,
-        ArrayPool $sourceModelPool,
+        Context    $context,
+        ArrayPool  $sourceModelPool,
         FormSelect $formSelect,
-        array $data = []
-    ) {
+        array      $data = []
+    )
+    {
         parent::__construct($context, $data);
         $this->_sourceModelPool = $sourceModelPool;
         $this->_formSelect = $formSelect;
@@ -59,9 +60,11 @@ class Store extends Widget
         //Since we're using block as widget parameter type we need to create the select ourselves
         $select = $this->_formSelect;
         $select->setHtmlId($element->getHtmlId());
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $select->setName($element->getName());
         $configuredValue = $element->getData();
         if ($configuredValue !== null) {
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $select->setValue($element->getData());
         }
         $select->setValues($this->_sourceModelPool->get('Magento\Config\Model\Config\Source\Store')->toOptionArray());

@@ -9,13 +9,13 @@ require(
 
         $('#clerk_log_level').focus(function () {
 
-            before_logging_level = $('#clerk_log_level').val();
+            let before_logging_level = $('#clerk_log_level').val();
 
         }).change(function () {
 
-            log_level = $(this).val();
+            let log_level = $(this).val();
 
-            if (log_level == 'all') {
+            if (log_level === 'all') {
 
                 confirmation({
                     title: $.mage.__('Changing Logging Level'),
@@ -44,8 +44,7 @@ require(
                     }]
                 });
 
-            }
-            else {
+            } else {
 
                 before_logging_level = $('#clerk_log_level').val();
 
