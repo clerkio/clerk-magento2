@@ -69,6 +69,9 @@ class Content extends Template implements BlockInterface
         }
 
         $output = '';
+        if(empty($contents)){
+            return $output;
+        }
         foreach ($contents as $content) {
             $output .= $this->getHtmlForContent(str_replace(' ', '', $content));
         }
