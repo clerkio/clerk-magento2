@@ -58,9 +58,12 @@ class Index extends AbstractAction
      * Version controller constructor.
      *
      * @param Context $context
-     * @param ScopeConfigInterface $scopeConfig
+     * @param ScopeConfigInterface $ScopeConfigInterface
      * @param LoggerInterface $logger
      * @param ModuleList $moduleList
+     * @param StoreManagerInterface $storeManager
+     * @param ClerkLogger $clerk_logger
+     * @param WriterInterface $configWriter
      * @param ProductMetadataInterface $product_metadata
      * @param CacheType $cacheType
      * @param RequestApi $request_api
@@ -117,7 +120,7 @@ class Index extends AbstractAction
                 $count = 0;
                 foreach ($arr_settings as $key => $value) {
 
-                    // generel
+                    // general
 
                     if ($key == "LANGUAGE") {
                         $this->config_writer->save(Config::XML_PATH_LANGUAGE, $value, $scope, $scopeId);
@@ -373,12 +376,12 @@ class Index extends AbstractAction
                         $count++;
                     }
 
-                } // foreach
+                }
 
                 if ($count != 0) {
                     $this->_cacheType->cleanType('config');
                 }
-            } // if post
+            }
 
 
             /** @noinspection PhpPossiblePolymorphicInvocationInspection */
