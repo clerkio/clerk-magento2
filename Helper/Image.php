@@ -3,11 +3,15 @@
 namespace Clerk\Clerk\Helper;
 
 use Clerk\Clerk\Model\Config;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\UrlInterface;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Image
 {
@@ -36,11 +40,12 @@ class Image
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        ImageFactory $helperFactory,
-        ScopeConfigInterface $scopeConfig,
+        ImageFactory          $helperFactory,
+        ScopeConfigInterface  $scopeConfig,
         StoreManagerInterface $storeManager,
-        \Magento\Framework\App\RequestInterface $requestInterface
-    ) {
+        RequestInterface      $requestInterface
+    )
+    {
         $this->helperFactory = $helperFactory;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -50,10 +55,11 @@ class Image
     /**
      * Builds product image URL
      *
-     * @param Product $item
+     * @param Product|ProductInterface $item
      * @return string
+     * @throws NoSuchEntityException
      */
-    public function getUrl(Product $item)
+    public function getUrl($item, $scopeId = null)
     {
         $imageUrl = null;
 
@@ -65,16 +71,14 @@ class Image
         if ($imageType) {
             $imageUrl = $helper->getUrl();
             if ($imageUrl == $helper->getDefaultPlaceholderUrl()) {
-                // allow to try other types
+                // allow trying other types
                 $imageUrl = null;
             }
         }
 
-        if (!$imageUrl) {
-            $_params = $this->requestInterface->getParams();
-            if (array_key_exists('scope_id', $_params)){
-                $storeId = $_params['scope_id'];
-                $store = $this->storeManager->getStore($storeId);
+        if (!$imageUrl || $scopeId) {
+            if ($scopeId) {
+                $store = $this->storeManager->getStore($scopeId);
             } else {
                 $store = $this->storeManager->getStore();
             }
@@ -83,7 +87,7 @@ class Image
             if ($itemImage === 'no_selection' || !$itemImage) {
                 $imageUrl = $helper->getDefaultPlaceholderUrl('small_image');
             } else {
-                $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
+                $imageUrl = $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $itemImage;
             }
         }
 
