@@ -114,6 +114,8 @@ class Index extends AbstractAction
             }
             $scopeId = intval($this->getRequest()->getParam('scope_id'));
 
+            $arr_settings = [];
+
             if ($post) {
                 $arr_settings = json_decode($post, true);
 

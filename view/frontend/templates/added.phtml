@@ -47,16 +47,15 @@ use Clerk\Clerk\Block\Powerstep;
             $spanAttributes['exclude'] = $filter_string;
         }
         ?>
-        <span
-                class="<?php echo $spanAttributes['class']; ?>"
+        <span class="<?php echo $spanAttributes['class']; ?>"
     <?php
     if ($slider_count > 0 && $filter_duplicates) {
         echo 'data-exclude-from="' . $spanAttributes['exclude'] . '"';
     }
     ?>
         data-template="@<?php echo str_replace(' ', '', $template); ?>"
-                data-products="[<?php echo $spanAttributes['products']; ?>]"
-                data-category="<?php echo $spanAttributes['category']; ?>"
+              data-products="[<?php echo $spanAttributes['products']; ?>]"
+              data-category="<?php echo $spanAttributes['category']; ?>"
         ></span>
         <?php
         $slider_count++;
