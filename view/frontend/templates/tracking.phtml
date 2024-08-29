@@ -105,6 +105,15 @@ if (!empty($block->getPublicKey())):
                             localStorage.setItem("clerk_productids", clerk_productids);
                         }
                     }
+
+                    if (this.responseURL.includes("/cart/add/")) {
+                        if (this.readyState === 4 && this.status === 200) {
+                            const urlParts = this.responseURL.split('/');
+                            const product_id = urlParts[urlParts.length - 2];
+                            Clerk('basket', 'add', product_id);
+                        }
+                    }
+
                 }, false);
                 open.apply(this, arguments);
             };
