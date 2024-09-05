@@ -309,7 +309,7 @@ class Product extends AbstractAdapter
             });
 
             $this->addFieldhandler('visibility', function ($item) {
-                return $item->getattributetext('visibility');
+                return $item->getAttributetext('visibility');
             });
 
             $this->addFieldHandler('tax_rate', function ($item) {
