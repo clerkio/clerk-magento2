@@ -161,6 +161,7 @@ class Result extends BaseResult
             'data-target' => '#' . $this->getTargetId(),
             'data-offset' => 0,
             'data-after-render' => '_clerk_after_load_event',
+            'data-facets-in-url' => true
         ];
 
         if ($this->shouldIncludeCategories()) {
