@@ -174,55 +174,81 @@ abstract class AbstractAdapter
 
 
 
+        // WARN: SPECIAL HANDLING FOR CONFIGURABLE PRODUCTS AND THEIR CHILDREN
         if ($resourceItemTypeId === self::PRODUCT_TYPE_CONFIGURABLE) {
           $usedProductsAttributeValues = array();
           $entityField = 'entity_'.$field;
           $usedProducts = $resourceItemTypeInstance->getUsedProducts($resourceItem);
+
           if ( ! empty($usedProducts) ){
             foreach ($usedProducts as $usedProduct) {
+
+              // INFO: Here is simply checks if the field or `entity_`+field exists in the product object
+              // then adds it to the array of used product attributes
               if (isset($usedProduct[$field])) {
                 $usedProductsAttributeValues[] = $this->getAttributeValue($usedProduct, $field);
               } elseif (isset($usedProduct[$entityField])) {
                 $usedProductsAttributeValues[] = $this->getAttributeValue($usedProduct, $entityField);
               }
+
+              // INFO: If the attribute list is empty, and SEARCH_NON_INDEXED_ATTRIBUTES is on, then it tries to look up the value
+              // in a less performant way. If the lookup return a non null value it appends it to the list.
               if(empty($usedProductsAttributeValues) && $heavyAttributeQuery) {
-                $attributeValue = $this->getAttributeValueHeavy($usedProduct, $field);
+                $attributeValue = $this->getAttributeValueHeavy($usedProduct, $field, true);
+                // INFO: This means this attribute list can be of smaller length than the number of children.
                 if(isset($attributeValue)){
                   $usedProductsAttributeValues[] = $attributeValue;
                 }
               }
+
             }
           }
-          if ( ! empty($usedProductsAttributeValues) && !array_key_exists('child_'.$this->getFieldName($field).'s', $info) ) {
+
+          // WARN: HERE SOME ATTRIBUTES WITH child_ prefix, have a lower count than the number of child skus
+          if ( ! empty($usedProductsAttributeValues) && !array_key_exists('child_'.$this->getFieldName($field).'s_c', $info) ) {
+            $rawUsedProductsAttributeValues = $usedProductsAttributeValues;
             $usedProductsAttributeValues = is_array($usedProductsAttributeValues) ? $this->flattenArray($usedProductsAttributeValues) : $usedProductsAttributeValues;
-            $info["child_".$this->getFieldName($field)."s"] = $usedProductsAttributeValues;
+            $info["child_".$this->getFieldName($field)."s_c"] = $usedProductsAttributeValues;
+            $info["child_".$this->getFieldName($field)."s_c_nf"] = $rawUsedProductsAttributeValues;
           }
+
         }
 
+        // WARN: SPECIAL HANDLING FOR GROUPED PRODUCTS AND THEIR CHILDREN
         if ($resourceItemTypeId === self::PRODUCT_TYPE_GROUPED) {
           $associatedProductsAttributeValues = array();
           $entityField = 'entity_'.$field;
           $associatedProducts = $resourceItemTypeInstance->getAssociatedProducts($resourceItem);
           if ( ! empty($associatedProducts) ) {
             foreach ($associatedProducts as $associatedProduct) {
+
+              // INFO: Here is simply checks if the field or `entity_`+field exists in the product object
+              // then adds it to the array of used product attributes
               if (isset($associatedProduct[$field])) {
                 $associatedProductsAttributeValues[] = $this->getAttributeValue($associatedProduct, $field);
               } elseif (isset($associatedProduct[$entityField])) {
                 $associatedProductsAttributeValues[] = $this->getAttributeValue($associatedProduct, $entityField);
               }
+
+              // INFO: If the attribute list is empty, and SEARCH_NON_INDEXED_ATTRIBUTES is on, then it tries to look up the value
+              // in a less performant way. If the lookup return a non null value it appends it to the list.
               if(empty($associatedProductsAttributeValues) && $heavyAttributeQuery) {
-                $attributeValue = $this->getAttributeValueHeavy($associatedProduct, $field);
+                $attributeValue = $this->getAttributeValueHeavy($associatedProduct, $field, true);
+                // INFO: This means this attribute list can be of smaller length than the number of children.
                 if(isset($attributeValue)){
                   $associatedProductsAttributeValues[] = $attributeValue;
                 }
-
               }
+
             }
           }
 
-          if ( ! empty($associatedProductsAttributeValues) && !array_key_exists('child_'.$this->getFieldName($field).'s', $info)) {
+          // WARN: HERE SOME ATTRIBUTES WITH child_ prefix, have a lower count than the number of child skus
+          if ( ! empty($associatedProductsAttributeValues) && !array_key_exists('child_'.$this->getFieldName($field).'s_a', $info)) {
+            $rawAssociatedProductsAttributeValues = $associatedProductsAttributeValues;
             $associatedProductsAttributeValues = is_array($associatedProductsAttributeValues) ? $this->flattenArray($associatedProductsAttributeValues) : $associatedProductsAttributeValues;
-            $info["child_".$this->getFieldName($field)."s"] = $associatedProductsAttributeValues;
+            $info["child_".$this->getFieldName($field)."s_a"] = $associatedProductsAttributeValues;
+            $info["child_".$this->getFieldName($field)."s_a_nf"] = $rawAssociatedProductsAttributeValues;
           }
 
         }
@@ -255,6 +281,10 @@ abstract class AbstractAdapter
         }
         $info['bundle_skus'] = $bundle_skus;
       }
+
+      // WARN: IF YOU WANT TO ADD ANY STATIC VALUE TO PRODUCT OBJECT
+      // YOU CAN DO IT HERE BEFORE RETURN
+      $info["debug_response"] = "IS DEBUG ATTRIBUTE";
 
       return $info;
     } catch (\Exception $e) {
@@ -354,7 +384,7 @@ abstract class AbstractAdapter
    * @param $field
    * @return mixed
    */
-  public function getAttributeValueHeavy($resourceItem, $field)
+  public function getAttributeValueHeavy($resourceItem, $field, $return_as_object = false)
   {
     try {
 
@@ -363,9 +393,23 @@ abstract class AbstractAdapter
       if(in_array($resourceItem->getTypeId(), self::PRODUCT_TYPES)){
         $attributeResource->load($resourceItem, $resourceItem->getId(), [$field]);
 
-        $customAttribute = $resourceItem->getCustomAttribute($field);
-        if($customAttribute){
-          return $customAttribute->getValue();
+        // INFO: If flag not given, we attempt to return the actual value for the customAttribute
+        // as specified by the M2 resource access pattern
+        // https://magento.stackexchange.com/questions/170512/magento-2-getcustomattribute-returning-object-insted-of-value
+        if(!$return_as_object){
+          $customAttribute = $resourceItem->getCustomAttribute($field);
+          if($customAttribute){
+            return $customAttribute->getValue();
+          }
+        } else {
+          // INFO: IF customAttribute is not null, we return the object as an array dump
+          // which cenveniently can be JSON serialized
+          $customAttribute = $resourceItem->getCustomAttribute($field);
+          if(!$customAttribute){
+            return $customAttribute;
+          } else {
+            return (array) $customAttribute;
+          }
         }
       }
 
