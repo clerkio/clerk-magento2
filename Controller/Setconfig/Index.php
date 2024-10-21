@@ -221,6 +221,10 @@ class Index extends AbstractAction
                         $this->config_writer->save(Config::XML_PATH_FACETED_SEARCH_ENABLED, $value, $scope, $scopeId);
                         $count++;
                     }
+                    if ($key == "FACETS_IN_URL") {
+                        $this->config_writer->save(Config::XML_PATH_FACETS_IN_URL, $value, $scope, $scopeId);
+                        $count++;
+                    }
                     if ($key == "FACETED_SEARCH_DESIGN") {
                         $this->config_writer->save(Config::XML_PATH_FACETED_SEARCH_DESIGN, $value, $scope, $scopeId);
                         $count++;
