@@ -163,7 +163,7 @@ class Result extends BaseResult
             'data-after-render' => '_clerk_after_load_event',
         ];
         if($this->_scopeConfig->isSetFlag(Config::XML_PATH_FACETS_IN_URL, $scope, $scope_id)){
-            $spanAttributes['data-facets-in-url'] = true;
+            $spanAttributes['data-facets-in-url'] = "true";
         }
 
         if ($this->shouldIncludeCategories()) {
