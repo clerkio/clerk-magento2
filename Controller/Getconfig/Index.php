@@ -127,6 +127,7 @@ class Index extends AbstractAction
                 'SEARCH_LOAD_MORE_TEXT' => $this->scopeConfig->getValue(Config::XML_PATH_SEARCH_LOAD_MORE_TEXT, $scope, $scopeID),
 
                 'FACETED_SEARCH_ENABLED' => $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ENABLED, $scope, $scopeID),
+                'FACETS_IN_URL' => $this->scopeConfig->getValue(Config::XML_PATH_FACETS_IN_URL, $scope, $scopeID),
                 'FACETED_SEARCH_DESIGN' => $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_DESIGN, $scope, $scopeID),
                 'FACETED_SEARCH_ATTRIBUTES' => $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_ATTRIBUTES, $scope, $scopeID),
                 'FACETED_SEARCH_MULTISELECT_ATTRIBUTES' => $this->scopeConfig->getValue(Config::XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES, $scope, $scopeID),

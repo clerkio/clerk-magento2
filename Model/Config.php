@@ -51,6 +51,7 @@ class Config
      * Faceted Search configuration
      */
     const XML_PATH_FACETED_SEARCH_ENABLED = 'clerk/faceted_search/enabled';
+    const XML_PATH_FACETS_IN_URL = 'clerk/faceted_search/facets_in_url';
     const XML_PATH_FACETED_SEARCH_DESIGN = 'clerk/faceted_search/design';
     const XML_PATH_FACETED_SEARCH_ATTRIBUTES = 'clerk/faceted_search/attributes';
     const XML_PATH_FACETED_SEARCH_MULTISELECT_ATTRIBUTES = 'clerk/faceted_search/multiselect_attributes';
