@@ -8,12 +8,12 @@ namespace Clerk\Clerk\Block;
 use Clerk\Clerk\Model\Config;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Customer\Model\Session;
-use Magento\Directory\Model\Currency;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Locale\CurrencyInterface;
 
 class Tracking extends Template
 {
@@ -26,19 +26,21 @@ class Tracking extends Template
 
     protected $_customerSession;
 
+    protected $_localeCurrency;
+
     public function __construct(
         Context               $context,
         FormKey               $formKey,
-        Currency              $_currency,
         StoreManagerInterface $_storeManager,
-        Session               $_customerSession
+        Session               $_customerSession,
+        CurrencyInterface     $_localeCurrency
     )
     {
         parent::__construct($context);
         $this->formKey = $formKey;
-        $this->_currency = $_currency;
         $this->_storeManager = $_storeManager;
         $this->_customerSession = $_customerSession;
+        $this->_localeCurrency = $_localeCurrency;
     }
 
 
@@ -198,7 +200,8 @@ class Tracking extends Template
      * If base currency is not allowed in current website config scope,
      * then it can be disabled with $skipBaseNotAllowed
      *
-     * @param bool $skipBaseNotAllowed
+     * @param bool $skipBaseNotAllowed Skip base currencies
+     *
      * @return array
      */
     public function getAvailableCurrencyCodes($skipBaseNotAllowed = false)
@@ -223,14 +226,34 @@ class Tracking extends Template
      */
     public function getCurrentCurrencySymbol()
     {
-        return $this->_currency->getCurrencySymbol();
+        return $this->_localeCurrency->getCurrency($this->getCurrentCurrencyCode())->getSymbol();
     }
 
+    /**
+     * Get all currency symbols as a map
+     *
+     * @return array
+     */
+    public function getAllCurrencySymbols()
+    {
+        $currency_codes = $this->getAllowedCurrencies();
+        $currency_symbols_array = array();
+        foreach ($currency_codes as $code) {
+            $currency_symbols_array[$code] = $this->_localeCurrency->getCurrency($code)->getSymbol();
+        }
+        return $currency_symbols_array;
+    }
+
+    /**
+     * Get all currency rates as a map
+     *
+     * @return array
+     */
     public function getAllCurrencyRates()
     {
         $currency_codes = $this->getAllowedCurrencies();
         $currency_rates_array = array();
-        foreach ($currency_codes as $key => $code) {
+        foreach ($currency_codes as $code) {
             $currency_rates_array[$code] = $this->getCurrencyRateFromIso($code);
         }
         return $currency_rates_array;

@@ -47,6 +47,13 @@ if (!empty($block->getPublicKey())):
                         return price * ex_rates[currency_iso];
                     }
                     return price;
+                },
+                currency_symbol_from_iso: function (symbol, iso) {
+                    const ex_symbols = JSON.parse('<?php echo json_encode($block->getAllCurrencySymbols()); ?>');
+                    if (ex_symbols[currency_iso] !== undefined) {
+                        return ex_symbols[currency_iso];
+                    }
+                    return symbol;
                 }
             }
         });
