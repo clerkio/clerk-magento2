@@ -53,15 +53,23 @@ class ProductDeleteAfterDoneObserver implements ObserverInterface
             $scope_id = $_params[$scope];
         }
         $product = $observer->getEvent()->getProduct();
-        if($product && $product->getId()){
-            if($scope_id == 0){
+
+        if($product && $product->getId())
+        {
+            if($scope_id == 0)
+            {
                 $store_ids_prod = $product->getStoreIds();
+                if (empty($store_ids_prod)) {
+                $store_ids_prod = [$product->getStoreId()];
+                }
                 foreach ($store_ids_prod as $store_id) {
                     if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, 'store', $store_id)) {
-                        $this->api->removeProduct($product->getId(), $scope_id);
+                        $this->api->removeProduct($product->getId(), $store_id);
                     }
                 }
-            } else {
+            }
+            else 
+            {
                 if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, $scope, $scope_id)) {
                     $this->api->removeProduct($product->getId(), $scope_id);
                 }

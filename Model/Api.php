@@ -134,7 +134,7 @@ class Api
         try {
 
             $params = [
-                'products' => [$productId],
+                'products' => json_encode([(string) $productId]),
             ];
 
             $this->get('product/remove', $params, $store_id);
