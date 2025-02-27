@@ -14,6 +14,8 @@ use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Locale\CurrencyInterface;
+use Magento\Framework\Url\EncoderInterface;
+use Magento\Framework\UrlInterface;
 
 class Tracking extends Template
 {
@@ -28,12 +30,20 @@ class Tracking extends Template
 
     protected $_localeCurrency;
 
+    protected $urlEncoder;
+
+    protected $urlBuilder;
+
     public function __construct(
         Context               $context,
         FormKey               $formKey,
         StoreManagerInterface $_storeManager,
         Session               $_customerSession,
-        CurrencyInterface     $_localeCurrency
+        CurrencyInterface     $_localeCurrency,
+        Template\Context      $context,
+        EncoderInterface      $urlEncoder,
+        UrlInterface          $urlBuilder,
+        array $data = []
     )
     {
         parent::__construct($context);
@@ -41,6 +51,9 @@ class Tracking extends Template
         $this->_storeManager = $_storeManager;
         $this->_customerSession = $_customerSession;
         $this->_localeCurrency = $_localeCurrency;
+        $this->urlEncoder = $urlEncoder;
+        $this->urlBuilder = $urlBuilder;
+        parent::__construct($context, $data);
     }
 
 
@@ -154,6 +167,12 @@ class Tracking extends Template
             $collectBaskets = "true";
         }
         return $collectBaskets;
+    }
+
+    public function getEncodedUrl()
+    {
+      $currentUrl = $this->urlBuilder->getCurrentUrl();
+      return $this->urlEncoder->encode($currentUrl);
     }
 
     public function getFormKey()
