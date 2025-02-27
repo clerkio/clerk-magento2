@@ -179,7 +179,12 @@ class ProductSaveAfterObserver implements ObserverInterface
         $this->emulation->startEnvironmentEmulation($storeId);
         if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_REAL_TIME_ENABLED, ScopeInterface::SCOPE_STORE, $storeId)) {
             if ($product->getId()) {
-
+                
+                // check product status, remove if disabled in magento
+                if ($product->getStatus() == \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_DISABLED) {
+                    $response = $this->api->removeProduct($product->getId(), $storeId);
+                    return;
+                }
                 //Cancel if product visibility is not as defined
                 if ('any' != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
                     if ($product->getVisibility() != $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY, ScopeInterface::SCOPE_STORE, $storeId)) {
