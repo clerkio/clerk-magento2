@@ -51,7 +51,7 @@ class Tracking extends Template
         try {
             $customerData = $this->_customerSession->getCustomer();
             $email = $customerData->getEmail();
-        } catch (Exception) {
+        } catch (Exception $e) {
         }
         return $email;
     }
