@@ -40,20 +40,18 @@ class Tracking extends Template
         StoreManagerInterface $_storeManager,
         Session               $_customerSession,
         CurrencyInterface     $_localeCurrency,
-        Template\Context      $context,
         EncoderInterface      $urlEncoder,
         UrlInterface          $urlBuilder,
         array $data = []
     )
     {
-        parent::__construct($context);
+        parent::__construct($context, $data);
         $this->formKey = $formKey;
         $this->_storeManager = $_storeManager;
         $this->_customerSession = $_customerSession;
         $this->_localeCurrency = $_localeCurrency;
         $this->urlEncoder = $urlEncoder;
         $this->urlBuilder = $urlBuilder;
-        parent::__construct($context, $data);
     }
 
 
