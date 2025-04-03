@@ -301,7 +301,7 @@ class Tracking extends Template
 
     public function getClerkJSLink()
     {
-        $storeName = $this->getStoreNameSlug() ?? 'clerk';
+        $storeName = ($this->getStoreNameSlug() !== null) ? $this->getStoreNameSlug() : 'clerk';
         return '://custom.clerk.io/' . $storeName . '.js';
     }
 

@@ -874,7 +874,8 @@ class Product extends AbstractAdapter
     protected function getProductStockStateQty($product)
     {
         $product_stock = $this->stockStateInterface->getStockQty($product->getId(), $product->getStore()->getWebsiteId());
-        return $product_stock ?? 0;
+        // Replace null coalescing operator with ternary operator for PHP 7.4 compatibility
+        return ($product_stock !== null) ? $product_stock : 0;
     }
 
     protected function getStoreIdFromContext()
@@ -989,4 +990,3 @@ class Product extends AbstractAdapter
         }
     }
 }
-
