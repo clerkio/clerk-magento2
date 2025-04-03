@@ -82,7 +82,14 @@ class Image
             } else {
                 $store = $this->storeManager->getStore();
             }
-            $itemImage = $item->getImage() ?? $item->getSmallImage() ?? $item->getThumbnail();
+            // Replace null coalescing operator with ternary operator for PHP 7.4 compatibility
+            $itemImage = $item->getImage();
+            if ($itemImage === null) {
+                $itemImage = $item->getSmallImage();
+                if ($itemImage === null) {
+                    $itemImage = $item->getThumbnail();
+                }
+            }
 
             if ($itemImage === 'no_selection' || !$itemImage) {
                 $imageUrl = $helper->getDefaultPlaceholderUrl('small_image');
