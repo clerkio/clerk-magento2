@@ -58,6 +58,27 @@ if (!empty($block->getPublicKey())):
             }
         });
 
+        // Update form key via AJAX to ensure it's correct for the current session
+        require(['jquery', 'mage/url'], function($, urlBuilder) {
+            $(document).ready(function() {
+                $.ajax({
+                    url: urlBuilder.build('clerk/formkey/get'),
+                    type: 'get',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response && response.formkey) {
+                            // Update the global formkey with the fresh one from the server
+                            Clerk('config', {
+                                globals: {
+                                    formkey: response.formkey
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        });
+
         <?php
         if ($block->getCollectionEmails(true) && $block->getCustomerEmail()) {
         ?>
