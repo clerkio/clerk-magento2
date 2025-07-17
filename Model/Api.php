@@ -169,6 +169,28 @@ class Api
         }
 
     }
+
+    /**
+     * Update order data in Clerk after refund
+     *
+     * @param array $orderData
+     * @param int $store_id
+     * @return void
+     */
+    public function updateOrder($orderData, $store_id)
+    {
+        try {
+            $params = [
+                'orders' => [$orderData],
+            ];
+
+            $this->post('order/update', $params, $store_id);
+            $this->clerk_logger->log('Updated Order', ['response' => $params]);
+
+        } catch (\Exception $e) {
+            $this->clerk_logger->error('Updating Order Error', ['error' => $e->getMessage()]);
+        }
+    }
     private function _curl_get($url, $params = [])
     {
         try {
