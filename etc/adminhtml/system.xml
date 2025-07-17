@@ -81,6 +81,11 @@
                     <label>Disable order synchronization</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="import_orders_from_all_stores" translate="label comment" type="select" sortOrder="52" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Import orders from all stores</label>
+                    <comment>When enabled, orders from all stores will be imported regardless of store scope. Useful for multi-store setups where you want comprehensive order history.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="image_type" translate="label comment" type="select" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Image type</label>
                     <comment>Select image type to send to Clerk</comment>
