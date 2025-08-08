@@ -9,7 +9,7 @@ if (!empty($block->getPublicKey())):
             var e = d.createElement('script');
             e.type = 'text/javascript';
             e.async = true;
-            e.src = (d.location.protocol == 'https:' ? 'https' : 'http') + '<?php echo $clerkJsUrl; ?>';
+            e.src = (d.location.protocol == 'https:' ? 'https' : 'http') + <?php echo $block->jsonEncodeSafe($clerkJsUrl); ?>;
             var s = d.getElementsByTagName('script')[0];
             s.parentNode.insertBefore(e, s);
             w.__clerk_q = w.__clerk_q || [];
@@ -28,10 +28,10 @@ if (!empty($block->getPublicKey())):
             }
             ?>
             globals: {
-                uenc: '<?php echo $block->getEncodedUrl(); ?>',
-                formkey: '<?php echo $block->getFormKey(); ?>',
-                currency_symbol: '<?php echo $block->getCurrentCurrencySymbol(); ?>',
-                currency_iso: '<?php echo $block->getCurrentCurrencyCode(); ?>'
+                uenc: <?php echo $block->jsonEncodeSafe($block->getEncodedUrl()); ?>,
+                formkey: <?php echo $block->jsonEncodeSafe($block->getFormKey()); ?>,
+                currency_symbol: <?php echo $block->jsonEncodeSafe($block->getCurrentCurrencySymbol()); ?>,
+                currency_iso: <?php echo $block->jsonEncodeSafe($block->getCurrentCurrencyCode()); ?>
             },
             formatters: {
                 convert_currency: function (price) {
@@ -42,14 +42,14 @@ if (!empty($block->getPublicKey())):
                     return price;
                 },
                 convert_currency_from_iso: function (price, currency_iso) {
-                    const ex_rates = JSON.parse('<?php echo json_encode($block->getAllCurrencyRates()); ?>');
+                    const ex_rates = <?php echo $block->jsonEncodeSafe($block->getAllCurrencyRates()); ?>;
                     if (ex_rates[currency_iso] !== undefined) {
                         return price * ex_rates[currency_iso];
                     }
                     return price;
                 },
                 currency_symbol_from_iso: function (symbol, iso) {
-                    const ex_symbols = JSON.parse('<?php echo json_encode($block->getAllCurrencySymbols()); ?>');
+                    const ex_symbols = <?php echo $block->jsonEncodeSafe($block->getAllCurrencySymbols()); ?>;
                     if (ex_symbols[currency_iso] !== undefined) {
                         return ex_symbols[currency_iso];
                     }
@@ -84,7 +84,7 @@ if (!empty($block->getPublicKey())):
         ?>
         if (typeof window.Clerk == 'function') {
             Clerk('call', 'log/email', {
-                email: "<?php echo $block->getCustomerEmail() ?>"
+                email: <?php echo $block->jsonEncodeSafe($block->getCustomerEmail()); ?>
             });
         }
         <?php
