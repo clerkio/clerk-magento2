@@ -179,6 +179,14 @@ class Tracking extends Template
     }
 
     /**
+     * Safely encode a PHP value as a JavaScript string/JSON literal suitable for inline <script> contexts.
+     */
+    public function jsonEncodeSafe($value): string
+    {
+        return json_encode($value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+    }
+
+    /**
      * Get store base currency code
      *
      * @return string
