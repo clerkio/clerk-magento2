@@ -13,6 +13,7 @@
                 <additional_fields></additional_fields>
                 <saleable_only>1</saleable_only>
                 <visibility>4</visibility>
+                <exclude_disabled_products>1</exclude_disabled_products>
                 <disable_order_synchronization>0</disable_order_synchronization>
             </product_synchronization>
             <search>

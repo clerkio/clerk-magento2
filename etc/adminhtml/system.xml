@@ -73,6 +73,11 @@
                     <label>Only synchronize product with visibility</label>
                     <source_model>Clerk\Clerk\Model\Config\Source\Visibility</source_model>
                 </field>
+                <field id="exclude_disabled_products" translate="label comment" type="select" sortOrder="42" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Exclude disabled products and their children</label>
+                    <comment>When enabled, disabled parent products and their children will not be imported to Clerk</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="return_order_synchronization" translate="label" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Track returned orders</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
