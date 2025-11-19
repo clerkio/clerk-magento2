@@ -5,6 +5,7 @@
             <values>
                 <value id="clerkioapi-script" type="host">https://api.clerk.io</value>
                 <value id="clerkiocdn-script" type="host">https://cdn.clerk.io</value>
+                <value id="clerkiocustom-script" type="host">https://custom.clerk.io</value>
             </values>
         </policy>
         <policy id="img-src">
