@@ -717,7 +717,7 @@ class Product extends AbstractAdapter
                     foreach ($productsArray as $bundle_item) {
                         $bundle_option_min_stock = 0;
                         foreach ($bundle_item as $bundle_option) {
-                            if ((integer)$bundle_option['min_qty'] <= $bundle_option['stock']) {
+                            if ((int)$bundle_option['min_qty'] <= $bundle_option['stock']) {
                                 $bundle_option_min_stock = ($bundle_option_min_stock == 0) ? $bundle_option['stock'] : $bundle_option_min_stock;
                                 $bundle_option_min_stock = ($bundle_option_min_stock < $bundle_option['stock']) ? $bundle_option['stock'] : $bundle_option_min_stock;
                             }
@@ -768,7 +768,7 @@ class Product extends AbstractAdapter
                     foreach ($productsArray as $bundle_item) {
                         $bundle_option_min_stock = 0;
                         foreach ($bundle_item as $bundle_option) {
-                            if ((integer)$bundle_option['min_qty'] <= $bundle_option['stock']) {
+                            if ((int)$bundle_option['min_qty'] <= $bundle_option['stock']) {
                                 $bundle_option_min_stock = ($bundle_option_min_stock == 0) ? $bundle_option['stock'] : $bundle_option_min_stock;
                                 $bundle_option_min_stock = ($bundle_option_min_stock < $bundle_option['stock']) ? $bundle_option['stock'] : $bundle_option_min_stock;
                             }

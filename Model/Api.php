@@ -180,7 +180,11 @@ class Api
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $response = curl_exec($curl);
-            curl_close($curl);
+
+            if (PHP_VERSION_ID < 80000) {
+                curl_close($curl);
+            }
+
             return $response;
 
         } catch (\Exception $e) {
@@ -201,7 +205,11 @@ class Api
             }
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $response = curl_exec($curl);
-            curl_close($curl);
+
+            if (PHP_VERSION_ID < 80000) {
+                curl_close($curl);
+            }
+
             return $response;
 
         } catch (\Exception $e) {
