@@ -1,15 +1,40 @@
 <?php
-/** @var Clerk\Clerk\Block\Tracking $block */
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Clerk\Clerk\Block\Tracking as TrackingBlock;
+
+/** @var TrackingBlock $block */
+/** @var SecureHtmlRenderer $secureRenderer */
+
 if (!empty($block->getPublicKey())):
     $clerkJsUrl = $block->getClerkJSLink();
-    ?>
-    <!-- Start of Clerk.io E-commerce Personalisation tool - www.clerk.io -->
-    <script>
+    $currencyRatesJson = json_encode($block->getAllCurrencyRates());
+    $currencySymbolsJson = json_encode($block->getAllCurrencySymbols());
+    $languageOutput = '';
+    $logEmailOutput = '';
+
+
+    $current_language = is_null($block->getLanguage()) ? 'False' : $block->getLanguage();
+    if (strpos($current_language, 'auto_') === false && $block->getLanguage() != "") {
+        $languageOutput = "language: '" . $block->escapeJsQuote($block->getLanguage()) . "',";
+    }
+
+    if ($block->getCollectionEmails(true) && $block->getCustomerEmail()) {
+        $logEmailOutput = "
+            if (typeof window.Clerk == 'function') {
+                Clerk('call', 'log/email', {
+                    email: '{$block->getCustomerEmail()}'
+                });
+            }
+        ";
+    }
+
+$scriptString = <<<scriptStr
         (function (w, d) {
             var e = d.createElement('script');
             e.type = 'text/javascript';
             e.async = true;
-            e.src = (d.location.protocol == 'https:' ? 'https' : 'http') + '<?php echo $clerkJsUrl; ?>';
+            e.src = (d.location.protocol == 'https:' ? 'https' : 'http') + '{$clerkJsUrl}';
             var s = d.getElementsByTagName('script')[0];
             s.parentNode.insertBefore(e, s);
             w.__clerk_q = w.__clerk_q || [];
@@ -19,37 +44,32 @@ if (!empty($block->getPublicKey())):
         })(window, document);
 
         Clerk('config', {
-            key: '<?php echo $block->escapeJsQuote($block->getPublicKey()); ?>',
-            collect_email: <?php echo $block->getCollectionEmails(); ?>,
-            <?php
-            $current_language = is_null($block->getLanguage()) ? 'False' : $block->getLanguage();
-            if (strpos($current_language, 'auto_') === false && $block->getLanguage() != "") {
-                echo "language: '" . $block->escapeJsQuote($block->getLanguage()) . "',";
-            }
-            ?>
+            key: '{$block->escapeJsQuote($block->getPublicKey())}',
+            collect_email: {$block->getCollectionEmails()},
+            {$languageOutput}
             globals: {
-                uenc: '<?php echo $block->getEncodedUrl(); ?>',
-                formkey: '<?php echo $block->getFormKey(); ?>',
-                currency_symbol: '<?php echo $block->getCurrentCurrencySymbol(); ?>',
-                currency_iso: '<?php echo $block->getCurrentCurrencyCode(); ?>'
+                uenc: '{$block->getEncodedUrl()}',
+                formkey: '{$block->getFormKey()}',
+                currency_symbol: '{$block->getCurrentCurrencySymbol()}',
+                currency_iso: '{$block->getCurrentCurrencyCode()}'
             },
             formatters: {
                 convert_currency: function (price) {
-                    const ex_rate = parseFloat('<?php print_r($block->getCurrentCurrencyRate()); ?>') ?? null;
+                    const ex_rate = parseFloat('{$block->getCurrentCurrencyRate()}') ?? null;
                     if (ex_rate) {
                         return price * ex_rate;
                     }
                     return price;
                 },
                 convert_currency_from_iso: function (price, currency_iso) {
-                    const ex_rates = JSON.parse('<?php echo json_encode($block->getAllCurrencyRates()); ?>');
+                    const ex_rates = JSON.parse('{$currencyRatesJson}');
                     if (ex_rates[currency_iso] !== undefined) {
                         return price * ex_rates[currency_iso];
                     }
                     return price;
                 },
                 currency_symbol_from_iso: function (symbol, iso) {
-                    const ex_symbols = JSON.parse('<?php echo json_encode($block->getAllCurrencySymbols()); ?>');
+                    const ex_symbols = JSON.parse('{$currencySymbolsJson}');
                     if (ex_symbols[currency_iso] !== undefined) {
                         return ex_symbols[currency_iso];
                     }
@@ -58,21 +78,9 @@ if (!empty($block->getPublicKey())):
             }
         });
 
-        <?php
-        if ($block->getCollectionEmails(true) && $block->getCustomerEmail()) {
-        ?>
-        if (typeof window.Clerk == 'function') {
-            Clerk('call', 'log/email', {
-                email: "<?php echo $block->getCustomerEmail() ?>"
-            });
-        }
-        <?php
-        }
-        ?>
+        {$logEmailOutput}
 
-
-
-        var collectbaskets = <?php echo $block->getCollectionBaskets(); ?>;
+        var collectbaskets = {$block->getCollectionBaskets()};
 
         if (collectbaskets) {
 
@@ -127,7 +135,10 @@ if (!empty($block->getPublicKey())):
 
         }
 
-    </script>
+scriptStr;
+?>
+    <!-- Start of Clerk.io E-commerce Personalisation tool - www.clerk.io -->
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
     <!-- End of Clerk.io E-commerce Personalisation tool - www.clerk.io -->
 <?php
 endif;
