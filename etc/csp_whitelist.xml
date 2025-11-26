@@ -24,5 +24,10 @@
                 <value id="clerkiocdn-frame-ancestors" type="host">https://cdn.clerk.io</value>
             </values>
         </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="clerkiochat-connect" type="host">https://chat.clerk.io</value>
+            </values>
+        </policy>
     </policies>
 </csp_whitelist>
