@@ -810,7 +810,14 @@ class Product extends AbstractAdapter
                 if ($attribute->usesSource()) {
                     $source = $attribute->getSource();
                     if ($source) {
-                        return $source->getOptionText($resourceItem[$field]);
+                        $result = $source->getOptionText($resourceItem[$field]);
+                        
+                        // preserve array type for multiselect
+                        if ($attribute->getFrontendInput() === 'multiselect' && !is_array($result)) {
+                            return $result ? [$result] : [];
+                        }
+                        
+                        return $result;
                     }
                 }
             }
