@@ -25,6 +25,7 @@ class Config
     const XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY = 'clerk/product_synchronization/additional_fields_heavy_query';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY = 'clerk/product_synchronization/saleable_only';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY = 'clerk/product_synchronization/visibility';
+    const XML_PATH_PRODUCT_SYNCHRONIZATION_EXCLUDE_DISABLED_PRODUCTS = 'clerk/product_synchronization/exclude_disabled_products';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_DISABLE_ORDER_SYNCHRONIZATION = 'clerk/product_synchronization/disable_order_synchronization';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_IMAGE_TYPE = 'clerk/product_synchronization/image_type';
     const XML_PATH_PRODUCT_SYNCHRONIZATION_ENABLE_ORDER_RETURN_SYNCHRONIZATION = 'clerk/product_synchronization/return_order_synchronization';
