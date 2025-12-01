@@ -155,6 +155,12 @@ abstract class AbstractAdapter
       $heavyAttributeQuery = $this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_ADDITIONAL_FIELDS_HEAVY_QUERY, $scope, $scopeid);
       $customFields = is_string($additionalFields) ? str_replace(' ', '', explode(',', $additionalFields)) : [];
       $resourceItemTypeId = $resourceItem->getTypeId();
+      
+      // Fix: Reset type instance to clear cached child product data
+      // Magento's type instance caches getUsedProducts() and getAssociatedProducts() results
+      // which causes child data (IDs, images, prices) to be shared between different products
+      // when the same adapter instance processes multiple products sequentially (e.g., in observers)
+      $resourceItem->setTypeInstance(null);
       $resourceItemTypeInstance = $resourceItem->getTypeInstance();
 
       $this->setFields($customFields, $scope, $scopeid);
