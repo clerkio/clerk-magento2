@@ -1,8 +1,13 @@
 <?php
-/** @var \Clerk\Clerk\Block\PowerstepScripts $block */
-if ($block->shouldShow()):
-    ?>
-<script>
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Clerk\Clerk\Block\PowerstepScripts as PowerstepScriptsBlock;
+
+/** @var PowerstepScriptsBlock $block */
+/** @var SecureHtmlRenderer $secureRenderer */
+
+if ($block->shouldShow()) {
+    $scriptString = <<<scriptStr
 require(['jquery', 'mage/url'], function($, urlBuilder) {
     function getPowerstepPopup(isAjax)
     {
@@ -27,7 +32,7 @@ require(['jquery', 'mage/url'], function($, urlBuilder) {
     $(document).on('ajax:addToCart', function(e) {
         getPowerstepPopup(true);
     });
-    
+
     $(document).ready(function() {
         let product_added_with_reload = (document.querySelectorAll('[data-ui-id="message-success"]').length > 0) ? true : false;
         if(product_added_with_reload){
@@ -45,5 +50,7 @@ require(['jquery', 'mage/url'], function($, urlBuilder) {
     });
     */
 });
-</script>
-<?php endif; ?>
+scriptStr;
+
+    echo /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false);
+}
