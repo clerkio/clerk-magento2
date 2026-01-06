@@ -58,6 +58,13 @@ if (!empty($block->getPublicKey())):
             }
         });
 
+        // Clerk.js Context
+        Clerk('context', {
+            product: <?php echo $block->getContextProductId() !== null ? $block->getContextProductId() : 'null'; ?>,
+            category: <?php echo $block->getContextCategoryId() !== null ? $block->getContextCategoryId() : 'null'; ?>,
+            page: <?php $p = $block->getContextPageId(); echo $p !== null ? ($block->isContextPageString() ? "'" . $block->escapeJs($p) . "'" : $p) : 'null'; ?>
+        });
+
         // Update form key via AJAX to ensure it's correct for the current session
         require(['jquery', 'mage/url'], function($, urlBuilder) {
             $(document).ready(function() {
