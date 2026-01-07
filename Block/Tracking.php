@@ -319,4 +319,78 @@ class Tracking extends Template
         $storeName = preg_replace('/[^a-z]/', '', strtolower($storeName));
         return $storeName;
     }
+
+    /**
+     * Get current product ID 
+     *
+     * @return int|null
+     */
+    public function getContextProductId()
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $registry = $objectManager->get(\Magento\Framework\Registry::class);
+        $product = $registry->registry('current_product');
+        return $product ? (int) $product->getId() : null;
+    }
+
+    /**
+     * Get current category ID 
+     * Only returns category ID if NOT on a product page
+     *
+     * @return int|null
+     */
+    public function getContextCategoryId()
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $registry = $objectManager->get(\Magento\Framework\Registry::class);
+        if ($registry->registry('current_product')) {
+            return null;
+        }
+        $category = $registry->registry('current_category');
+        return $category ? (int) $category->getId() : null;
+    }
+
+    /**
+     * Get current page context 
+     *
+     * @return int|string|null
+     */
+    public function getContextPageId()
+    {
+        // Skip if on product or category page
+        if ($this->getContextProductId() || $this->getContextCategoryId()) {
+            return null;
+        }
+
+        // Get the full action name
+        $fullActionName = $this->getRequest()->getFullActionName();
+
+        if ($fullActionName === 'cms_index_index') {
+            return 'homepage';
+        }
+
+        // CMS page view
+        if ($fullActionName === 'cms_page_view') {
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $cmsPage = $objectManager->get(\Magento\Cms\Model\Page::class);
+            $pageId = $cmsPage->getId();
+            if ($pageId) {
+                return (int) $pageId;
+            }
+        }
+
+        $actionParts = explode('_', $fullActionName);
+        return $actionParts[0] ?? null;
+    }
+
+    /**
+     * page context value is a string
+     *
+     * @return bool
+     */
+    public function isContextPageString()
+    {
+        $page = $this->getContextPageId();
+        return is_string($page);
+    }
 }
