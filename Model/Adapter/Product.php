@@ -258,6 +258,11 @@ class Product extends AbstractAdapter
                     break;
             }
 
+            // Filter out disabled products and their children if configuration is enabled
+            if ($this->scopeConfig->getValue(Config::XML_PATH_PRODUCT_SYNCHRONIZATION_EXCLUDE_DISABLED_PRODUCTS, $scope, $scopeid)) {
+                $this->filterDisabledProducts($collection, $scopeid);
+            }
+
             $collection->setPageSize($limit)->setCurPage($page)->addOrder($orderBy, $order);
 
             $this->eventManager->dispatch('clerk_' . $this->eventPrefix . '_get_collection_after', [
@@ -271,6 +276,97 @@ class Product extends AbstractAdapter
 
             $this->clerk_logger->error('Prepare Collection Error', ['error' => $e->getMessage()]);
 
+        }
+    }
+
+    /**
+     * Filter out disabled products and their children from the collection
+     *
+     * @param $collection
+     * @param $scopeid
+     * @return void
+     */
+    protected function filterDisabledProducts($collection, $scopeid)
+    {
+        try {
+            // First, filter out disabled products directly
+            $collection->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
+
+            // Get all disabled configurable products to exclude their children
+            $disabledConfigurableProducts = $this->collectionFactory->create()
+                ->addStoreFilter($scopeid)
+                ->addAttributeToFilter('type_id', self::PRODUCT_TYPE_CONFIGURABLE)
+                ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_DISABLED)
+                ->getAllIds();
+
+            if (!empty($disabledConfigurableProducts)) {
+                // Get all child products of disabled configurable products
+                $childProductIds = [];
+                foreach ($disabledConfigurableProducts as $parentId) {
+                    try {
+                        $parentProduct = $this->_productRepository->getById($parentId, false, $scopeid);
+                        if ($parentProduct->getTypeId() === self::PRODUCT_TYPE_CONFIGURABLE) {
+                            $childProducts = $parentProduct->getTypeInstance()->getUsedProducts($parentProduct);
+                            foreach ($childProducts as $childProduct) {
+                                $childProductIds[] = $childProduct->getId();
+                            }
+                        }
+                    } catch (Exception $e) {
+                        $this->clerk_logger->error('Error getting child products for disabled parent', [
+                            'parent_id' => $parentId,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+
+                // Exclude child products of disabled configurable products
+                if (!empty($childProductIds)) {
+                    $collection->addFieldToFilter('entity_id', ['nin' => $childProductIds]);
+                    $this->clerk_logger->log('Excluded child products of disabled configurable products', [
+                        'disabled_parent_count' => count($disabledConfigurableProducts),
+                        'excluded_child_count' => count($childProductIds)
+                    ]);
+                }
+            }
+
+            // Also handle grouped products
+            $disabledGroupedProducts = $this->collectionFactory->create()
+                ->addStoreFilter($scopeid)
+                ->addAttributeToFilter('type_id', self::PRODUCT_TYPE_GROUPED)
+                ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_DISABLED)
+                ->getAllIds();
+
+            if (!empty($disabledGroupedProducts)) {
+                $associatedProductIds = [];
+                foreach ($disabledGroupedProducts as $parentId) {
+                    try {
+                        $parentProduct = $this->_productRepository->getById($parentId, false, $scopeid);
+                        if ($parentProduct->getTypeId() === self::PRODUCT_TYPE_GROUPED) {
+                            $associatedProducts = $parentProduct->getTypeInstance()->getAssociatedProducts($parentProduct);
+                            foreach ($associatedProducts as $associatedProduct) {
+                                $associatedProductIds[] = $associatedProduct->getId();
+                            }
+                        }
+                    } catch (Exception $e) {
+                        $this->clerk_logger->error('Error getting associated products for disabled grouped parent', [
+                            'parent_id' => $parentId,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+
+                // Exclude associated products of disabled grouped products
+                if (!empty($associatedProductIds)) {
+                    $collection->addFieldToFilter('entity_id', ['nin' => $associatedProductIds]);
+                    $this->clerk_logger->log('Excluded associated products of disabled grouped products', [
+                        'disabled_parent_count' => count($disabledGroupedProducts),
+                        'excluded_associated_count' => count($associatedProductIds)
+                    ]);
+                }
+            }
+
+        } catch (Exception $e) {
+            $this->clerk_logger->error('Error filtering disabled products', ['error' => $e->getMessage()]);
         }
     }
 
