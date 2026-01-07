@@ -182,7 +182,12 @@ abstract class AbstractAction extends Action
     {
         try {
 
-            $collection = $this->prepareCollection()->addFieldToFilter('store_id', $this->scopeid);
+            $collection = $this->prepareCollection();
+            
+            // Apply store filter if needed (can be overridden by child classes)
+            if ($this->shouldApplyStoreFilter()) {
+                $collection->addFieldToFilter('store_id', $this->scopeid);
+            }
 
             $this->_eventManager->dispatch($this->eventPrefix . '_get_collection_after', [
                 'controller' => $this,
@@ -825,5 +830,16 @@ abstract class AbstractAction extends Action
     public function addFieldHandler($field, callable $handler)
     {
         $this->fieldHandlers[$field] = $handler;
+    }
+
+    /**
+     * Determine if store filter should be applied to collection
+     * Can be overridden by child classes to customize filtering behavior
+     *
+     * @return bool
+     */
+    protected function shouldApplyStoreFilter()
+    {
+        return true; // Default behavior: apply store filter
     }
 }
