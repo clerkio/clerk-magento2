@@ -568,7 +568,8 @@ class Product extends AbstractAdapter
 
             //Add categories fieldhandler
             $this->addFieldHandler('categories', function ($item) {
-                return $item->getCategoryIds();
+                // ensure consistent type across all sync methods
+                return array_map('intval', $item->getCategoryIds());
             });
 
             $this->addFieldHandler('child_stocks', function ($item) {
