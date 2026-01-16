@@ -132,17 +132,32 @@ class Api
     public function removeProduct($productId, $store_id = null)
     {
         try {
-
+            // The API might expect a simple array of product IDs, not a JSON string
             $params = [
-                'products' => json_encode([(string) $productId]),
+                'products' => [(string) $productId],
             ];
 
-            $this->get('product/remove', $params, $store_id);
-            $this->clerk_logger->log('Removed Product', ['response' => $params]);
+            // Log the exact parameters being sent for debugging
+            $this->clerk_logger->log('Removing Product Request', [
+                'product_id' => $productId,
+                'store_id' => $store_id,
+                'params' => $params
+            ]);
+
+            $response = $this->get('product/remove', $params, $store_id);
+            
+            // Log the response for debugging
+            $this->clerk_logger->log('Removed Product Response', [
+                'product_id' => $productId,
+                'response' => $response
+            ]);
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('Removing Products Error', ['error' => $e->getMessage()]);
+            $this->clerk_logger->error('Removing Products Error', [
+                'product_id' => $productId,
+                'error' => $e->getMessage()
+            ]);
 
         }
     }
@@ -177,15 +192,58 @@ class Api
                 $params = is_array($params) ? http_build_query($params) : $params;
                 $url = $url . '?' . $params;
             }
+            
+            // Log the full URL for debugging
+            $this->clerk_logger->log('CURL GET Request', [
+                'url' => $url
+            ]);
+            
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            
+            // Add additional options for better error handling
+            curl_setopt($curl, CURLOPT_FAILONERROR, true);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+            
             $response = curl_exec($curl);
+            
+            // Check for curl errors
+            $curl_error = curl_errno($curl);
+            if ($curl_error) {
+                $this->clerk_logger->error('CURL Error', [
+                    'error_code' => $curl_error,
+                    'error_message' => curl_error($curl),
+                    'url' => $url
+                ]);
+            }
+            
+            // Get HTTP status code
+            $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            if ($http_code >= 400) {
+                $this->clerk_logger->error('HTTP Error', [
+                    'http_code' => $http_code,
+                    'url' => $url,
+                    'response' => $response
+                ]);
+            }
+            
             curl_close($curl);
+            
+            // Log the response for debugging
+            $this->clerk_logger->log('CURL GET Response', [
+                'http_code' => $http_code,
+                'response' => $response
+            ]);
+            
             return $response;
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('GET Request Error', ['error' => $e->getMessage()]);
+            $this->clerk_logger->error('GET Request Error', [
+                'error' => $e->getMessage(),
+                'url' => $url
+            ]);
 
         }
     }
@@ -224,15 +282,33 @@ class Api
 
             $params = array_merge($this->getDefaultParams($store_id), $params);
 
+            // Log the full request details for debugging
+            $this->clerk_logger->log('GET Request Details', [
+                'endpoint' => $endpoint,
+                'url' => $this->baseurl . $endpoint,
+                'params' => $params,
+                'store_id' => $store_id
+            ]);
+
             $url = $this->baseurl . $endpoint;
 
             $response = $this->_curl_get($url, $params);
+
+            // Log the response for debugging
+            $this->clerk_logger->log('GET Response', [
+                'endpoint' => $endpoint,
+                'response' => $response
+            ]);
 
             return $response;
 
         } catch (\Exception $e) {
 
-            $this->clerk_logger->error('GET Request Error', ['error' => $e->getMessage()]);
+            $this->clerk_logger->error('GET Request Error', [
+                'endpoint' => $endpoint,
+                'error' => $e->getMessage(),
+                'params' => $params
+            ]);
 
         }
     }
@@ -487,7 +563,4 @@ class Api
 
         return ['limit'];
     }
-
-
-
 }
