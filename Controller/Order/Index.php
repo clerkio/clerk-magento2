@@ -162,6 +162,99 @@ class Index extends AbstractAction
     }
 
     /**
+     * Prepare collection with multi-store support
+     *
+     * @return object|null
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
+    protected function prepareCollection()
+    {
+        try {
+            $collection = $this->collectionFactory->create();
+            $collection->addFieldToSelect('*');
+
+            // Check if we should import orders from all stores
+            $importFromAllStores = $this->scopeConfig->isSetFlag(
+                Config::XML_PATH_PRODUCT_SYNCHRONIZATION_IMPORT_ORDERS_FROM_ALL_STORES,
+                $this->scope,
+                $this->scopeid
+            );
+
+            if ($this->start_date) {
+                $collection->setPageSize($this->limit)
+                    ->setCurPage($this->page)
+                    ->addAttributeToFilter('created_at', ['from' => $this->start_date, 'to' => $this->end_date])
+                    ->addOrder($this->orderBy, $this->order);
+            } else {
+                $collection->setPageSize($this->limit)
+                    ->setCurPage($this->page)
+                    ->addOrder($this->orderBy, $this->order);
+            }
+
+            // Log the collection strategy being used
+            if ($importFromAllStores) {
+                $this->clerk_logger->log('Order Collection: Importing from ALL stores', [
+                    'scope' => $this->scope,
+                    'scope_id' => $this->scopeid,
+                    'import_all_stores' => true
+                ]);
+            } else {
+                $this->clerk_logger->log('Order Collection: Importing from CURRENT store only', [
+                    'scope' => $this->scope,
+                    'scope_id' => $this->scopeid,
+                    'import_all_stores' => false
+                ]);
+            }
+
+            return $collection;
+
+        } catch (\Exception $e) {
+            $this->clerk_logger->error('Order prepareCollection ERROR', ['error' => $e->getMessage()]);
+        }
+        
+        return null;
+    }
+
+    /**
+     * Determine if store filter should be applied to order collection
+     * Checks configuration to decide between single-store or multi-store import
+     *
+     * @return bool
+     */
+    protected function shouldApplyStoreFilter()
+    {
+        try {
+            // Check if we should import orders from all stores
+            $importFromAllStores = $this->scopeConfig->isSetFlag(
+                Config::XML_PATH_PRODUCT_SYNCHRONIZATION_IMPORT_ORDERS_FROM_ALL_STORES,
+                $this->scope,
+                $this->scopeid
+            );
+
+            // If importing from all stores, don't apply store filter
+            if ($importFromAllStores) {
+                $this->clerk_logger->log('Order Store Filter: DISABLED (importing from all stores)', [
+                    'scope' => $this->scope,
+                    'scope_id' => $this->scopeid
+                ]);
+                return false;
+            }
+
+            // Default behavior: apply store filter
+            $this->clerk_logger->log('Order Store Filter: ENABLED (importing from current store only)', [
+                'scope' => $this->scope,
+                'scope_id' => $this->scopeid
+            ]);
+            return true;
+
+        } catch (\Exception $e) {
+            $this->clerk_logger->error('Order shouldApplyStoreFilter ERROR', ['error' => $e->getMessage()]);
+            // On error, default to applying store filter for safety
+            return true;
+        }
+    }
+
+    /**
      * Parse request arguments
      */
     protected function getArguments(RequestInterface $request)
