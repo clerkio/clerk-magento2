@@ -147,7 +147,7 @@ There are also diagnostic endpoints (`/clerk/getconfig`, `/clerk/setconfig`, `/c
 
 If you need to customize the extension, here are the parts to be careful with.
 
-**`tracking.phtml` — be very careful.** This template loads Clerk.js and configures the entire integration. It also monkey-patches `XMLHttpRequest.prototype.open` to intercept Magento's cart AJAX calls for basket tracking. If you override this template, make sure you keep the Clerk.js initialization and the `Clerk('config', {...})` call intact, or nothing will work. If you're seeing weird AJAX behavior on the site, this is the first place to check — you can disable basket tracking in admin under **Synchronization > Collect Baskets**.
+**`tracking.phtml` — be very careful.** This template loads Clerk.js and configures the entire integration. It also intercepts Magento's cart AJAX calls to keep basket tracking in sync with Clerk.io. If you override this template, make sure you keep the Clerk.js initialization and the `Clerk('config', {...})` call intact, or nothing will work. You can disable basket tracking in admin under **Synchronization > Collect Baskets**.
 
 **`etc/di.xml` — the add-to-cart override.** The extension replaces Magento's `Magento\Checkout\Controller\Cart\Add` controller entirely with its own version (`Clerk\Clerk\Controller\Checkout\Cart\Add`) to make the powerstep work. This means:
 - If another extension also tries to override `Cart\Add` via a DI preference, one of them will win and the other will break. Magento only allows one preference per class.
@@ -197,4 +197,3 @@ Issues & feature requests: [github.com/clerkio/clerk-magento2/issues](https://gi
 ## Support
 
 - [help.clerk.io](https://help.clerk.io) · [support@clerk.io](mailto:support@clerk.io) · [status.clerk.io](https://status.clerk.io)
-
