@@ -196,12 +196,28 @@ class Api
 
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+            ]);
             if (!empty($params)) {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($params, true));
             }
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $response = curl_exec($curl);
             curl_close($curl);
+
+            $decoded = json_decode($response, true);
+
+            if (is_array($decoded)) {
+                if (isset($decoded['status']) && $decoded['status'] === 'error') {
+                    $message = !empty($decoded['message'])
+                        ? $decoded['message']
+                        : 'Unknown Clerk API error.';
+
+                    throw new \Exception($message);
+                }
+            }
+
             return $response;
 
         } catch (\Exception $e) {
