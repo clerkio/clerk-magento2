@@ -161,7 +161,7 @@ class Index extends AbstractAction
                     if ($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
                         $sub_state = $subscriberInstance->loadByEmail($customer['email']);
                         if ($sub_state->getId()) {
-                            $_customer['subscribed'] = (bool) ($sub_state->getSubscriberStatus() == 1 && $sub_state->getCustomerId() == $customer['id']);
+                            $_customer['subscribed'] = (bool) ($sub_state->getSubscriberStatus() == 1 && $sub_state->getCustomerId() == $customer['entity_id']);
                         } else {
                             $_customer['subscribed'] = false;
                         }
