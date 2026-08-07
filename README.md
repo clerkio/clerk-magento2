@@ -2,7 +2,7 @@
 
 The official [Clerk.io](https://clerk.io) extension for Magento 2. It connects your store to Clerk.io's AI platform, giving you personalized search, product recommendations, and visitor tracking out of the box.
 
-**Version:** 4.8.9 · **PHP:** 7.4+ · **Magento:** 2.3+
+**Version:** 4.9.0 · **PHP:** 7.4+ · **Magento:** 2.3+
 
 ---
 
