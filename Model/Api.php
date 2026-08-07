@@ -197,6 +197,7 @@ class Api
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_POST, true);
             if (!empty($params)) {
+                curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($params, true));
             }
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
