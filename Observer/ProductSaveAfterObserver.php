@@ -182,7 +182,21 @@ class ProductSaveAfterObserver implements ObserverInterface
                 
                 // check product status, remove if disabled in magento
                 if ($product->getStatus() == \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_DISABLED) {
+                    // Log before attempting to remove the product
+                    $this->logger->info('Product ' . $product->getId() . ' is disabled, attempting to remove from Clerk via real-time update', [
+                        'product_id' => $product->getId(),
+                        'store_id' => $storeId,
+                        'status' => $product->getStatus()
+                    ]);
+                    
                     $response = $this->api->removeProduct($product->getId(), $storeId);
+                    
+                    // Log after the removal attempt
+                    $this->logger->info('Product removal from Clerk completed', [
+                        'product_id' => $product->getId(),
+                        'store_id' => $storeId
+                    ]);
+                    
                     return;
                 }
                 //Cancel if product visibility is not as defined
