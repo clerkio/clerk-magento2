@@ -112,13 +112,41 @@ class Index extends AbstractAction
             $this->addFieldHandler('products', function ($item) {
                 $products = [];
                 foreach ($item->getAllVisibleItems() as $productItem) {
+                    // Calculate net price per unit considering discounts and tax
+                    $netPrice = $this->calculateNetProductPrice($productItem);
+                    
                     $products[] = [
                         'id' => $productItem->getProductId(),
                         'quantity' => (int) $productItem->getQtyOrdered(),
-                        'price' => (float) $productItem->getPrice(),
+                        'price' => (float) $netPrice,
                     ];
                 }
                 return $products;
+            });
+
+            //Add total net value fieldhandler
+            $this->addFieldHandler('total', function ($item) {
+                return (float) $this->calculateOrderNetTotal($item);
+            });
+
+            //Add discount amount fieldhandler
+            $this->addFieldHandler('discount_amount', function ($item) {
+                return (float) abs($item->getDiscountAmount());
+            });
+
+            //Add shipping amount fieldhandler
+            $this->addFieldHandler('shipping_amount', function ($item) {
+                return (float) $item->getShippingAmount();
+            });
+
+            //Add tax amount fieldhandler
+            $this->addFieldHandler('tax_amount', function ($item) {
+                return (float) $item->getTaxAmount();
+            });
+
+            //Add refunded amount fieldhandler
+            $this->addFieldHandler('refunded_amount', function ($item) {
+                return (float) $item->getTotalRefunded();
             });
 
         } catch (\Exception $e) {
@@ -176,6 +204,90 @@ class Index extends AbstractAction
 
             $this->clerk_logger->error('Order getArguments ERROR', ['error' => $e->getMessage()]);
 
+        }
+    }
+
+    /**
+     * Calculate net price per product unit considering discounts and tax
+     *
+     * @param \Magento\Sales\Model\Order\Item $productItem
+     * @return float
+     */
+    protected function calculateNetProductPrice($productItem)
+    {
+        try {
+            // Get the row total (price * quantity) after discounts
+            $rowTotal = $productItem->getRowTotal();
+            $discountAmount = abs($productItem->getDiscountAmount());
+            $taxAmount = $productItem->getTaxAmount();
+            $quantity = $productItem->getQtyOrdered();
+
+            if ($quantity <= 0) {
+                return 0.0;
+            }
+
+            // Calculate net row total: base price - discounts + tax (if tax-inclusive store)
+            $netRowTotal = $rowTotal - $discountAmount;
+            
+            // For tax-inclusive stores, we need to include tax in the net price
+            // For tax-exclusive stores, the net price should exclude tax
+            $order = $productItem->getOrder();
+            $store = $order->getStore();
+            
+            // Check if prices include tax in the store configuration
+            $pricesIncludeTax = $this->scopeConfig->getValue(
+                'tax/calculation/price_includes_tax',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $store->getId()
+            );
+
+            if (!$pricesIncludeTax) {
+                // For tax-exclusive stores, add tax to get the final customer-paid amount
+                $netRowTotal += $taxAmount;
+            }
+
+            // Return net price per unit
+            return $netRowTotal / $quantity;
+
+        } catch (\Exception $e) {
+            $this->clerk_logger->error('calculateNetProductPrice ERROR', [
+                'error' => $e->getMessage(),
+                'product_id' => $productItem->getProductId()
+            ]);
+            
+            // Fallback to original price if calculation fails
+            return (float) $productItem->getPrice();
+        }
+    }
+
+    /**
+     * Calculate the true net order total that reflects what customer actually paid
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @return float
+     */
+    protected function calculateOrderNetTotal($order)
+    {
+        try {
+            // Start with the grand total (what customer actually paid)
+            $netTotal = $order->getGrandTotal();
+            
+            // Subtract any refunded amounts to get current net value
+            $refundedAmount = $order->getTotalRefunded();
+            if ($refundedAmount > 0) {
+                $netTotal -= $refundedAmount;
+            }
+
+            return $netTotal;
+
+        } catch (\Exception $e) {
+            $this->clerk_logger->error('calculateOrderNetTotal ERROR', [
+                'error' => $e->getMessage(),
+                'order_id' => $order->getIncrementId()
+            ]);
+            
+            // Fallback to grand total if calculation fails
+            return (float) $order->getGrandTotal();
         }
     }
 }
