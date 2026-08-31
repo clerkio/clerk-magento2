@@ -367,7 +367,9 @@ class ClerkLogger
 
                     }
 
-                    curl_close($curl);
+                    if (PHP_VERSION_ID < 80000) {
+                        curl_close($curl);
+                    }
 
                 } elseif ($this->Log_to == 'file') {
 
@@ -442,7 +444,9 @@ class ClerkLogger
 
                 }
 
-                curl_close($curl);
+                if (PHP_VERSION_ID < 80000) {
+                    curl_close($curl);
+                }
 
             } elseif ($this->Log_to == 'file') {
 
@@ -521,7 +525,9 @@ class ClerkLogger
 
                     }
 
-                    curl_close($curl);
+                    if (PHP_VERSION_ID < 80000) {
+                        curl_close($curl);
+                    }
 
                 } elseif ($this->Log_to == 'file') {
 
