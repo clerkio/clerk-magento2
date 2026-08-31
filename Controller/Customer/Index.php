@@ -11,6 +11,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
 use Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory as SubscriberCollectionFactory;
+use Magento\Newsletter\Model\Subscriber;
 use Magento\Newsletter\Model\SubscriberFactory as SubscriberFactory;
 use Magento\Framework\Module\ModuleList;
 use Psr\Log\LoggerInterface;
@@ -131,8 +132,6 @@ class Index extends AbstractAction
 
                 $response = $this->getCustomerCollection($this->page, $this->limit, $this->scopeid);
 
-                $subscriberInstance = $this->_subscriberFactory->create();
-
                 foreach ($response->getData() as $customer) {
 
                     $_customer = array();
@@ -159,12 +158,11 @@ class Index extends AbstractAction
                     }
 
                     if ($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
-                        $sub_state = $subscriberInstance->loadByEmail($customer['email']);
-                        if ($sub_state->getId()) {
-                            $_customer['subscribed'] = (bool) ($sub_state->getSubscriberStatus() == 1 && $sub_state->getCustomerId() == $customer['entity_id']);
-                        } else {
-                            $_customer['subscribed'] = false;
-                        }
+                        // loadByEmail() does not clear a reused model when there is no row.
+                        $sub_state = $this->_subscriberFactory->create()->loadByEmail($customer['email']);
+                        $_customer['subscribed'] = $this->getClerkSubscribedValue(
+                            $sub_state->getId() ? $sub_state->getSubscriberStatus() : null
+                        );
                         $_customer['unsub_url'] = $sub_state->getUnsubscriptionLink();
                     }
 
@@ -177,11 +175,11 @@ class Index extends AbstractAction
 
                     foreach ($subscribersOnlyResponse->getData() as $subscriber) {
                         if (isset($subscriber['subscriber_id'])) {
-                            $sub_state = $subscriberInstance->loadByEmail($subscriber['subscriber_email']);
+                            $sub_state = $this->_subscriberFactory->create()->loadByEmail($subscriber['subscriber_email']);
                             $_sub = array();
                             $_sub['id'] = 'SUB' . $subscriber['subscriber_id'];
                             $_sub['email'] = $subscriber['subscriber_email'];
-                            $_sub['subscribed'] = (bool) ($subscriber['subscriber_status'] == 1 && $sub_state->getSubscriberEmail() == $subscriber['subscriber_email']);
+                            $_sub['subscribed'] = $this->getClerkSubscribedValue($subscriber['subscriber_status']);
                             $_sub['name'] = "";
                             $_sub['firstname'] = "";
                             $_sub['unsub_url'] = $sub_state->getUnsubscriptionLink();
@@ -235,5 +233,29 @@ class Index extends AbstractAction
     public function getCustomerGender($GenderCode)
     {
         return $this->_customerMetadata->getAttributeMetadata('gender')->getOptions()[$GenderCode]->getLabel();
+    }
+
+    /**
+     * Map Magento newsletter status to Clerk subscribed.
+     * Subscribed (1) → true, unsubscribed (3) → false, otherwise "unknown".
+     *
+     * @param mixed $status
+     * @return bool|string
+     */
+    protected function getClerkSubscribedValue($status)
+    {
+        if ($status === null || $status === '') {
+            return 'unknown';
+        }
+
+        $status = (int) $status;
+        if ($status === Subscriber::STATUS_SUBSCRIBED) {
+            return true;
+        }
+        if ($status === Subscriber::STATUS_UNSUBSCRIBED) {
+            return false;
+        }
+
+        return 'unknown';
     }
 }
