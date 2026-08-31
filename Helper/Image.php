@@ -76,7 +76,7 @@ class Image
             }
         }
 
-        if (!$imageUrl || $scopeId) {
+        if (!$imageUrl) {
             if ($scopeId) {
                 $store = $this->storeManager->getStore($scopeId);
             } else {
