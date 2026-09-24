@@ -5,18 +5,28 @@ if (!empty($block->getPublicKey())):
     ?>
     <!-- Start of Clerk.io E-commerce Personalisation tool - www.clerk.io -->
     <script>
-        (function (w, d) {
-            var e = d.createElement('script');
-            e.type = 'text/javascript';
-            e.async = true;
-            e.src = (d.location.protocol == 'https:' ? 'https' : 'http') + <?php echo $block->jsonEncodeSafe($clerkJsUrl); ?>;
-            var s = d.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(e, s);
+        (function (w) {
             w.__clerk_q = w.__clerk_q || [];
             w.Clerk = w.Clerk || function () {
                 w.__clerk_q.push(arguments)
             };
-        })(window, document);
+        })(window);
+
+        var clerkScriptStarted = false;
+        function startClerkScript() {
+            if (clerkScriptStarted) {
+                return;
+            }
+            clerkScriptStarted = true;
+            (function (w, d) {
+                var e = d.createElement('script');
+                e.type = 'text/javascript';
+                e.async = true;
+                e.src = (d.location.protocol == 'https:' ? 'https' : 'http') + <?php echo $block->jsonEncodeSafe($clerkJsUrl); ?>;
+                var s = d.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(e, s);
+            })(window, document);
+        }
 
         Clerk('config', {
             key: '<?php echo $block->escapeJsQuote($block->getPublicKey()); ?>',
@@ -76,20 +86,26 @@ if (!empty($block->getPublicKey())):
                     },
                     dataType: 'json',
                     success: function(response) {
-                        if (response && (response.formkey || response.uenc)) {
-                            // Update per-visitor values after the cached page has loaded.
+                        var globals = {};
+                        if (response && response.formkey) {
+                            globals.formkey = response.formkey;
+                        }
+                        if (response && response.uenc) {
+                            globals.uenc = response.uenc;
+                        }
+                        if (globals.formkey || globals.uenc) {
                             Clerk('config', {
-                                globals: {
-                                    formkey: response.formkey || null,
-                                    uenc: response.uenc || null
-                                }
+                                globals: globals
                             });
                         }
-                        if (response && response.email && typeof window.Clerk == 'function') {
+                        if (response && response.email) {
                             Clerk('call', 'log/email', {
                                 email: response.email
                             });
                         }
+                    },
+                    complete: function() {
+                        startClerkScript();
                     }
                 });
             });
