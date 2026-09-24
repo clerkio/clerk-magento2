@@ -38,8 +38,8 @@ if (!empty($block->getPublicKey())):
             }
             ?>
             globals: {
-                uenc: null,
-                formkey: null,
+                uenc: <?php echo $block->jsonEncodeSafe($block->getEncodedUrl()); ?>,
+                formkey: <?php echo $block->jsonEncodeSafe($block->getFormKey()); ?>,
                 currency_symbol: <?php echo $block->jsonEncodeSafe($block->getCurrentCurrencySymbol()); ?>,
                 currency_iso: <?php echo $block->jsonEncodeSafe($block->getCurrentCurrencyCode()); ?>
             },
