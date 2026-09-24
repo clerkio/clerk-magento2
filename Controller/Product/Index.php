@@ -116,9 +116,21 @@ class Index extends AbstractAction
 
             $response = $this->productAdapter->getResponse($this->fields, $this->page, $this->limit, $this->orderBy, $this->order, $this->scope, $this->scopeid);
 
-            if (is_array($response)) {
-                $response = array_values(array_filter($response));
+            if (!is_array($response)) {
+                $this->clerk_logger->error('Product execute ERROR', ['error' => 'Product adapter returned no list']);
+                $this->getResponse()
+                    ->setHttpResponseCode(500)
+                    ->setHeader('Content-Type', 'application/json', true)
+                    ->setBody(json_encode([
+                        'error' => [
+                            'code' => 500,
+                            'message' => 'An exception occurred',
+                        ]
+                    ]));
+                return;
             }
+
+            $response = array_values(array_filter($response));
 
             $this->clerk_logger->log('Feched page ' . $this->page . ' with ' . count($response) . ' products', ['response' => $response]);
 
@@ -142,7 +154,7 @@ class Index extends AbstractAction
             $this->debug = (bool) $request->getParam('debug', false);
             $this->limit = (int) $request->getParam('limit', 0);
             $this->page = (int) $request->getParam('page', 0);
-            $this->orderBy = $request->getParam('orderby', 'entity_id');
+            $this->orderBy = $this->sanitizeOrderBy($request->getParam('orderby', 'entity_id'));
             $this->scopeid = $request->getParam('scope_id');
             $this->scope = $request->getParam('scope');
 

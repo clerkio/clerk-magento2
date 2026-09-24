@@ -182,7 +182,7 @@ abstract class AbstractAction extends Action
     {
         try {
 
-            $collection = $this->prepareCollection()->addFieldToFilter('store_id', $this->scopeid);
+            $collection = $this->prepareCollection()->addFieldToFilter('store_id', $this->getStoreIdForFeed());
 
             $this->_eventManager->dispatch($this->eventPrefix . '_get_collection_after', [
                 'controller' => $this,
@@ -233,7 +233,6 @@ abstract class AbstractAction extends Action
                         'error' => [
                             'code' => 500,
                             'message' => 'An exception occurred',
-                            'description' => $e->getMessage(),
                         ]
                     ])
                 );
@@ -318,9 +317,10 @@ abstract class AbstractAction extends Action
                         ])
                     );
 
-                $this->clerkLogger->warn('Invalid keys supplied', ['response' => parent::dispatch($request)]);
+                $dispatchResult = parent::dispatch($request);
+                $this->clerkLogger->warn('Invalid keys supplied', ['response' => $dispatchResult]);
 
-                return parent::dispatch($request);
+                return $dispatchResult;
             }
 
             $request->setParams(['scope_id' => $identity['scope_id']]);
@@ -412,7 +412,8 @@ abstract class AbstractAction extends Action
 
             $websiteids = $this->getWebsites();
             foreach ($websiteids as $scopeID) {
-                if ($this->timingSafeEquals($this->getPublicWebsiteKey($scopeID), $this->publicKey)) {
+                $configuredKey = $this->getPublicWebsiteKey($scopeID);
+                if ($configuredKey && $this->timingSafeEquals($configuredKey, $this->publicKey)) {
                     return $scopeID;
                 }
             }
@@ -443,23 +444,13 @@ abstract class AbstractAction extends Action
      * @param string $user
      * @return boolean
      */
-    private function timingSafeEquals(string $safe, string $user)
+    private function timingSafeEquals($safe, $user)
     {
-        $safeLen = strlen($safe);
-        $userLen = strlen($user);
-
-        if ($userLen != $safeLen) {
+        if (!is_string($safe) || !is_string($user) || $safe === '' || $user === '') {
             return false;
         }
 
-        $result = 0;
-
-        for ($i = 0; $i < $userLen; $i++) {
-            $result |= (ord($safe[$i]) ^ ord($user[$i]));
-        }
-
-        // They are only identical strings if $result is exactly 0...
-        return $result === 0;
+        return hash_equals($safe, $user);
     }
 
     /**
@@ -498,7 +489,8 @@ abstract class AbstractAction extends Action
 
             $storeids = $this->getStores();
             foreach ($storeids as $scopeID) {
-                if ($this->timingSafeEquals($this->getPublicKey($scopeID), $this->publicKey)) {
+                $configuredKey = $this->getPublicKey($scopeID);
+                if ($configuredKey && $this->timingSafeEquals($configuredKey, $this->publicKey)) {
                     return $scopeID;
                 }
             }
@@ -553,7 +545,8 @@ abstract class AbstractAction extends Action
         try {
 
             $scopeID = $this->storeManager->getDefaultStoreView()->getId();
-            if ($this->timingSafeEquals($this->getPublicDefaultKey($scopeID), $this->publicKey)) {
+            $configuredKey = $this->getPublicDefaultKey($scopeID);
+            if ($configuredKey && $this->timingSafeEquals($configuredKey, $this->publicKey)) {
                 return $scopeID;
             }
 
@@ -740,11 +733,11 @@ abstract class AbstractAction extends Action
             $this->end_date = date('Y-m-d', $endDate);
             $this->limit = (int)$request->getParam('limit', 0);
             $this->page = (int)$request->getParam('page', 0);
-            $this->orderBy = $request->getParam('orderby', 'entity_id');
+            $this->orderBy = $this->sanitizeOrderBy($request->getParam('orderby', 'entity_id'));
             $this->order = $request->getParam('order', 'asc');
             $this->limit = (int)$request->getParam('limit', 0);
             $this->page = (int)$request->getParam('page', 0);
-            $this->orderBy = $request->getParam('orderby', 'entity_id');
+            $this->orderBy = $this->sanitizeOrderBy($request->getParam('orderby', 'entity_id'));
             $this->scope = $request->getParam('scope');
             $this->scopeid = $request->getParam('scope_id');
 
@@ -768,6 +761,46 @@ abstract class AbstractAction extends Action
             $this->clerkLogger->error('getArguments ERROR', ['error' => $e->getMessage()]);
 
         }
+    }
+
+    /**
+     * Keep sort values to real column names. Anything else stays on entity_id.
+     *
+     * @param mixed $orderBy
+     * @return string
+     */
+    protected function sanitizeOrderBy($orderBy)
+    {
+        if (!is_string($orderBy) || !preg_match('/^[A-Za-z0-9_]+$/', $orderBy)) {
+            return 'entity_id';
+        }
+
+        return $orderBy;
+    }
+
+    /**
+     * Collection filters need a store id. A website-scoped key still reads config
+     * from the website, but the feed itself is loaded from that website's default store.
+     *
+     * @return mixed
+     */
+    protected function getStoreIdForFeed()
+    {
+        $scope = (string)$this->scope;
+        if ($scope !== 'website' && $scope !== ScopeInterface::SCOPE_WEBSITE && $scope !== ScopeInterface::SCOPE_WEBSITES) {
+            return $this->scopeid;
+        }
+
+        try {
+            $defaultStore = $this->storeManager->getWebsite($this->scopeid)->getDefaultStore();
+            if ($defaultStore && $defaultStore->getId()) {
+                return $defaultStore->getId();
+            }
+        } catch (Exception $e) {
+            $this->clerkLogger->error('getStoreIdForFeed ERROR', ['error' => $e->getMessage()]);
+        }
+
+        return $this->scopeid;
     }
 
     /**

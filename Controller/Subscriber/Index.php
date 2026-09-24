@@ -80,7 +80,7 @@ class Index extends AbstractAction
 
                 }
 
-                $response = $this->getSubscriberCollection($this->page, $this->limit, $this->scopeid);
+                $response = $this->getSubscriberCollection($this->page, $this->limit, $this->getStoreIdForFeed());
 
                 foreach ($response->getData() as $subscriber) {
                     $_subscriber = [];

@@ -28,8 +28,8 @@ if (!empty($block->getPublicKey())):
             }
             ?>
             globals: {
-                uenc: <?php echo $block->jsonEncodeSafe($block->getEncodedUrl()); ?>,
-                formkey: <?php echo $block->jsonEncodeSafe($block->getFormKey()); ?>,
+                uenc: null,
+                formkey: null,
                 currency_symbol: <?php echo $block->jsonEncodeSafe($block->getCurrentCurrencySymbol()); ?>,
                 currency_iso: <?php echo $block->jsonEncodeSafe($block->getCurrentCurrencyCode()); ?>
             },
@@ -71,32 +71,29 @@ if (!empty($block->getPublicKey())):
                 $.ajax({
                     url: urlBuilder.build('clerk/formkey/get'),
                     type: 'get',
+                    data: {
+                        current_url: window.location.href
+                    },
                     dataType: 'json',
                     success: function(response) {
-                        if (response && response.formkey) {
-                            // Update the global formkey with the fresh one from the server
+                        if (response && (response.formkey || response.uenc)) {
+                            // Update per-visitor values after the cached page has loaded.
                             Clerk('config', {
                                 globals: {
-                                    formkey: response.formkey
+                                    formkey: response.formkey || null,
+                                    uenc: response.uenc || null
                                 }
+                            });
+                        }
+                        if (response && response.email && typeof window.Clerk == 'function') {
+                            Clerk('call', 'log/email', {
+                                email: response.email
                             });
                         }
                     }
                 });
             });
         });
-
-        <?php
-        if ($block->getCollectionEmails(true) && $block->getCustomerEmail()) {
-        ?>
-        if (typeof window.Clerk == 'function') {
-            Clerk('call', 'log/email', {
-                email: <?php echo $block->jsonEncodeSafe($block->getCustomerEmail()); ?>
-            });
-        }
-        <?php
-        }
-        ?>
 
 
 

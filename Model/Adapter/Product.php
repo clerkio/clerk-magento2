@@ -20,6 +20,7 @@ use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Tax\Api\TaxCalculationInterface;
 use Magento\Tax\Model\Calculation\Rate as TaxRate;
 
 class Product extends AbstractAdapter
@@ -114,6 +115,11 @@ class Product extends AbstractAdapter
     protected $taxHelper;
 
     /**
+     * @var TaxCalculationInterface
+     */
+    protected $taxCalculation;
+
+    /**
      * @var array
      */
     protected $fieldMap = [
@@ -174,7 +180,8 @@ class Product extends AbstractAdapter
         TaxRate                    $taxRate,
         ProductRepositoryInterface $productRepository,
         ModuleManager              $moduleManager,
-        ObjectManagerInterface     $objectManager
+        ObjectManagerInterface     $objectManager,
+        ?TaxCalculationInterface   $taxCalculation = null
     )
     {
         $this->taxHelper = $taxHelper;
@@ -184,6 +191,7 @@ class Product extends AbstractAdapter
         $this->storeManager = $storeManager;
         $this->moduleManager = $moduleManager;
         $this->objectManager = $objectManager;
+        $this->taxCalculation = $taxCalculation ?: $objectManager->get(TaxCalculationInterface::class);
         $this->stockStateInterface = $stockStateInterface;
         $this->productMetadataInterface = $productMetadataInterface;
         $this->requestInterface = $requestInterface;
@@ -221,7 +229,8 @@ class Product extends AbstractAdapter
             $collection = $this->collectionFactory->create();
 
             $collection->addFieldToSelect('*');
-            $collection->addStoreFilter($scopeid);
+            $storeId = $this->resolveStoreId($scope, $scopeid);
+            $collection->addStoreFilter($storeId);
             $productMetadata = $this->productMetadataInterface;
             $version = $productMetadata->getVersion();
 
@@ -258,7 +267,7 @@ class Product extends AbstractAdapter
                     break;
             }
 
-            $collection->setPageSize($limit)->setCurPage($page)->addOrder($orderBy, $order);
+            $collection->setPageSize($limit)->setCurPage($page)->addOrder($this->sanitizeOrderBy($orderBy), $order);
 
             $this->eventManager->dispatch('clerk_' . $this->eventPrefix . '_get_collection_after', [
                 'adapter' => $this,
@@ -313,12 +322,16 @@ class Product extends AbstractAdapter
             });
 
             $this->addFieldHandler('tax_rate', function ($item) {
-                foreach ($this->productTaxRates as $tax) {
-                    if (array_key_exists('tax_calculation_rate_id', $tax) && $item->getTaxClassId() == $tax['tax_calculation_rate_id']) {
-                        return (float)$tax['rate'];
-                    }
+                try {
+                    return (float)$this->taxCalculation->getCalculatedRate(
+                        (int)$item->getTaxClassId(),
+                        null,
+                        $this->scopeId
+                    );
+                } catch (Exception $e) {
+                    $this->clerk_logger->error('Tax rate ERROR', ['error' => $e->getMessage()]);
+                    return 0;
                 }
-                return 0;
             });
 
             $this->addFieldHandler('price', function ($item) {
@@ -633,6 +646,7 @@ class Product extends AbstractAdapter
                 $productType = $item->getTypeID();
                 $productTypeInstance = $item->getTypeInstance();
                 $childImages = array();
+                $childIds = array();
                 if ($productType == self::PRODUCT_TYPE_CONFIGURABLE) {
                     if ($heavyAttributeQuery) {
                         $childIdsRaw = $productTypeInstance->getChildrenIds($item->getId());
@@ -844,11 +858,48 @@ class Product extends AbstractAdapter
         return $this->taxHelper->getTaxPrice($product, $price, $withTax, null, null, null, $store, null, true);
     }
 
+    /**
+     * @param mixed $orderBy
+     * @return string
+     */
+    protected function sanitizeOrderBy($orderBy)
+    {
+        if (!is_string($orderBy) || !preg_match('/^[A-Za-z0-9_]+$/', $orderBy)) {
+            return 'entity_id';
+        }
+
+        return $orderBy;
+    }
+
+    /**
+     * @param mixed $scope
+     * @param mixed $scopeId
+     * @return mixed
+     */
+    protected function resolveStoreId($scope, $scopeId)
+    {
+        if ($scope !== 'website' && $scope !== 'websites') {
+            return $scopeId;
+        }
+
+        try {
+            $defaultStore = $this->storeManager->getWebsite($scopeId)->getDefaultStore();
+            if ($defaultStore && $defaultStore->getId()) {
+                return $defaultStore->getId();
+            }
+        } catch (Exception $e) {
+            $this->clerk_logger->error('resolveStoreId ERROR', ['error' => $e->getMessage()]);
+        }
+
+        return $scopeId;
+    }
+
     protected function getStoreFromContext()
     {
         $requestParams = $this->requestInterface->getParams();
         if (array_key_exists('scope_id', $requestParams)) {
-            return $this->storeManager->getStore($requestParams['scope_id']);
+            $scope = array_key_exists('scope', $requestParams) ? $requestParams['scope'] : null;
+            return $this->storeManager->getStore($this->resolveStoreId($scope, $requestParams['scope_id']));
         } else {
             return $this->storeManager->getStore();
         }
@@ -882,7 +933,8 @@ class Product extends AbstractAdapter
     {
         $requestParams = $this->requestInterface->getParams();
         if (array_key_exists('scope_id', $requestParams)) {
-            return $requestParams['scope_id'];
+            $scope = array_key_exists('scope', $requestParams) ? $requestParams['scope'] : null;
+            return $this->resolveStoreId($scope, $requestParams['scope_id']);
         } else {
             return $this->storeManager->getStore()->getId();
         }
@@ -944,7 +996,7 @@ class Product extends AbstractAdapter
         try {
 
             $this->scope = $scope;
-            $this->scopeId = $scopeid;
+            $this->scopeId = $this->resolveStoreId($scope, $scopeid);
 
             $fields = [
                 'name',

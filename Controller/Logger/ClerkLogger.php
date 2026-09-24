@@ -436,7 +436,7 @@ class ClerkLogger
 
                 $response = json_decode(curl_exec($curl));
 
-                if ($response->status == 'error') {
+                if (!is_object($response) || !isset($response->status) || $response->status == 'error') {
 
                     $this->LogToFile($Message, $Metadata);
 

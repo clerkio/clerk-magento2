@@ -227,7 +227,6 @@ class Index extends AbstractAction
                         'error' => [
                             'code' => 500,
                             'message' => 'An exception occured',
-                            'description' => $e->getMessage(),
                         ]
                     ])
                 );
