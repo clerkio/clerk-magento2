@@ -98,6 +98,25 @@ class Api
         }
     }
 
+    /**
+     * @param resource|\CurlHandle $curl
+     * @return void
+     */
+    private function logTimeout($curl)
+    {
+        if (curl_errno($curl) !== CURLE_OPERATION_TIMEDOUT) {
+            return;
+        }
+
+        $url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+        $url = is_string($url) ? strtok($url, '?') : '';
+
+        $this->clerk_logger->error('Clerk API request timed out', [
+            'error' => 'Clerk did not respond within 60 seconds',
+            'url' => $url,
+        ]);
+    }
+
     private function getDefaultParams($store_id = null)
     {
         if (null === $store_id) {
@@ -179,7 +198,9 @@ class Api
             }
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 60);
             $response = curl_exec($curl);
+            $this->logTimeout($curl);
             curl_close($curl);
             return $response;
 
@@ -201,7 +222,9 @@ class Api
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($params, true));
             }
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 60);
             $response = curl_exec($curl);
+            $this->logTimeout($curl);
             curl_close($curl);
             return $response;
 
