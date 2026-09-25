@@ -734,10 +734,6 @@ abstract class AbstractAction extends Action
             $this->limit = (int)$request->getParam('limit', 0);
             $this->page = (int)$request->getParam('page', 0);
             $this->orderBy = $this->sanitizeOrderBy($request->getParam('orderby', 'entity_id'));
-            $this->order = $request->getParam('order', 'asc');
-            $this->limit = (int)$request->getParam('limit', 0);
-            $this->page = (int)$request->getParam('page', 0);
-            $this->orderBy = $this->sanitizeOrderBy($request->getParam('orderby', 'entity_id'));
             $this->scope = $request->getParam('scope');
             $this->scopeid = $request->getParam('scope_id');
 
@@ -800,7 +796,27 @@ abstract class AbstractAction extends Action
             $this->clerkLogger->error('getStoreIdForFeed ERROR', ['error' => $e->getMessage()]);
         }
 
-        return $this->scopeid;
+        return $this->getDefaultStoreViewId($this->scopeid);
+    }
+
+    /**
+     * A failed website lookup must not keep using the website id as a store id.
+     *
+     * @param mixed $fallback
+     * @return mixed
+     */
+    protected function getDefaultStoreViewId($fallback)
+    {
+        try {
+            $defaultView = $this->storeManager->getDefaultStoreView();
+            if ($defaultView && $defaultView->getId()) {
+                return $defaultView->getId();
+            }
+        } catch (Exception $e) {
+            $this->clerkLogger->error('getDefaultStoreViewId ERROR', ['error' => $e->getMessage()]);
+        }
+
+        return $fallback;
     }
 
     /**

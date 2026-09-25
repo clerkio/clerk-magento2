@@ -891,6 +891,15 @@ class Product extends AbstractAdapter
             $this->clerk_logger->error('resolveStoreId ERROR', ['error' => $e->getMessage()]);
         }
 
+        try {
+            $defaultView = $this->storeManager->getDefaultStoreView();
+            if ($defaultView && $defaultView->getId()) {
+                return $defaultView->getId();
+            }
+        } catch (Exception $e) {
+            $this->clerk_logger->error('resolveStoreId ERROR', ['error' => $e->getMessage()]);
+        }
+
         return $scopeId;
     }
 

@@ -78,37 +78,44 @@ if (!empty($block->getPublicKey())):
         // Update form key via AJAX to ensure it's correct for the current session
         require(['jquery', 'mage/url'], function($, urlBuilder) {
             $(document).ready(function() {
-                $.ajax({
-                    url: urlBuilder.build('clerk/formkey/get'),
-                    type: 'get',
-                    data: {
-                        current_url: window.location.href
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        var globals = {};
-                        if (response && response.formkey) {
-                            globals.formkey = response.formkey;
+                try {
+                    $.ajax({
+                        url: urlBuilder.build('clerk/formkey/get'),
+                        type: 'get',
+                        timeout: 5000,
+                        data: {
+                            current_url: window.location.href
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            var globals = {};
+                            if (response && response.formkey) {
+                                globals.formkey = response.formkey;
+                            }
+                            if (response && response.uenc) {
+                                globals.uenc = response.uenc;
+                            }
+                            if (globals.formkey || globals.uenc) {
+                                Clerk('config', {
+                                    globals: globals
+                                });
+                            }
+                            if (response && response.email) {
+                                Clerk('call', 'log/email', {
+                                    email: response.email
+                                });
+                            }
+                        },
+                        complete: function() {
+                            startClerkScript();
                         }
-                        if (response && response.uenc) {
-                            globals.uenc = response.uenc;
-                        }
-                        if (globals.formkey || globals.uenc) {
-                            Clerk('config', {
-                                globals: globals
-                            });
-                        }
-                        if (response && response.email) {
-                            Clerk('call', 'log/email', {
-                                email: response.email
-                            });
-                        }
-                    },
-                    complete: function() {
-                        startClerkScript();
-                    }
-                });
+                    });
+                } catch (e) {
+                    startClerkScript();
+                }
             });
+        }, function () {
+            startClerkScript();
         });
 
 

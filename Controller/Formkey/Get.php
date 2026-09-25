@@ -14,6 +14,7 @@ use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Url\EncoderInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -92,7 +93,7 @@ class Get extends Action
         $result->setHeader('Pragma', 'no-cache', true);
         $data = ['formkey' => $this->formKey->getFormKey()];
         $currentUrl = $this->getRequest()->getParam('current_url');
-        if (is_string($currentUrl) && $currentUrl !== '') {
+        if ($this->isShopUrl($currentUrl)) {
             $data['uenc'] = $this->urlEncoder->encode($currentUrl);
         }
         $email = $this->getLoggedInEmail();
@@ -101,6 +102,50 @@ class Get extends Action
         }
 
         return $result->setData($data);
+    }
+
+    /**
+     * Designs read uenc as a return URL. Only a URL on this shop is encoded.
+     *
+     * @param mixed $url
+     * @return bool
+     */
+    private function isShopUrl($url)
+    {
+        if (!is_string($url) || $url === '') {
+            return false;
+        }
+
+        $parts = parse_url($url);
+        if (!is_array($parts) || empty($parts['host'])) {
+            return false;
+        }
+
+        $scheme = strtolower((string)($parts['scheme'] ?? ''));
+        if ($scheme !== 'http' && $scheme !== 'https') {
+            return false;
+        }
+
+        $host = strtolower($parts['host']);
+        $allowed = [];
+        $requestHost = $this->getRequest()->getHttpHost();
+        if (is_string($requestHost) && $requestHost !== '') {
+            $allowed[] = strtolower((string)preg_replace('/:\d+$/', '', $requestHost));
+        }
+
+        try {
+            $store = $this->storeManager->getStore();
+            foreach ([false, true] as $secure) {
+                $baseHost = parse_url($store->getBaseUrl(UrlInterface::URL_TYPE_LINK, $secure), PHP_URL_HOST);
+                if (is_string($baseHost) && $baseHost !== '') {
+                    $allowed[] = strtolower($baseHost);
+                }
+            }
+        } catch (\Exception $e) {
+            return in_array($host, $allowed, true);
+        }
+
+        return in_array($host, $allowed, true);
     }
 
     /**
