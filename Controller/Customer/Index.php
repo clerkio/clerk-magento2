@@ -130,7 +130,7 @@ class Index extends AbstractAction
 
                 }
 
-                $response = $this->getCustomerCollection($this->page, $this->limit, $this->scopeid);
+                $response = $this->getCustomerCollection($this->page, $this->limit, $this->getStoreIdForFeed());
 
                 foreach ($response->getData() as $customer) {
 
@@ -171,7 +171,7 @@ class Index extends AbstractAction
 
                 if ($this->scopeConfig->getValue(Config::XML_PATH_SUBSCRIBER_SYNCHRONIZATION_ENABLED, $this->scope, $this->scopeid)) {
 
-                    $subscribersOnlyResponse = $this->getSubscriberCollection($this->page, $this->limit, $this->scopeid);
+                    $subscribersOnlyResponse = $this->getSubscriberCollection($this->page, $this->limit, $this->getStoreIdForFeed());
 
                     foreach ($subscribersOnlyResponse->getData() as $subscriber) {
                         if (isset($subscriber['subscriber_id'])) {
@@ -213,7 +213,7 @@ class Index extends AbstractAction
     public function getCustomerCollection($page, $limit, $storeid)
     {
         $customerCollection = $this->collectionFactory->create();
-        $customerCollection->setOrder('title', 'ASC');
+        $customerCollection->setOrder('entity_id', 'ASC');
         $customerCollection->addFilter('store_id', $storeid);
         $customerCollection->setPageSize($limit);
         $customerCollection->setCurPage($page);
