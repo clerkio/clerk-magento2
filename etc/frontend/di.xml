@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\CatalogSearch\Controller\Result\Index">
+        <plugin name="clerk_catalogsearch_result_index" type="Clerk\Clerk\Plugin\CatalogSearch\Controller\Result\IndexPlugin"/>
+    </type>
+</config>

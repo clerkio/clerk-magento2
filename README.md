@@ -85,6 +85,9 @@ There are also diagnostic endpoints (`/clerk/getconfig`, `/clerk/setconfig`, `/c
 │   ├── Powerstep/Popup.php         ← Powerstep popup AJAX
 │   └── Adminhtml/Dashboard/        ← Admin dashboard iframe controllers
 │
+├── Plugin/
+│   └── CatalogSearch/Controller/Result/IndexPlugin.php ← Renders the Clerk search page without native search processing
+│
 ├── Model/
 │   ├── Config.php                  ← All config path constants
 │   ├── Api.php                     ← Curl-based Clerk.io API client
@@ -96,7 +99,6 @@ There are also diagnostic endpoints (`/clerk/getconfig`, `/clerk/setconfig`, `/c
 │   ├── SalesOrderCreditmemoSaveAfterObserver ← Track returned orders
 │   ├── CheckoutCartAddProductCompleteObserver ← Trigger powerstep popup
 │   ├── CheckoutCartUpdateItemsAfterObserver  ← Basket tracking to Clerk API
-│   └── LayoutLoadBeforeObserver.php          ← Inject Clerk search layout handle
 │
 ├── Block/
 │   ├── Tracking.php                ← Clerk.js init block
@@ -118,7 +120,8 @@ There are also diagnostic endpoints (`/clerk/getconfig`, `/clerk/setconfig`, `/c
 │   ├── adminhtml/system.xml        ← Admin config fields (this is where all settings live)
 │   └── frontend/
 │       ├── routes.xml              ← Frontend routes: clerk/*, checkout/*
-│       └── events.xml              ← Frontend observers (layout, cart, powerstep)
+│       ├── di.xml                  ← Frontend search controller plugin
+│       └── events.xml              ← Frontend observers (cart, powerstep)
 │
 ├── view/frontend/
 │   ├── layout/
