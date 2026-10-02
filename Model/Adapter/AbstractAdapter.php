@@ -176,6 +176,11 @@ abstract class AbstractAdapter
             $attributeValue = $this->getAttributeValueHeavy($resourceItem, $field);
           }
           $info[$this->getFieldName($field)] = $attributeValue;
+        } elseif ($heavyAttributeQuery && in_array($field, $customFields, true) && !array_key_exists($this->getFieldName($field), $info)) {
+          $attributeValue = $this->getAttributeValueForStore($resourceItem, $field, $this->resolveStoreId($scope, $scopeid));
+          if (isset($attributeValue)) {
+            $info[$this->getFieldName($field)] = $attributeValue;
+          }
         }
 
 
@@ -380,6 +385,63 @@ abstract class AbstractAdapter
       $this->clerk_logger->error('Getting Attribute Value Error', ['error' => $e->getMessage()]);
 
     }
+  }
+
+  /**
+   * Get attribute value for a field that is not loaded on the product
+   *
+   * @param $resourceItem
+   * @param $field
+   * @param $storeId
+   * @return mixed
+   */
+  protected function getAttributeValueForStore($resourceItem, $field, $storeId)
+  {
+    try {
+
+      $attributeResource = $resourceItem->getResource();
+
+      if (!$attributeResource || !method_exists($attributeResource, 'getAttributeRawValue')) {
+        return null;
+      }
+
+      $rawValue = $attributeResource->getAttributeRawValue($resourceItem->getId(), $field, $storeId);
+
+      // getAttributeRawValue returns an empty array when the product has no value.
+      if (is_array($rawValue) || $rawValue === false || $rawValue === null || $rawValue === '') {
+        return null;
+      }
+
+      $attribute = $attributeResource->getAttribute($field);
+      if (is_object($attribute) && $attribute->usesSource()) {
+        $source = $attribute->getSource();
+        if ($source) {
+          $optionText = $source->getOptionText($rawValue);
+          return ($optionText === false || $optionText === []) ? null : $optionText;
+        }
+      }
+
+      return $rawValue;
+
+    } catch (\Exception $e) {
+
+      $this->clerk_logger->error('Getting Attribute Value For Store Error', ['error' => $e->getMessage()]);
+
+    }
+
+    return null;
+  }
+
+  /**
+   * Resolve the store to read store values from
+   *
+   * @param string $scope
+   * @param int|string $scopeId
+   * @return int|string
+   */
+  protected function resolveStoreId($scope, $scopeId)
+  {
+    return $scopeId;
   }
 
   /**
