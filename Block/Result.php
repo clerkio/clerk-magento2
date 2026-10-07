@@ -3,13 +3,59 @@
 namespace Clerk\Clerk\Block;
 
 use Clerk\Clerk\Model\Config;
-use Magento\CatalogSearch\Block\Result as BaseResult;
+use Magento\CatalogSearch\Helper\Data as CatalogSearchHelper;
+use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\ScopeInterface;
 
-class Result extends BaseResult
+class Result extends Template
 {
 
     const TARGET_ID = 'clerk-search-results';
+
+    /**
+     * @var CatalogSearchHelper
+     */
+    protected $catalogSearchData;
+
+    /**
+     * @param Template\Context $context
+     * @param CatalogSearchHelper $catalogSearchData
+     * @param array $data
+     */
+    public function __construct(
+        Template\Context $context,
+        CatalogSearchHelper $catalogSearchData,
+        array $data = []
+    ) {
+        $this->catalogSearchData = $catalogSearchData;
+        parent::__construct($context, $data);
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _prepareLayout()
+    {
+        $title = __("Search results for: '%1'", $this->getSearchQuery());
+        $this->pageConfig->getTitle()->set($title);
+
+        $breadcrumbs = $this->getLayout()->getBlock('breadcrumbs');
+        if ($breadcrumbs) {
+            $breadcrumbs->addCrumb(
+                'home',
+                [
+                    'label' => __('Home'),
+                    'title' => __('Go to Home Page'),
+                    'link' => $this->_storeManager->getStore()->getBaseUrl()
+                ]
+            )->addCrumb(
+                'search',
+                ['label' => $title, 'title' => $title]
+            );
+        }
+
+        return parent::_prepareLayout();
+    }
 
     /**
      * Get search query
