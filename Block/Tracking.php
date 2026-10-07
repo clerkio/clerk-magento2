@@ -258,7 +258,8 @@ class Tracking extends Template
      */
     public function getAllCurrencySymbols()
     {
-        $currency_codes = $this->getAllowedCurrencies();
+        // getAllowedCurrencies() reads system/currency/installed, not currency/options/allow.
+        $currency_codes = $this->getAvailableCurrencyCodes(true);
         $currency_symbols_array = array();
         foreach ($currency_codes as $code) {
             $currency_symbols_array[$code] = $this->_localeCurrency->getCurrency($code)->getSymbol();
@@ -273,7 +274,8 @@ class Tracking extends Template
      */
     public function getAllCurrencyRates()
     {
-        $currency_codes = $this->getAllowedCurrencies();
+        // getAllowedCurrencies() reads system/currency/installed, not currency/options/allow.
+        $currency_codes = $this->getAvailableCurrencyCodes(true);
         $currency_rates_array = array();
         foreach ($currency_codes as $code) {
             $currency_rates_array[$code] = $this->getCurrencyRateFromIso($code);
