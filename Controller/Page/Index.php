@@ -270,6 +270,8 @@ class Index extends AbstractAction
         $collection->addFilter('is_active', 1);
         $collection->addFilter('store_id', $store->getId());
         $collection->addStoreFilter($store);
+        // main_table keeps page_id unambiguous after addStoreFilter joins cms_page_store.
+        $collection->setOrder('main_table.page_id', \Magento\Framework\Data\Collection::SORT_ORDER_ASC);
         $collection->setPageSize($limit);
         $collection->setCurPage($page);
         return $collection;

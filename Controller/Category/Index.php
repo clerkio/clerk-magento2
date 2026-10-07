@@ -255,7 +255,8 @@ class Index extends AbstractAction
             $collection->addPathsFilter('1/' . $rootCategory . '/%');
             $collection->addFieldToFilter('is_active', ["in" => ['1']]);
 
-
+            // Stable order so LIMIT/OFFSET pages do not overlap and drop categories.
+            $collection->setOrder('entity_id', \Magento\Framework\Data\Collection::SORT_ORDER_ASC);
             $collection->setCurPage($this->page)->setPageSize($this->limit);
 
 
