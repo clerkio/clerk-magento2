@@ -47,7 +47,10 @@ class ProductRealtimeSynchronizerTest extends TestCase
 
         $sync->syncProduct($this->product(10, true), 1);
 
-        $this->assertSame(['clear stock item 10', 'clear stock status 10', 'load 10 store 1 forced'], $log->entries);
+        $this->assertSame(
+            ['clear stock item 10', 'clear stock status 10', 'load 10 store 1 forced', 'clear stock item 10'],
+            $log->entries
+        );
     }
 
     public function testEditingAHiddenChildStillResyncsItsParent(): void
@@ -55,7 +58,7 @@ class ProductRealtimeSynchronizerTest extends TestCase
         [$sync, $api] = $this->synchronizer(
             [
                 11 => $this->product(11, true, self::NOT_VISIBLE),
-                20 => $this->product(20, true, self::VISIBLE_BOTH, Status::STATUS_ENABLED, true),
+                20 => $this->product(20, true, self::VISIBLE_BOTH, Status::STATUS_ENABLED, 'configurable'),
             ],
             [11 => true],
             [11 => [20]]
@@ -71,7 +74,7 @@ class ProductRealtimeSynchronizerTest extends TestCase
         [$sync, $api] = $this->synchronizer(
             [
                 11 => $this->product(11, true, self::VISIBLE_BOTH, Status::STATUS_DISABLED),
-                20 => $this->product(20, true, self::VISIBLE_BOTH, Status::STATUS_ENABLED, true),
+                20 => $this->product(20, true, self::VISIBLE_BOTH, Status::STATUS_ENABLED, 'configurable'),
             ],
             [11 => true],
             [11 => [20]]
@@ -82,20 +85,54 @@ class ProductRealtimeSynchronizerTest extends TestCase
         $this->assertSame([['add', 20], ['remove', 11]], $api->calls);
     }
 
-    public function testSoldOutConfigurableParentIsRemoved(): void
+    public function testConfigurableWhoseLastChildSoldOutIsRemovedEvenWhenTheIndexIsStale(): void
     {
         [$sync, $api] = $this->synchronizer(
             [
-                11 => $this->product(11, false, self::NOT_VISIBLE),
-                20 => $this->product(20, false, self::VISIBLE_BOTH, Status::STATUS_ENABLED, true),
+                11 => $this->product(11, true, self::NOT_VISIBLE),
+                12 => $this->product(12, false, self::NOT_VISIBLE),
+                20 => $this->product(20, true, self::VISIBLE_BOTH, Status::STATUS_ENABLED, 'configurable'),
             ],
-            [11 => false, 20 => true],
-            [11 => [20]]
+            [11 => false, 12 => false, 20 => true],
+            [11 => [20], 12 => [20]]
         );
 
         $sync->syncProductIds([11], 1);
 
-        $this->assertSame([['remove', 20]], $api->calls, 'composite products ignore their own stock flag');
+        $this->assertSame([['remove', 20]], $api->calls);
+    }
+
+    public function testConfigurableWithARestockedChildIsAddedEvenWhenTheIndexIsStale(): void
+    {
+        [$sync, $api] = $this->synchronizer(
+            [
+                11 => $this->product(11, false, self::NOT_VISIBLE),
+                12 => $this->product(12, false, self::NOT_VISIBLE),
+                20 => $this->product(20, false, self::VISIBLE_BOTH, Status::STATUS_ENABLED, 'configurable'),
+            ],
+            [11 => true, 12 => false, 20 => false],
+            [11 => [20], 12 => [20]]
+        );
+
+        $sync->syncProduct($this->product(11, false, self::NOT_VISIBLE), 1);
+
+        $this->assertSame([['add', 20]], $api->calls);
+    }
+
+    public function testParentInTheSameOrderIsSentOnce(): void
+    {
+        [$sync, $api] = $this->synchronizer(
+            [
+                11 => $this->product(11, true),
+                20 => $this->product(20, true, self::VISIBLE_BOTH, Status::STATUS_ENABLED, 'configurable'),
+            ],
+            [11 => true],
+            [11 => [20]]
+        );
+
+        $sync->syncProductIds([20, 11], 1);
+
+        $this->assertSame([['add', 20], ['add', 11]], $api->calls);
     }
 
     /**
@@ -196,6 +233,17 @@ class ProductRealtimeSynchronizerTest extends TestCase
             {
                 return $this->parents[$childId] ?? [];
             }
+
+            public function getChildrenIds($parentId, $required = true)
+            {
+                $children = [];
+                foreach ($this->parents as $childId => $parentIds) {
+                    if (in_array($parentId, $parentIds, true)) {
+                        $children[$childId] = $childId;
+                    }
+                }
+                return [0 => $children];
+            }
         };
         $grouped = new class {
             public function getParentIdsByChild($childId)
@@ -241,21 +289,26 @@ class ProductRealtimeSynchronizerTest extends TestCase
         bool $salable,
         int $visibility = self::VISIBLE_BOTH,
         int $status = Status::STATUS_ENABLED,
-        bool $composite = false
+        string $type = 'simple'
     ): object {
-        return new class ($id, $salable, $visibility, $status, $composite) {
+        return new class ($id, $salable, $visibility, $status, $type) {
             public function __construct(
                 private int $id,
                 private bool $salable,
                 private int $visibility,
                 private int $status,
-                private bool $composite
+                private string $type
             ) {
             }
 
             public function getId()
             {
                 return $this->id;
+            }
+
+            public function getTypeId()
+            {
+                return $this->type;
             }
 
             public function isSalable()
@@ -275,7 +328,7 @@ class ProductRealtimeSynchronizerTest extends TestCase
 
             public function getTypeInstance()
             {
-                $composite = $this->composite;
+                $composite = $this->type !== 'simple';
                 return new class ($composite) {
                     public function __construct(private bool $composite)
                     {

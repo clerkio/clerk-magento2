@@ -69,6 +69,13 @@ class ProductRealtimeSynchronizer
      */
     protected $stockRegistry;
 
+    /**
+     * Products already sent in the current sync, keyed by store and product ID.
+     *
+     * @var array
+     */
+    protected $pushed = [];
+
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Emulation $emulation,
@@ -105,6 +112,7 @@ class ProductRealtimeSynchronizer
         if (!$product || !$product->getId()) {
             return;
         }
+        $this->pushed = [];
 
         if ($storeId == 0) {
             foreach ($product->getStoreIds() as $productStoreId) {
@@ -135,6 +143,7 @@ class ProductRealtimeSynchronizer
     public function syncProductIds(array $productIds, $storeId)
     {
         $productIds = array_unique(array_filter($productIds));
+        $this->pushed = [];
         foreach ($productIds as $productId) {
             try {
                 $this->syncProductForStore($this->loadProduct($productId, $storeId), $storeId);
@@ -187,6 +196,13 @@ class ProductRealtimeSynchronizer
      */
     protected function pushProduct($product, $storeId)
     {
+        // An order holds both the configurable and its child, and the child pushes its parent too.
+        $key = $storeId . ':' . $product->getId();
+        if (isset($this->pushed[$key])) {
+            return;
+        }
+        $this->pushed[$key] = true;
+
         if ($product->getStatus() == Status::STATUS_DISABLED) {
             $this->api->removeProduct($product->getId(), $storeId);
             return;
@@ -237,20 +253,48 @@ class ProductRealtimeSynchronizer
     }
 
     /**
-     * Simple products use the live stock item: with "Update by Schedule" the stock index lags until cron runs.
+     * Salability from live stock items: with "Update by Schedule" the stock index lags until cron runs.
      *
      * @param ProductModel|ProductInterface $product
      * @return bool
      */
     protected function isSalable($product)
     {
-        if (!$product->getTypeInstance()->isComposite($product)) {
-            $stockItem = $this->stockRegistry->getStockItem($product->getId());
-            if ($stockItem && $stockItem->getItemId() && $stockItem->getManageStock()) {
-                return (bool)$stockItem->getIsInStock();
+        if ($product->getTypeId() === 'configurable') {
+            $childIds = [];
+            foreach ($this->_productModelConfigurable->getChildrenIds($product->getId()) as $group) {
+                $childIds = array_merge($childIds, array_values($group));
+            }
+            if ($childIds) {
+                // Salable while any child is; a child without managed stock counts as in stock.
+                foreach ($childIds as $childId) {
+                    if ($this->getLiveStockStatus($childId) !== false) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        } elseif (!$product->getTypeInstance()->isComposite($product)) {
+            $inStock = $this->getLiveStockStatus($product->getId());
+            if ($inStock !== null) {
+                return $inStock;
             }
         }
         return (bool)$product->isSalable();
+    }
+
+    /**
+     * @param int|string $productId
+     * @return bool|null null when the product does not manage stock
+     */
+    protected function getLiveStockStatus($productId)
+    {
+        $this->stockRegistryStorage->removeStockItem($productId);
+        $stockItem = $this->stockRegistry->getStockItem($productId);
+        if ($stockItem && $stockItem->getItemId() && $stockItem->getManageStock()) {
+            return (bool)$stockItem->getIsInStock();
+        }
+        return null;
     }
 
     /**
