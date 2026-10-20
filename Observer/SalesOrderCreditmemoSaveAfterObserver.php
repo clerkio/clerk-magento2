@@ -4,13 +4,12 @@ namespace Clerk\Clerk\Observer;
 
 use Clerk\Clerk\Model\Api;
 use Clerk\Clerk\Model\Config;
-use Clerk\Clerk\Model\ProductRealtimeSynchronizer;
+use Clerk\Clerk\Model\DeferredProductSync;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\ScopeInterface;
-use Psr\Log\LoggerInterface;
 
 class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
 {
@@ -30,27 +29,20 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
     protected $orderRepository;
 
     /**
-     * @var ProductRealtimeSynchronizer
+     * @var DeferredProductSync
      */
-    protected $productRealtimeSynchronizer;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected $deferredProductSync;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Api $api,
         OrderRepositoryInterface $orderRepository,
-        ProductRealtimeSynchronizer $productRealtimeSynchronizer,
-        LoggerInterface $logger
+        DeferredProductSync $deferredProductSync
     ) {
         $this->orderRepository = $orderRepository;
         $this->scopeConfig = $scopeConfig;
         $this->api = $api;
-        $this->productRealtimeSynchronizer = $productRealtimeSynchronizer;
-        $this->logger = $logger;
+        $this->deferredProductSync = $deferredProductSync;
     }
 
     /**
@@ -95,10 +87,6 @@ class SalesOrderCreditmemoSaveAfterObserver implements ObserverInterface
             return;
         }
 
-        try {
-            $this->productRealtimeSynchronizer->syncProductIds($productIds, $storeId);
-        } catch (\Exception $e) {
-            $this->logger->error('Clerk realtime product sync after credit memo failed: ' . $e->getMessage());
-        }
+        $this->deferredProductSync->add($productIds, $storeId);
     }
 }

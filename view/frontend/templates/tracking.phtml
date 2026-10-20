@@ -12,22 +12,6 @@ if (!empty($block->getPublicKey())):
             };
         })(window);
 
-        var clerkScriptStarted = false;
-        function startClerkScript() {
-            if (clerkScriptStarted) {
-                return;
-            }
-            clerkScriptStarted = true;
-            (function (w, d) {
-                var e = d.createElement('script');
-                e.type = 'text/javascript';
-                e.async = true;
-                e.src = (d.location.protocol == 'https:' ? 'https' : 'http') + <?php echo $block->jsonEncodeSafe($clerkJsUrl); ?>;
-                var s = d.getElementsByTagName('script')[0];
-                s.parentNode.insertBefore(e, s);
-            })(window, document);
-        }
-
         Clerk('config', {
             key: '<?php echo $block->escapeJsQuote($block->getPublicKey()); ?>',
             collect_email: <?php echo $block->getCollectionEmails(); ?>,
@@ -75,47 +59,60 @@ if (!empty($block->getPublicKey())):
             page: <?php $p = $block->getContextPageId(); echo $p !== null ? ($block->isContextPageString() ? "'" . $block->escapeJs($p) . "'" : $p) : 'null'; ?>
         });
 
+        // Load clerk.js right away; queued calls replay when it loads, so it does not need to wait for the AJAX below.
+        (function (w, d) {
+            var e = d.createElement('script');
+            e.type = 'text/javascript';
+            e.async = true;
+            e.src = (d.location.protocol == 'https:' ? 'https' : 'http') + <?php echo $block->jsonEncodeSafe($clerkJsUrl); ?>;
+            var s = d.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(e, s);
+        })(window, document);
+
         // Update form key via AJAX to ensure it's correct for the current session
         require(['jquery', 'mage/url'], function($, urlBuilder) {
             $(document).ready(function() {
-                try {
-                    $.ajax({
-                        url: urlBuilder.build('clerk/formkey/get'),
-                        type: 'get',
-                        timeout: 5000,
-                        data: {
-                            current_url: window.location.href
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            var globals = {};
-                            if (response && response.formkey) {
-                                globals.formkey = response.formkey;
-                            }
-                            if (response && response.uenc) {
-                                globals.uenc = response.uenc;
-                            }
-                            if (globals.formkey || globals.uenc) {
-                                Clerk('config', {
-                                    globals: globals
-                                });
-                            }
-                            if (response && response.email) {
-                                Clerk('call', 'log/email', {
-                                    email: response.email
-                                });
-                            }
-                        },
-                        complete: function() {
-                            startClerkScript();
+                $.ajax({
+                    url: urlBuilder.build('clerk/formkey/get'),
+                    type: 'get',
+                    timeout: 5000,
+                    data: {
+                        current_url: window.location.href
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        var globals = {};
+                        if (response && response.formkey) {
+                            globals.formkey = response.formkey;
                         }
-                    });
-                } catch (e) {
-                    startClerkScript();
-                }
+                        if (response && response.uenc) {
+                            globals.uenc = response.uenc;
+                        }
+                        if (globals.formkey || globals.uenc) {
+                            // Blocks clerk.js already rendered still carry the cached page's form key; re-render them from their cached response.
+                            var current = window.Clerk._clerk ? (Clerk('config', 'globals') || {}) : null;
+                            var changed = current && (
+                                (globals.formkey && globals.formkey !== current.formkey) ||
+                                (globals.uenc && globals.uenc !== current.uenc)
+                            );
+                            Clerk('config', {
+                                globals: globals
+                            });
+                            if (changed) {
+                                var contents = Clerk('contents') || {};
+                                Object.keys(contents).forEach(function (id) {
+                                    contents[id].render();
+                                });
+                            }
+                        }
+                        if (response && response.email) {
+                            Clerk('call', 'log/email', {
+                                email: response.email
+                            });
+                        }
+                    }
+                });
             });
-        }, function () {
-            startClerkScript();
         });
 
 
