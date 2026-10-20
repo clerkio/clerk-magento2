@@ -2,29 +2,21 @@
 
 namespace Clerk\Clerk\Observer;
 
-use Clerk\Clerk\Model\ProductRealtimeSynchronizer;
+use Clerk\Clerk\Model\DeferredProductSync;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Psr\Log\LoggerInterface;
 
 class QuoteSubmitSuccessObserver implements ObserverInterface
 {
     /**
-     * @var ProductRealtimeSynchronizer
+     * @var DeferredProductSync
      */
-    protected $productRealtimeSynchronizer;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected $deferredProductSync;
 
     public function __construct(
-        ProductRealtimeSynchronizer $productRealtimeSynchronizer,
-        LoggerInterface $logger
+        DeferredProductSync $deferredProductSync
     ) {
-        $this->productRealtimeSynchronizer = $productRealtimeSynchronizer;
-        $this->logger = $logger;
+        $this->deferredProductSync = $deferredProductSync;
     }
 
     /**
@@ -51,10 +43,7 @@ class QuoteSubmitSuccessObserver implements ObserverInterface
             return;
         }
 
-        try {
-            $this->productRealtimeSynchronizer->syncProductIds($productIds, $order->getStoreId());
-        } catch (\Exception $e) {
-            $this->logger->error('Clerk realtime product sync after order failed: ' . $e->getMessage());
-        }
+        // Deferred so a slow Clerk call cannot hold checkout while the quote is still active.
+        $this->deferredProductSync->add($productIds, $order->getStoreId());
     }
 }

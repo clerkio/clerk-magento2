@@ -96,7 +96,7 @@ class ProductRealtimeSynchronizer
                     if (!$this->storeManager->getStore($productStoreId)->isActive()) {
                         continue;
                     }
-                    $storeProduct = $this->productRepository->getById($product->getId(), false, $productStoreId);
+                    $storeProduct = $this->productRepository->getById($product->getId(), false, $productStoreId, true);
                     $this->syncProductForStore($storeProduct, $productStoreId);
                 } catch (NoSuchEntityException $e) {
                 }
@@ -119,7 +119,8 @@ class ProductRealtimeSynchronizer
         $productIds = array_unique(array_filter($productIds));
         foreach ($productIds as $productId) {
             try {
-                $product = $this->productRepository->getById($productId, false, $storeId);
+                // Force reload: a cached instance still has the stock and salability from before the order.
+                $product = $this->productRepository->getById($productId, false, $storeId, true);
                 $this->syncProduct($product, $storeId);
             } catch (NoSuchEntityException $e) {
             }
@@ -147,62 +148,71 @@ class ProductRealtimeSynchronizer
                 return;
             }
 
-            if ($product->getStatus() == Status::STATUS_DISABLED) {
-                $this->api->removeProduct($product->getId(), $storeId);
-                return;
-            }
-
-            $visibility = $this->scopeConfig->getValue(
-                Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY,
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            );
-            if ('any' != $visibility && $product->getVisibility() != $visibility) {
-                return;
-            }
-
-            if ($this->scopeConfig->getValue(
-                Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY,
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            )) {
-                if (!$product->isSalable()) {
-                    return;
-                }
-            }
-
-            $confParentProductIds = $this->_productModelConfigurable->getParentIdsByChild($product->getId());
-            if (isset($confParentProductIds[0])) {
+            // Parents first: a hidden, disabled or sold-out child still changes its parent's price and stock.
+            foreach ($this->getParentIds($product) as $parentId) {
                 try {
-                    $confParentProduct = $this->productRepository->getById($confParentProductIds[0], false, $storeId);
-                    $this->api->addProduct(
-                        $this->productAdapter->getInfoForItem($confParentProduct, 'store', $storeId),
-                        $storeId
-                    );
+                    $parent = $this->productRepository->getById($parentId, false, $storeId, true);
+                    $this->pushProduct($parent, $storeId);
                 } catch (NoSuchEntityException $e) {
                 }
             }
 
-            $groupParentProductIds = $this->_productModelGrouped->getParentIdsByChild($product->getId());
-            if (isset($groupParentProductIds[0])) {
-                foreach ($groupParentProductIds as $groupParentProductId) {
-                    try {
-                        $groupParentProduct = $this->productRepository->getById($groupParentProductId, false, $storeId);
-                        $this->api->addProduct(
-                            $this->productAdapter->getInfoForItem($groupParentProduct, 'store', $storeId),
-                            $storeId
-                        );
-                    } catch (NoSuchEntityException $e) {
-                    }
-                }
-            }
-
-            $this->api->addProduct(
-                $this->productAdapter->getInfoForItem($product, 'store', $storeId),
-                $storeId
-            );
+            $this->pushProduct($product, $storeId);
         } finally {
             $this->emulation->stopEnvironmentEmulation();
         }
+    }
+
+    /**
+     * Add the product to Clerk, or remove it when it should no longer be in the feed.
+     *
+     * @param ProductModel|ProductInterface $product
+     * @param int|string $storeId
+     * @return void
+     */
+    protected function pushProduct($product, $storeId)
+    {
+        if ($product->getStatus() == Status::STATUS_DISABLED) {
+            $this->api->removeProduct($product->getId(), $storeId);
+            return;
+        }
+
+        $visibility = $this->scopeConfig->getValue(
+            Config::XML_PATH_PRODUCT_SYNCHRONIZATION_VISIBILITY,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+        if ('any' != $visibility && $product->getVisibility() != $visibility) {
+            return;
+        }
+
+        if ($this->scopeConfig->getValue(
+            Config::XML_PATH_PRODUCT_SYNCHRONIZATION_SALABLE_ONLY,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        )) {
+            if (!$product->isSalable()) {
+                // The feed leaves unsalable products out, so a sold-out product must leave Clerk too.
+                $this->api->removeProduct($product->getId(), $storeId);
+                return;
+            }
+        }
+
+        $this->api->addProduct(
+            $this->productAdapter->getInfoForItem($product, 'store', $storeId),
+            $storeId
+        );
+    }
+
+    /**
+     * @param ProductModel|ProductInterface $product
+     * @return int[]
+     */
+    protected function getParentIds($product)
+    {
+        return array_unique(array_merge(
+            $this->_productModelConfigurable->getParentIdsByChild($product->getId()),
+            $this->_productModelGrouped->getParentIdsByChild($product->getId())
+        ));
     }
 }
