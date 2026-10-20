@@ -13,7 +13,26 @@ class ProductRealtimeSynchronizerTest extends TestCase
     private const NOT_VISIBLE = 1;
     private const VISIBLE_BOTH = 4;
 
-    public function testSoldOutProductIsRemovedNotLeftInClerk(): void
+    public function testLastUnitSoldIsRemovedEvenWhenTheStockIndexIsStale(): void
+    {
+        // "Update by Schedule": the index still says salable, the stock item says out of stock.
+        [$sync, $api] = $this->synchronizer([10 => $this->product(10, true)], [10 => false]);
+
+        $sync->syncProductIds([10], 1);
+
+        $this->assertSame([['remove', 10]], $api->calls);
+    }
+
+    public function testRestockedProductIsAddedEvenWhenTheStockIndexIsStale(): void
+    {
+        [$sync, $api] = $this->synchronizer([10 => $this->product(10, false)], [10 => true]);
+
+        $sync->syncProduct($this->product(10, false), 1);
+
+        $this->assertSame([['add', 10]], $api->calls);
+    }
+
+    public function testProductWithoutManagedStockFallsBackToSalability(): void
     {
         [$sync, $api] = $this->synchronizer([10 => $this->product(10, false)]);
 
@@ -22,13 +41,13 @@ class ProductRealtimeSynchronizerTest extends TestCase
         $this->assertSame([['remove', 10]], $api->calls);
     }
 
-    public function testSalableProductIsAdded(): void
+    public function testStockCacheIsClearedBeforeEveryLoad(): void
     {
-        [$sync, $api] = $this->synchronizer([10 => $this->product(10, true)]);
+        [$sync, , , $log] = $this->synchronizer([10 => $this->product(10, true)], [10 => true]);
 
-        $sync->syncProductIds([10], 1);
+        $sync->syncProduct($this->product(10, true), 1);
 
-        $this->assertSame([['add', 10]], $api->calls);
+        $this->assertSame(['clear stock item 10', 'clear stock status 10', 'load 10 store 1 forced'], $log->entries);
     }
 
     public function testEditingAHiddenChildStillResyncsItsParent(): void
@@ -36,8 +55,9 @@ class ProductRealtimeSynchronizerTest extends TestCase
         [$sync, $api] = $this->synchronizer(
             [
                 11 => $this->product(11, true, self::NOT_VISIBLE),
-                20 => $this->product(20, true),
+                20 => $this->product(20, true, self::VISIBLE_BOTH, Status::STATUS_ENABLED, true),
             ],
+            [11 => true],
             [11 => [20]]
         );
 
@@ -51,8 +71,9 @@ class ProductRealtimeSynchronizerTest extends TestCase
         [$sync, $api] = $this->synchronizer(
             [
                 11 => $this->product(11, true, self::VISIBLE_BOTH, Status::STATUS_DISABLED),
-                20 => $this->product(20, true),
+                20 => $this->product(20, true, self::VISIBLE_BOTH, Status::STATUS_ENABLED, true),
             ],
+            [11 => true],
             [11 => [20]]
         );
 
@@ -61,36 +82,32 @@ class ProductRealtimeSynchronizerTest extends TestCase
         $this->assertSame([['add', 20], ['remove', 11]], $api->calls);
     }
 
-    public function testSoldOutParentIsRemoved(): void
+    public function testSoldOutConfigurableParentIsRemoved(): void
     {
         [$sync, $api] = $this->synchronizer(
             [
                 11 => $this->product(11, false, self::NOT_VISIBLE),
-                20 => $this->product(20, false),
+                20 => $this->product(20, false, self::VISIBLE_BOTH, Status::STATUS_ENABLED, true),
             ],
+            [11 => false, 20 => true],
             [11 => [20]]
         );
 
         $sync->syncProductIds([11], 1);
 
-        $this->assertSame([['remove', 20]], $api->calls);
-    }
-
-    public function testOrderSyncLoadsFreshProducts(): void
-    {
-        [$sync, , $repository] = $this->synchronizer([10 => $this->product(10, true)]);
-
-        $sync->syncProductIds([10], 1);
-
-        $this->assertSame([[10, 1, true]], $repository->loads);
+        $this->assertSame([['remove', 20]], $api->calls, 'composite products ignore their own stock flag');
     }
 
     /**
      * @param array<int, object> $products
+     * @param array<int, bool> $stock product ID => is_in_stock of a managed stock item; missing = no managed stock
      * @param array<int, int[]> $parents child ID => configurable parent IDs
      */
-    private function synchronizer(array $products, array $parents = []): array
+    private function synchronizer(array $products, array $stock = [], array $parents = []): array
     {
+        $log = new class {
+            public array $entries = [];
+        };
         $api = new class {
             public array $calls = [];
 
@@ -104,17 +121,60 @@ class ProductRealtimeSynchronizerTest extends TestCase
                 $this->calls[] = ['remove', $productId];
             }
         };
-        $repository = new class ($products) {
-            public array $loads = [];
-
-            public function __construct(private array $products)
+        $repository = new class ($products, $log) {
+            public function __construct(private array $products, private object $log)
             {
             }
 
             public function getById($id, $editMode = false, $storeId = null, $forceReload = false)
             {
-                $this->loads[] = [$id, $storeId, $forceReload];
+                $this->log->entries[] = "load $id store $storeId" . ($forceReload ? ' forced' : '');
                 return $this->products[$id];
+            }
+        };
+        $storage = new class ($log) {
+            public function __construct(private object $log)
+            {
+            }
+
+            public function removeStockItem($productId, $scopeId = null)
+            {
+                $this->log->entries[] = "clear stock item $productId";
+            }
+
+            public function removeStockStatus($productId, $scopeId = null)
+            {
+                $this->log->entries[] = "clear stock status $productId";
+            }
+        };
+        $registry = new class ($stock) {
+            public function __construct(private array $stock)
+            {
+            }
+
+            public function getStockItem($productId, $scopeId = null)
+            {
+                $managed = array_key_exists($productId, $this->stock);
+                return new class ($managed, $this->stock[$productId] ?? false) {
+                    public function __construct(private bool $managed, private bool $inStock)
+                    {
+                    }
+
+                    public function getItemId()
+                    {
+                        return $this->managed ? 1 : null;
+                    }
+
+                    public function getManageStock()
+                    {
+                        return $this->managed;
+                    }
+
+                    public function getIsInStock()
+                    {
+                        return $this->inStock;
+                    }
+                };
             }
         };
         $config = new class {
@@ -162,20 +222,35 @@ class ProductRealtimeSynchronizerTest extends TestCase
         $sync = (new ReflectionClass(ProductRealtimeSynchronizer::class))->newInstanceWithoutConstructor();
         $this->setProperty($sync, 'api', $api);
         $this->setProperty($sync, 'productRepository', $repository);
+        $this->setProperty($sync, 'stockRegistryStorage', $storage);
+        $this->setProperty($sync, 'stockRegistry', $registry);
         $this->setProperty($sync, 'scopeConfig', $config);
         $this->setProperty($sync, '_productModelConfigurable', $configurable);
         $this->setProperty($sync, '_productModelGrouped', $grouped);
         $this->setProperty($sync, 'productAdapter', $adapter);
         $this->setProperty($sync, 'emulation', $emulation);
 
-        return [$sync, $api, $repository];
+        return [$sync, $api, $repository, $log];
     }
 
-    private function product(int $id, bool $salable, int $visibility = self::VISIBLE_BOTH, int $status = Status::STATUS_ENABLED): object
-    {
-        return new class ($id, $salable, $visibility, $status) {
-            public function __construct(private int $id, private bool $salable, private int $visibility, private int $status)
-            {
+    /**
+     * @param bool $salable what Product::isSalable() returns, i.e. the stock index
+     */
+    private function product(
+        int $id,
+        bool $salable,
+        int $visibility = self::VISIBLE_BOTH,
+        int $status = Status::STATUS_ENABLED,
+        bool $composite = false
+    ): object {
+        return new class ($id, $salable, $visibility, $status, $composite) {
+            public function __construct(
+                private int $id,
+                private bool $salable,
+                private int $visibility,
+                private int $status,
+                private bool $composite
+            ) {
             }
 
             public function getId()
@@ -196,6 +271,21 @@ class ProductRealtimeSynchronizerTest extends TestCase
             public function getStatus()
             {
                 return $this->status;
+            }
+
+            public function getTypeInstance()
+            {
+                $composite = $this->composite;
+                return new class ($composite) {
+                    public function __construct(private bool $composite)
+                    {
+                    }
+
+                    public function isComposite($product)
+                    {
+                        return $this->composite;
+                    }
+                };
             }
         };
     }
