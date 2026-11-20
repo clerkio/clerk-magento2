@@ -70,6 +70,15 @@ namespace Magento\Store\Model {
     }
 }
 
+namespace Magento\Framework {
+    if (!interface_exists(UrlInterface::class)) {
+        interface UrlInterface
+        {
+            const URL_TYPE_LINK = 'link';
+        }
+    }
+}
+
 namespace Psr\Log {
     interface LoggerInterface
     {
