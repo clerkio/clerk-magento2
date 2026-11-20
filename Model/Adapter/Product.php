@@ -19,6 +19,7 @@ use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Api\TaxCalculationInterface;
 use Magento\Tax\Model\Calculation\Rate as TaxRate;
@@ -146,6 +147,11 @@ class Product extends AbstractAdapter
      * @var string|int|void
      */
     protected $scopeId;
+
+    /**
+     * @var array
+     */
+    private $dedicatedBaseUrl = [];
 
     /**
      * Summary of __construct
@@ -576,7 +582,7 @@ class Product extends AbstractAdapter
 
             //Add url fieldhandler
             $this->addFieldHandler('url', function ($item) {
-                return $item->setStoreId($this->scopeId)->getUrlInStore();
+                return $this->getFeedProductUrl($item);
             });
 
             //Add categories fieldhandler
@@ -989,6 +995,49 @@ class Product extends AbstractAdapter
         } catch (Exception $e) {
         }
         return $stockQuantity;
+    }
+
+    /**
+     * Get the product URL in the feed store view, without the store switch parameter
+     * when the store view is reachable on base URLs of its own
+     *
+     * @param mixed $item
+     * @return string
+     */
+    protected function getFeedProductUrl($item)
+    {
+        $url = $item->setStoreId($this->scopeId)->getUrlInStore();
+
+        if (!$this->hasDedicatedBaseUrl($this->storeManager->getStore($this->scopeId))) {
+            return $url;
+        }
+
+        return preg_replace(['/\?___store=[^&#]*&/', '/[?&]___store=[^&#]*/'], ['?', ''], $url);
+    }
+
+    /**
+     * @param mixed $store
+     * @return bool
+     */
+    protected function hasDedicatedBaseUrl($store)
+    {
+        $storeId = $store->getId();
+        if (!isset($this->dedicatedBaseUrl[$storeId])) {
+            $this->dedicatedBaseUrl[$storeId] = true;
+            foreach ($this->storeManager->getStores() as $other) {
+                if ($other->getId() == $storeId || !$other->isActive()) {
+                    continue;
+                }
+                foreach ([false, true] as $secure) {
+                    if ($other->getBaseUrl(UrlInterface::URL_TYPE_LINK, $secure) === $store->getBaseUrl(UrlInterface::URL_TYPE_LINK, $secure)) {
+                        $this->dedicatedBaseUrl[$storeId] = false;
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $this->dedicatedBaseUrl[$storeId];
     }
 
     /**
