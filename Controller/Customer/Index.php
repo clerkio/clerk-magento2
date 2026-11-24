@@ -241,8 +241,10 @@ class Index extends AbstractAction
 
     /**
      * Add when the newsletter status last changed, so Clerk can tell a real
-     * change from an old answer. Magento writes change_status_at in UTC only
-     * when the status changes; rows untouched since before 2.2.2 have none.
+     * change from an old answer. Magento writes change_status_at in UTC. From
+     * 2.4.0 it moves only when the status changes; before that it also moved on
+     * other customer saves, so a stale status would look new. Rows untouched
+     * since before 2.2.2 have none.
      *
      * @param array $data
      * @param mixed $changedAt
@@ -250,7 +252,7 @@ class Index extends AbstractAction
      */
     protected function addSubscriptionDate(array $data, $changedAt)
     {
-        if (!empty($changedAt)) {
+        if (!empty($changedAt) && version_compare($this->productMetadata->getVersion(), '2.4.0', '>=')) {
             $data['subscription_date'] = (string) $changedAt;
             $data['subscription_date_kind'] = 'change';
         }
