@@ -164,6 +164,9 @@ class Index extends AbstractAction
                             $sub_state->getId() ? $sub_state->getSubscriberStatus() : null
                         );
                         $_customer['unsub_url'] = $sub_state->getUnsubscriptionLink();
+                        if ($sub_state->getId()) {
+                            $_customer = $this->addSubscriptionDate($_customer, $sub_state->getChangeStatusAt());
+                        }
                     }
 
                     $Customers[] = $_customer;
@@ -183,6 +186,7 @@ class Index extends AbstractAction
                             $_sub['name'] = "";
                             $_sub['firstname'] = "";
                             $_sub['unsub_url'] = $sub_state->getUnsubscriptionLink();
+                            $_sub = $this->addSubscriptionDate($_sub, $subscriber['change_status_at'] ?? null);
                             $Customers[] = $_sub;
                         }
                     }
@@ -233,6 +237,25 @@ class Index extends AbstractAction
     public function getCustomerGender($GenderCode)
     {
         return $this->_customerMetadata->getAttributeMetadata('gender')->getOptions()[$GenderCode]->getLabel();
+    }
+
+    /**
+     * Add when the newsletter status last changed, so Clerk can tell a real
+     * change from an old answer. Magento writes change_status_at in UTC only
+     * when the status changes; rows untouched since before 2.2.2 have none.
+     *
+     * @param array $data
+     * @param mixed $changedAt
+     * @return array
+     */
+    protected function addSubscriptionDate(array $data, $changedAt)
+    {
+        if (!empty($changedAt)) {
+            $data['subscription_date'] = (string) $changedAt;
+            $data['subscription_date_kind'] = 'change';
+        }
+
+        return $data;
     }
 
     /**
